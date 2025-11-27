@@ -1,0 +1,63 @@
+import Image from "next/image";
+import { Check } from "lucide-react";
+
+const Understanding = () => {
+  const symptoms = [
+    "Tight, uncomfortable feeling",
+    "Flaky patches",
+    "Increased fine lines",
+    "Loss of plumpness",
+  ];
+
+  return (
+    <section className="py-16 sm:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div>
+            <p className="text-xs tracking-[0.2em] uppercase text-gray-600 mb-4">
+              UNDERSTANDING THE ISSUE
+            </p>
+            <h2 className="text-3xl font-semibold mb-6">
+              What Causes Dehydration?
+            </h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-12">
+              Dehydration can result from various factors including
+              environmental stressors, lifestyle habits, and natural aging
+              processes. Recognizing the symptoms early allows you to take
+              targeted action.
+            </p>
+
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold tracking-[0.1em] uppercase mb-6">
+                COMMON SYMPTOMS
+              </h3>
+              <div className="space-y-4">
+                {symptoms.map((symptom, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center shrink-0">
+                      <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                    </div>
+                    <span className="text-gray-700">{symptom}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Image */}
+          <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden">
+            <Image
+              src="/images/concern/concern1.jpg"
+              alt="Understanding Dehydration"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Understanding;

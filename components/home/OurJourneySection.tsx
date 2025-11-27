@@ -29,7 +29,7 @@ export default function OurJourneySection() {
             </p>
             <Link href="/shop">
               <button className="bg-white cursor-pointer text-black px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors">
-                Shope Now
+                Shop Now
               </button>
             </Link>
           </div>

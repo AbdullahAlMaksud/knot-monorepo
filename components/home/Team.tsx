@@ -49,7 +49,7 @@ const teamMembers = [
 
 const Team = () => {
   return (
-    <section className="py-16 sm:py-24 bg-white">
+    <section className="py-16 sm:py-24 bg-white mx-auto max-w-[1800px]">
       <div className="px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 max-w-7xl p-4 mx-auto ">

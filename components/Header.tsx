@@ -11,7 +11,7 @@ export default function Header() {
   const pathname = usePathname();
 
   // Pages that start with transparent header
-  const transparentPages = ["/", "/about", "/lab", "/blog"];
+  const transparentPages = ["/", "/about", "/lab", "/blog", "/concern"];
   const isTransparentPage =
     transparentPages.includes(pathname) || pathname.startsWith("/blog/");
 
