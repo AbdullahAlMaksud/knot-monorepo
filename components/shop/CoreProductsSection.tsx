@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
@@ -44,6 +45,18 @@ export default function CoreProductsSection({
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {/* Add to Cart Overlay */}
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button
+                    className="bg-white/90 cursor-pointer backdrop-blur-sm text-black px-8 py-3 rounded-full font-medium hover:bg-white transition-all duration-300 transform translate-y-4 group-hover:translate-y-0"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Add to cart logic here
+                    }}
+                  >
+                    Add to cart
+                  </button>
+                </div>
               </div>
               <div className="px-6 pb-6 w-full flex flex-col items-center">
                 <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition">
