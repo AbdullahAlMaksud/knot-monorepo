@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -29,6 +29,18 @@ export default function FeaturedProductHero() {
 
   const handleIncrease = () => {
     setQuantity(quantity + 1);
+  };
+
+  const handlePreviousImage = () => {
+    setSelectedImage((prev) =>
+      prev === 0 ? featuredProduct.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setSelectedImage((prev) =>
+      prev === featuredProduct.images.length - 1 ? 0 : prev + 1
+    );
   };
 
   return (
@@ -70,6 +82,23 @@ export default function FeaturedProductHero() {
                     className="object-cover"
                     priority
                   />
+
+                  {/* Navigation Arrows - Mobile Only */}
+                  <button
+                    onClick={handlePreviousImage}
+                    className="lg:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-white" />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white" />
+                  </button>
+
                   {/* Zoom icon */}
                   <button className="absolute bottom-4 right-4 w-12 h-12 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition">
                     <svg

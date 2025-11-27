@@ -19,8 +19,10 @@ export default function HeroSection() {
             <br />
             Glow
           </h1>
-          <p className="text-sm mb-6">
-            Transform your skin with science-backed formulations
+          <p className="text-sm mb-6 tracking-[0.2em]">
+            Byou brings you simple, pure, and effective beauty
+            <br />
+            essentials designed to highlight your true self.{" "}
           </p>
           <Link
             href="/shop"
