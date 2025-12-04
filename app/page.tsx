@@ -2,9 +2,6 @@ import Layout from "@/components/Layout";
 import HeroSection from "@/components/home/HeroSection";
 import OurStorySection from "@/components/home/OurStorySection";
 import OurJourneySection from "@/components/home/OurJourneySection";
-import PhilosophySection from "@/components/home/PhilosophySection";
-import IngredientsSection from "@/components/home/IngredientsSection";
-import CTASection from "@/components/shared/CTASection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
@@ -45,16 +42,11 @@ export default function Home() {
         <Info />
         <OurStorySection />
         <OurJourneySection />
-        {/* <PhilosophySection />
-      <IngredientsSection /> */}
         <ConcernsSection />
         <FeaturedProductHero />
         <Team />
         <FeaturedProductHero />
-        {/* <CTASection /> */}
-
         <BeforeAfterSection />
-
         <TestimonialsSection />
       </Layout>
     </>

@@ -26,14 +26,14 @@ const cartItems = [
     name: "Hydrating Essence",
     quantity: 1,
     price: 48,
-    image: "/images/product-1.jpg",
+    image: "/images/products/product1.jpg",
   },
   {
     id: 2,
     name: "Nourishing Cream",
     quantity: 1,
     price: 48,
-    image: "/images/product-2.jpg",
+    image: "/images/products/product2.jpg",
   },
 ];
 
@@ -52,9 +52,9 @@ export default function CheckoutPage() {
 
   return (
     <Layout>
-      <section className="py-16 sm:py-24">
+      <section className="py-16 sm:py-36">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl sm:text-4xl font-light mb-12">Checkout</h1>
+          <h1 className="text-3xl font-semibold mb-12">Checkout</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">

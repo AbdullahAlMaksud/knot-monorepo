@@ -28,7 +28,7 @@ export default function ShippingAddressForm({
   onSubmit,
 }: ShippingAddressFormProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-white">
       <h2 className="text-xl font-semibold mb-6">Shipping Address</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

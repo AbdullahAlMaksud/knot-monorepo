@@ -69,9 +69,9 @@ export default function MyAccountPage() {
 
   return (
     <Layout>
-      <section className="py-16 sm:py-24">
+      <div className="py-44">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl sm:text-4xl font-light mb-8">My Account</h1>
+          <h1 className="text-3xl font-semibold mb-8">My Account</h1>
 
           <AccountTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -101,7 +101,7 @@ export default function MyAccountPage() {
 
           {activeTab === "orders" && <OrderHistorySection />}
         </div>
-      </section>
+      </div>
     </Layout>
   );
 }

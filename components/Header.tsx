@@ -5,9 +5,11 @@ import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import CartDrawer from "./CartDrawer";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const pathname = usePathname();
 
   // Pages that start with transparent header
@@ -127,13 +129,18 @@ export default function Header() {
                 isSolid ? "text-black" : "text-white"
               }`}
             >
-              <button className="hover:text-gray-600 transition">
+              <button className="hover:opacity-70 cursor-pointer transition">
                 <Search size={20} />
               </button>
-              <button className="hover:text-gray-600 transition">
-                <User size={20} />
-              </button>
-              <button className="hover:text-gray-600 transition">
+              <Link href="/account">
+                <button className="hover:opacity-70 transition cursor-pointer">
+                  <User size={20} />
+                </button>
+              </Link>
+              <button
+                onClick={() => setCartOpen(true)}
+                className="hover:opacity-70 cursor-pointer transition"
+              >
                 <ShoppingBag size={20} />
               </button>
             </div>
@@ -201,6 +208,9 @@ export default function Header() {
           </div>
         )}
       </header>
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }

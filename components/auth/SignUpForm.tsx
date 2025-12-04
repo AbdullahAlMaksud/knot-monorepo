@@ -26,9 +26,7 @@ export default function SignUpForm() {
 
   return (
     <div className="max-w-md mx-auto w-full">
-      <h1 className="text-3xl sm:text-4xl font-light mb-8 text-center">
-        NEW HERE? JOIN US
-      </h1>
+      <h1 className="text-2xl font-light mb-8 text-right">NEW HERE? JOIN US</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
@@ -143,7 +141,7 @@ export default function SignUpForm() {
         </div>
       </form>
 
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-center space-y-2">
         <p className="text-sm text-gray-600">
           Already have an account?{" "}
           <Link
@@ -153,6 +151,14 @@ export default function SignUpForm() {
             Sign in here
           </Link>
         </p>
+        <div>
+          <Link
+            href="/auth/forgot-password"
+            className="text-sm text-gray-600 hover:text-black transition"
+          >
+            Forgot your password?
+          </Link>
+        </div>
       </div>
     </div>
   );

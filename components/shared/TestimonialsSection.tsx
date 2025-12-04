@@ -49,7 +49,7 @@ export default function TestimonialsSection() {
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative flex flex-col lg:flex-row lg:h-[600px]">
+      <div className="relative flex flex-col lg:flex-row">
         {/* Left Side - Fixed Header with Black Background */}
         <div className="w-full lg:w-[40%] bg-black flex items-center lg:sticky lg:top-0 lg:h-full z-10 py-12 lg:py-0">
           <div className="py-12 pl-8 sm:pl-36">

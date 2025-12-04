@@ -1,12 +1,8 @@
 import Layout from "@/components/Layout";
 import ProductDetailsSection from "@/components/product/ProductDetailsSection";
 import WhyChooseSection from "@/components/product/WhyChooseSection";
-import MakeSwitchSection from "@/components/product/MakeSwitchSection";
-import HowToUseSection from "@/components/product/HowToUseSection";
-import CTASection from "@/components/shared/CTASection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import FromUsToYouSection from "@/components/product/FromUsToYouSection";
-import MoreProductsSection from "@/components/product/MoreProductsSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import Info from "@/components/home/Info";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
@@ -28,9 +24,6 @@ export default function ProductDetailPage() {
         <ProductDetailsSection />
         <Info />
         <WhyChooseSection />
-        {/* <MakeSwitchSection />
-        <HowToUseSection />
-        <CTASection /> */}
         <BeforeAfterSection />
         <FromUsToYouSection />
         <CoreProductsSection

@@ -1,9 +1,6 @@
 import Layout from "@/components/Layout";
 import FeaturedProductHero from "@/components/shop/FeaturedProductHero";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
-import SignatureSerumSection from "@/components/shop/SignatureSerumSection";
-import TheCreamSection from "@/components/shop/TheCreamSection";
-import CTASection from "@/components/shared/CTASection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 
@@ -64,9 +61,6 @@ export default function ShopPage() {
           title="The Cream Your Skin Deserves"
           products={bestSellers2}
         />
-        {/* <SignatureSerumSection />
-        <TheCreamSection />
-        <CTASection /> */}
         <BeforeAfterSection />
         <TestimonialsSection />
       </div>

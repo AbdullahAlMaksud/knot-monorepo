@@ -27,7 +27,7 @@ export default function UserInfoForm({
   onSubmit,
 }: UserInfoFormProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-white">
       <h2 className="text-xl font-semibold mb-6">User Information</h2>
 
       <div className="flex items-center mb-6">

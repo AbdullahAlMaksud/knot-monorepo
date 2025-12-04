@@ -22,7 +22,7 @@ export default function SignInForm() {
 
   return (
     <div className="max-w-md mx-auto w-full">
-      <h1 className="text-3xl sm:text-4xl font-light mb-8 text-center">
+      <h1 className="text-2xl font-light mb-8 text-right">
         WELCOME BACK, SIGN IN
       </h1>
 
