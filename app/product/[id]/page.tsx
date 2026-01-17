@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import ProductDetailsSection from "@/components/product/ProductDetailsSection";
+import FeaturedProductHero from "@/components/shop/FeaturedProductHero";
 import WhyChooseSection from "@/components/product/WhyChooseSection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import FromUsToYouSection from "@/components/product/FromUsToYouSection";
@@ -13,7 +13,8 @@ const coreProducts = [
     name: "Glow Getter Brightening & Hydrating Serum",
     price: "From ₩925 DCU FR",
     rating: 5,
-    image: "/images/products/product1.jpg",
+    images: "/images/products/product1.jpg",
+    description: "Discover the secret to radiant skin with this expertly crafted serum that brightens and hydrates in one step.",
   },
 ];
 
@@ -21,7 +22,24 @@ export default function ProductDetailPage() {
   return (
     <Layout>
       <div className="pt-32">
-        <ProductDetailsSection />
+        <FeaturedProductHero
+          variant="light"
+          product={{
+            brand: "BYOU BEAUTY",
+            name: "Glow Contour Lifting Peptide Mist",
+            price: 63.0,
+            currency: "MYR",
+            images: [
+              "/images/products/product1.jpg",
+              "/images/products/product2.jpg",
+              "/images/products/product3.jpg",
+              "/images/products/product4.jpg",
+            ],
+            description:
+              "A revolutionary peptide mist that lifts, contours, and enhances your natural glow with advanced skincare technology. Perfect for daily use to achieve a radiant, youthful complexion.",
+            rating: 5,
+          }}
+        />
         <Info />
         <WhyChooseSection />
         <BeforeAfterSection />

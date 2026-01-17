@@ -13,14 +13,16 @@ const coreProducts = [
     name: "Glow Getter Brightening & Hydrating Serum",
     price: "From ₩925 DCU FR",
     rating: 5,
-    image: "/images/products/product1.jpg",
+    images: "/images/products/product1.jpg",
+    description: "Targeted solution for dull, dehydrated skin. This serum addresses your specific concerns with proven ingredients.",
   },
   {
     id: 2,
     name: "Glow Getter Brightening & Hydrating Serum",
     price: "From ₩925 DCU FR",
     rating: 5,
-    image: "/images/products/product2.jpg",
+    images: "/images/products/product2.jpg",
+    description: "Formulated to address your unique skin needs, delivering visible results for a healthier, more radiant complexion.",
   },
 ];
 

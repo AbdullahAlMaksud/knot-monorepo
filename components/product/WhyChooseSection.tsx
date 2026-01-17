@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Droplets, Droplet, Hand, Sparkles, Clock } from "lucide-react";
+import { Droplets, Droplet, Hand, Sparkles, Clock, Leaf, Flower2 } from "lucide-react";
 
 export default function WhyChooseSection() {
   const benefits = [
@@ -37,12 +37,35 @@ export default function WhyChooseSection() {
     },
   ];
 
+  const ingredients = [
+    {
+      icon: Leaf,
+      name: "Hyaluronic Acid",
+      benefit: "Deep hydration and plumping effect for youthful skin.",
+    },
+    {
+      icon: Flower2,
+      name: "Niacinamide",
+      benefit: "Reduces pores, evens skin tone, and strengthens barrier.",
+    },
+    {
+      icon: Droplets,
+      name: "Peptides",
+      benefit: "Stimulates collagen production for firmer, smoother skin.",
+    },
+    {
+      icon: Sparkles,
+      name: "Vitamin C",
+      benefit: "Brightens complexion and protects against free radicals.",
+    },
+  ];
+
   return (
     <section className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
           {/* Left Content */}
-          <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2 lg:order-1">
             <h2 className="text-3xl sm:text-5xl font-semibold mb-8">
               Why choose this serum?
             </h2>
@@ -80,7 +103,7 @@ export default function WhyChooseSection() {
           </div>
 
           {/* Right Image */}
-          <div className="relative h-[500px] lg:h-auto">
+          <div className="relative h-[500px] lg:h-auto order-1 lg:order-2">
             <Image
               src="/images/shop/choose.jpg"
               alt="Why choose this serum"
@@ -91,9 +114,9 @@ export default function WhyChooseSection() {
         </div>
 
         {/* How to Use Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
           {/* Left Image */}
-          <div className="relative h-[500px] lg:h-auto">
+          <div className="relative h-[500px] lg:h-auto order-1">
             <Image
               src="/images/shop/how.jpg"
               alt="How to use"
@@ -103,7 +126,7 @@ export default function WhyChooseSection() {
           </div>
 
           {/* Right Content - Black Background */}
-          <div className="bg-black text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="bg-black text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6">
               How to Use
             </h2>
@@ -133,6 +156,52 @@ export default function WhyChooseSection() {
                 );
               })}
             </div>
+          </div>
+        </div>
+
+        {/* Ingredients Section */}
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
+          {/* Left Content */}
+          <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2 lg:order-1">
+            <h2 className="text-3xl sm:text-5xl font-semibold mb-8">
+              Key Ingredients
+            </h2>
+            <p className="text-gray-700 mb-12 text-sm leading-relaxed">
+              Our serum is formulated with carefully selected, potent ingredients
+              that work in harmony to deliver visible results. Each component is
+              chosen for its proven efficacy and gentle nature on all skin types.
+            </p>
+
+            <div className="space-y-6">
+              {ingredients.map((ingredient, index) => {
+                const Icon = ingredient.icon;
+                return (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="shrink-0">
+                      <Icon size={24} className="text-black" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-1 text-black">
+                        {ingredient.name}
+                      </h3>
+                      <p className="text-gray-700 text-sm leading-relaxed">
+                        {ingredient.benefit}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Image */}
+          <div className="relative h-[500px] lg:h-auto order-1 lg:order-2">
+            <Image
+              src="/images/about/ingredient1.jpg"
+              alt="Key Ingredients"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </div>

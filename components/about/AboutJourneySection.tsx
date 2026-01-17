@@ -23,9 +23,9 @@ export default function AboutJourneySection() {
     <section className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Our Journey Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
           {/* Left Image */}
-          <div className="relative h-[500px] lg:h-auto">
+          <div className="relative h-[500px] lg:h-auto order-1">
             <Image
               src="/images/about/journey.jpg"
               alt="Our Journey"
@@ -35,7 +35,7 @@ export default function AboutJourneySection() {
           </div>
 
           {/* Right Content */}
-          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2">
             <h2 className="text-3xl font-semibold mb-8">Our Journey</h2>
             <div className="space-y-6 text-gray-700 text-sm leading-relaxed">
               <p>
@@ -59,9 +59,9 @@ export default function AboutJourneySection() {
         </div>
 
         {/* Our Philosophy Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
           {/* Left Content - Black Background */}
-          <div className="bg-black text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="bg-black text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2 lg:order-1">
             <h2 className="text-3xl font-semibold mb-8">Our Philosophy</h2>
             <p className="text-gray-300 mb-12 leading-relaxed text-sm">
               Founded in 2018, Byou began with a clear mission: to create
@@ -86,7 +86,7 @@ export default function AboutJourneySection() {
           </div>
 
           {/* Right Image */}
-          <div className="relative h-[500px] lg:h-auto">
+          <div className="relative h-[500px] lg:h-auto order-1 lg:order-2">
             <Image
               src="/images/about/product.jpg"
               alt="Our Philosophy"
@@ -95,6 +95,46 @@ export default function AboutJourneySection() {
             />
           </div>
         </div>
+
+        {/* Mission Section */}
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-0">
+          {/* Left Image */}
+          <div className="relative h-[500px] lg:h-auto order-1">
+            <Image
+              src="/images/about/product.jpg"
+              alt="Our Mission"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          {/* Right Content */}
+          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center order-2">
+            <h2 className="text-3xl font-semibold mb-8">Our Mission & Vision</h2>
+            <div className="space-y-6 text-gray-700 text-sm leading-relaxed">
+              <p>
+                At Byou, our mission is to empower individuals to embrace their
+                natural beauty through clean, effective skincare solutions. We
+                believe that everyone deserves access to products that are both
+                safe for their skin and kind to the planet.
+              </p>
+              <p>
+                We are committed to creating formulations that prioritize
+                transparency, quality, and sustainability. Every product we
+                develop undergoes rigorous testing to ensure it meets our high
+                standards for efficacy and safety.
+              </p>
+              <p>
+                Our mission extends beyond skincare—we aim to foster a community
+                where self-care is accessible, honest, and empowering. Byou is
+                more than a brand; it&apos;s a movement toward authentic beauty
+                and wellness.
+              </p>
+            </div>
+          </div>
+        </div>
+
+     
       </div>
     </section>
   );

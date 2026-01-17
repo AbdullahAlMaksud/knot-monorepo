@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import Image from "next/image";
+import { Button } from "../ui/button";
 
 type FormData = {
   name: string;
@@ -108,12 +109,12 @@ export default function ContactFormSection() {
                 )}
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full sm:w-auto bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition"
+                className="w-full sm:w-auto bg-black text-white px-8 py-6 rounded-full hover:bg-gray-800 transition"
               >
                 Let Us Know
-              </button>
+              </Button>
             </form>
           </div>
 

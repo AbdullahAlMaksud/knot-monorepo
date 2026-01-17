@@ -1,14 +1,16 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Product {
   id: number;
   name: string;
   price: string;
   rating: number;
-  image: string;
+  images: string | string[]; // Single image string or array of images for carousel
+  description?: string; // Optional description for the product
 }
 
 interface CoreProductsSectionProps {
@@ -22,6 +24,35 @@ export default function CoreProductsSection({
   title,
   products,
 }: CoreProductsSectionProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
+
+  const getProductImages = (product: Product): string[] => {
+    // Normalize to array: if it's a string, convert to array; if already array, use it
+    return Array.isArray(product.images) ? product.images : [product.images];
+  };
+
+  const getCurrentIndex = (productId: number): number => {
+    return currentImageIndex[productId] || 0;
+  };
+
+  const goToPrevious = (productId: number, totalImages: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) - 1 + totalImages) % totalImages,
+    }));
+  };
+
+  const goToNext = (productId: number, totalImages: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => ({
+      ...prev,
+      [productId]: ((prev[productId] || 0) + 1) % totalImages,
+    }));
+  };
+
   return (
     <section className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,45 +63,114 @@ export default function CoreProductsSection({
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {products.map((product) => (
-            <Link
-              key={product.id}
-              href={`/product/${product.id}`}
-              className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
-            >
-              <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {/* Add to Cart Overlay */}
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {products.map((product) => {
+            const images = getProductImages(product);
+            const currentIndex = getCurrentIndex(product.id);
+            const hasMultipleImages = images.length > 1;
+
+            return (
+              <div
+                key={product.id}
+                className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
+              >
+                <Link
+                  href={`/product/${product.id}`}
+                  className="w-full"
+                >
+                  <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
+                    {images.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`absolute inset-0 transition-opacity duration-500 ${
+                          index === currentIndex ? "opacity-100" : "opacity-0"
+                        }`}
+                      >
+                        <Image
+                          src={image}
+                          alt={`${product.name} - Image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                    
+                    {/* Navigation Arrows */}
+                    {hasMultipleImages && (
+                      <>
+                        <button
+                          onClick={(e) => goToPrevious(product.id, images.length, e)}
+                          className="absolute cursor-pointer left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2 rounded-full transition-all"
+                          aria-label="Previous image"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={(e) => goToNext(product.id, images.length, e)}
+                          className="absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2 rounded-full transition-all"
+                          aria-label="Next image"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Dots Indicator */}
+                    {hasMultipleImages && (
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+                        {images.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCurrentImageIndex((prev) => ({
+                                ...prev,
+                                [product.id]: index,
+                              }));
+                            }}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              index === currentIndex
+                                ? "bg-white w-6"
+                                : "bg-white/50 hover:bg-white/75"
+                            }`}
+                            aria-label={`Go to image ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                
+                <div className="px-6 pb-6 w-full flex flex-col items-center">
+                  <Link href={`/product/${product.id}`}>
+                    <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition text-center">
+                      {product.name}
+                    </h3>
+                  </Link>
+                  {product.description && (
+                    <p className="text-sm text-gray-500 mb-2 text-center max-w-md">
+                      {product.description}
+                    </p>
+                  )}
+                  <p className="text-gray-600 mb-2 font-medium">{product.price}</p>
+                 
+                  <div className="flex items-center gap-1 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} size={16} fill="black" />
+                    ))}
+                  </div>
                   <button
-                    className="bg-white/90 cursor-pointer backdrop-blur-sm text-black px-8 py-3 rounded-full font-medium hover:bg-white transition-all duration-300 transform translate-y-4 group-hover:translate-y-0"
+                    className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-all duration-300 w-full"
                     onClick={(e) => {
                       e.preventDefault();
-                      // Add to cart logic here
                     }}
                   >
                     Add to cart
                   </button>
                 </div>
               </div>
-              <div className="px-6 pb-6 w-full flex flex-col items-center">
-                <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition">
-                  {product.name}
-                </h3>
-                <p className="text-gray-600 mb-2">{product.price}</p>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={16} fill="black" />
-                  ))}
-                </div>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

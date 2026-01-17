@@ -51,8 +51,8 @@ export default function TestimonialsSection() {
     <section className="relative overflow-hidden">
       <div className="relative flex flex-col lg:flex-row">
         {/* Left Side - Fixed Header with Black Background */}
-        <div className="w-full lg:w-[40%] bg-black flex items-center lg:sticky lg:top-0 lg:h-full z-10 py-12 lg:py-0">
-          <div className="py-12 pl-8 sm:pl-36">
+        <div className="w-full lg:w-[40%] bg-black flex items-center lg:sticky lg:top-0 lg:h-screen z-10 py-8 lg:py-0">
+          <div className="py-8 lg:py-12 pl-8 sm:pl-36 w-full">
             <div>
               <p className="text-gray-400 text-xs tracking-[0.2em] uppercase mb-4">
                 TESTIMONIALS
@@ -67,15 +67,15 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Right Side - White Background with Scrollable Testimonials */}
-        <div className="w-full lg:w-[60%] bg-white relative lg:absolute lg:right-0 lg:top-0 lg:h-full py-12 lg:py-0">
+        <div className="w-full lg:w-[60%] bg-white relative py-8 lg:py-0">
           <div
-            className="overflow-x-scroll scrollbar-hide lg:h-full"
+            className="overflow-x-scroll scrollbar-hide lg:h-screen"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
             }}
           >
-            <div className="flex gap-6 py-12 px-4 sm:px-6 lg:px-8 min-w-max items-center lg:h-full">
+            <div className="flex gap-6 py-8 lg:py-12 px-4 sm:px-6 lg:px-8 min-w-max items-center lg:h-full">
               {testimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
