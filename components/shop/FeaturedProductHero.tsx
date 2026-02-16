@@ -3,7 +3,8 @@
 import { ShoppingCart, ChevronLeft, ChevronRight, Star, ZoomIn, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart/CartContext";
 
 interface FeaturedProductHeroProps {
   product?: {
@@ -24,6 +25,7 @@ export default function FeaturedProductHero({
 }: FeaturedProductHeroProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   const featuredProduct = {
     brand: product?.brand || "BYOU BEAUTY",
@@ -65,6 +67,16 @@ export default function FeaturedProductHero({
     );
   };
 
+  const handleAddToCart = () => {
+    addItem({
+      id: "featured",
+      name: featuredProduct.name,
+      price: featuredProduct.price,
+      image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
+      quantity,
+    });
+  };
+
   const isDark = variant === "dark";
   const containerBg = isDark ? "bg-black" : "";
   const containerPadding = isDark ? "p-8 sm:p-10 lg:p-12" : "";
@@ -98,10 +110,12 @@ export default function FeaturedProductHero({
               {/* Thumbnail Gallery */}
               <div className="hidden lg:flex flex-col gap-3">
                 {featuredProduct.images.map((image, index) => (
-                  <button
+                  <Button
                     key={index}
+                    type="button"
+                    variant="ghost"
                     onClick={() => setSelectedImage(index)}
-                    className={`relative w-[140px] h-[140px] rounded-2xl overflow-hidden transition-all shrink-0 ${
+                    className={`relative w-[140px] h-[140px] rounded-2xl overflow-hidden transition-all shrink-0 p-0 ${
                       selectedImage === index
                         ? `ring-2 ${thumbnailRing}`
                         : "opacity-60 hover:opacity-100"
@@ -113,7 +127,7 @@ export default function FeaturedProductHero({
                       fill
                       className="object-cover"
                     />
-                  </button>
+                  </Button>
                 ))}
               </div>
 
@@ -131,20 +145,26 @@ export default function FeaturedProductHero({
                   {/* Navigation Arrows - Mobile Only */}
                   {isDark && (
                     <>
-                      <button
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handlePreviousImage}
-                        className="lg:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        className="lg:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full hover:bg-black/70 text-white"
                         aria-label="Previous image"
                       >
-                        <ChevronLeft className="w-6 h-6 text-white" />
-                      </button>
-                      <button
+                        <ChevronLeft className="w-6 h-6" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handleNextImage}
-                        className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full hover:bg-black/70 text-white"
                         aria-label="Next image"
                       >
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      </button>
+                        <ChevronRight className="w-6 h-6" />
+                      </Button>
                     </>
                   )}
 
@@ -157,12 +177,15 @@ export default function FeaturedProductHero({
                 {/* Mobile Thumbnail Dots */}
                 <div className="flex lg:hidden justify-center gap-2 mt-4">
                   {featuredProduct.images.map((_, index) => (
-                    <button
+                    <Button
                       key={index}
+                      type="button"
+                      variant="ghost"
                       onClick={() => setSelectedImage(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
+                      className={`h-2 min-w-0 p-0 rounded-full transition-all ${
                         selectedImage === index ? `${dotColor} w-8` : dotColorInactive
                       }`}
+                      aria-label={`Go to image ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -208,28 +231,38 @@ export default function FeaturedProductHero({
 
               {/* Quantity Controls */}
               <div className="flex items-center gap-6 mb-8">
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handleDecrease}
-                  className={`w-14 h-14 rounded-full cursor-pointer border-2 ${borderColor} flex items-center justify-center ${hoverBg} transition`}
+                  className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Decrease quantity"
                 >
                   <span className="text-2xl leading-none">−</span>
-                </button>
+                </Button>
                 <span className={`text-3xl font-medium w-12 text-center ${textColor}`}>
                   {quantity}
                 </span>
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handleIncrease}
-                  className={`w-14 h-14 rounded-full cursor-pointer border-2 ${borderColor} flex items-center justify-center ${hoverBg} transition`}
+                  className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Increase quantity"
                 >
                   <span className="text-2xl leading-none">+</span>
-                </button>
+                </Button>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-4">
-                <Button className={`w-full ${buttonPrimary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}>
+                <Button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className={`w-full ${buttonPrimary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
+                >
                   Add to cart
                   <ArrowRight className="w-5 h-5" />
                 </Button>

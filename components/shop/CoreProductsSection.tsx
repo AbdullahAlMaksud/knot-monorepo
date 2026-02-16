@@ -3,20 +3,19 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
-
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  rating: number;
-  images: string | string[]; // Single image string or array of images for carousel
-  description?: string; // Optional description for the product
-}
+import { useCart } from "@/lib/cart/CartContext";
+import { Button } from "@/components/ui/button";
+import type { Product } from "@/data/products";
 
 interface CoreProductsSectionProps {
   subtitle?: string;
   title: string;
   products: Product[];
+}
+
+function parsePrice(price: string): number {
+  const n = parseFloat(price.replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : 48;
 }
 
 export default function CoreProductsSection({
@@ -25,6 +24,7 @@ export default function CoreProductsSection({
   products,
 }: CoreProductsSectionProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
+  const { addItem } = useCart();
 
   const getProductImages = (product: Product): string[] => {
     // Normalize to array: if it's a string, convert to array; if already array, use it
@@ -97,20 +97,26 @@ export default function CoreProductsSection({
                     {/* Navigation Arrows */}
                     {hasMultipleImages && (
                       <>
-                        <button
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="icon"
                           onClick={(e) => goToPrevious(product.id, images.length, e)}
-                          className="absolute cursor-pointer left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2 rounded-full transition-all"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Previous image"
                         >
                           <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="icon"
                           onClick={(e) => goToNext(product.id, images.length, e)}
-                          className="absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2 rounded-full transition-all"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Next image"
                         >
                           <ChevronRight className="w-5 h-5" />
-                        </button>
+                        </Button>
                       </>
                     )}
 
@@ -118,8 +124,10 @@ export default function CoreProductsSection({
                     {hasMultipleImages && (
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                         {images.map((_, index) => (
-                          <button
+                          <Button
                             key={index}
+                            type="button"
+                            variant="ghost"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -128,7 +136,7 @@ export default function CoreProductsSection({
                                 [product.id]: index,
                               }));
                             }}
-                            className={`w-2 h-2 rounded-full transition-all ${
+                            className={`h-2 min-w-0 p-0 rounded-full transition-all ${
                               index === currentIndex
                                 ? "bg-white w-6"
                                 : "bg-white/50 hover:bg-white/75"
@@ -159,14 +167,24 @@ export default function CoreProductsSection({
                       <Star key={star} size={16} fill="black" />
                     ))}
                   </div>
-                  <button
-                    className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition-all duration-300 w-full"
+                  <Button
+                    type="button"
+                    className="w-full rounded-full"
                     onClick={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
+                      const images = getProductImages(product);
+                      addItem({
+                        id: product.id,
+                        name: product.name,
+                        price: parsePrice(product.price),
+                        image: typeof product.images === "string" ? product.images : product.images[0] ?? "",
+                        quantity: 1,
+                      });
                     }}
                   >
                     Add to cart
-                  </button>
+                  </Button>
                 </div>
               </div>
             );

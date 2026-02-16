@@ -5,6 +5,7 @@ import Link from "next/link";
 import Layout from "@/components/Layout";
 import AuthHero from "@/components/auth/AuthHero";
 import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -72,12 +73,9 @@ export default function ForgotPasswordPage() {
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-                >
+                <Button type="submit" className="w-full rounded-full">
                   Send Reset Link
-                </button>
+                </Button>
               </form>
 
               <div className="mt-8 text-center">

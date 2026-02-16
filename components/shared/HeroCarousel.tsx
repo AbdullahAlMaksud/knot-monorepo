@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export interface MediaItem {
   type: "image" | "video";
@@ -118,20 +119,26 @@ export default function HeroCarousel({
       {/* Navigation Arrows */}
       {mediaItems.length > 1 && (
         <>
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={goToPrevious}
-            className="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition-all backdrop-blur-sm"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={goToNext}
-            className="absolute cursor-pointer right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition-all backdrop-blur-sm"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white rounded-full backdrop-blur-sm"
             aria-label="Next slide"
           >
             <ChevronRight className="w-6 h-6" />
-          </button>
+          </Button>
         </>
       )}
 
@@ -147,12 +154,9 @@ export default function HeroCarousel({
             </p>
           )}
           {buttonText && (
-            <Link
-              href={buttonLink}
-              className="inline-block bg-white text-black px-8 py-2 rounded-full hover:bg-gray-100 transition"
-            >
-              {buttonText}
-            </Link>
+            <Button asChild className="rounded-full bg-white text-black hover:bg-gray-100">
+              <Link href={buttonLink}>{buttonText}</Link>
+            </Button>
           )}
         </div>
       </div>
@@ -161,10 +165,12 @@ export default function HeroCarousel({
       {mediaItems.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
           {mediaItems.map((_, index) => (
-            <button
+            <Button
               key={index}
+              type="button"
+              variant="ghost"
               onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
+              className={`h-2 min-w-0 p-0 rounded-full transition-all ${
                 index === currentIndex
                   ? "bg-white w-8"
                   : "bg-white/50 hover:bg-white/75"

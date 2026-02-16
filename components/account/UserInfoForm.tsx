@@ -5,6 +5,7 @@ import {
   FieldErrors,
   UseFormHandleSubmit,
 } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 
 type ProfileFormData = {
   fullName: string;
@@ -18,6 +19,7 @@ type UserInfoFormProps = {
   errors: FieldErrors<ProfileFormData>;
   handleSubmit: UseFormHandleSubmit<ProfileFormData>;
   onSubmit: (data: ProfileFormData) => void;
+  userImage?: string | null;
 };
 
 export default function UserInfoForm({
@@ -25,6 +27,7 @@ export default function UserInfoForm({
   errors,
   handleSubmit,
   onSubmit,
+  userImage,
 }: UserInfoFormProps) {
   return (
     <div className="bg-white">
@@ -33,11 +36,24 @@ export default function UserInfoForm({
       <div className="flex items-center mb-6">
         <div className="relative">
           <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-500" />
+            {userImage ? (
+              <img
+                src={userImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-500" />
+            )}
           </div>
-          <button className="absolute bottom-0 right-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs hover:bg-gray-800 transition">
+          <Button
+            type="button"
+            size="icon"
+            className="absolute bottom-0 right-0 w-6 h-6 rounded-full text-xs"
+            aria-label="Change photo"
+          >
             ✓
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -120,12 +136,9 @@ export default function UserInfoForm({
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-        >
+        <Button type="submit" className="rounded-full">
           Update Profile
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Star, Upload, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type OrderItem = {
   id: number;
@@ -36,13 +37,14 @@ export default function OrderItemsList({
   if (showReviewForm) {
     return (
       <div className="bg-white border rounded-lg p-6 mb-6">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => setShowReviewForm(false)}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-6 transition"
+          className="mb-6 text-gray-600 hover:text-black"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} className="mr-2" />
           Back
-        </button>
+        </Button>
 
         <div className="mb-6">
           <h3 className="font-semibold mb-4">Order Items</h3>
@@ -86,8 +88,11 @@ export default function OrderItemsList({
             <label className="block text-sm font-semibold mb-2">Rating</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
+                <Button
                   key={star}
+                  type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
@@ -103,7 +108,7 @@ export default function OrderItemsList({
                     }
                     className="transition-colors"
                   />
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -122,15 +127,14 @@ export default function OrderItemsList({
           </div>
 
           <div className="flex gap-4 pt-4">
-            <button
+            <Button
+              variant="outline"
               onClick={() => setShowReviewForm(false)}
-              className="flex-1 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium">
-              Submit
-            </button>
+            </Button>
+            <Button className="flex-1">Submit</Button>
           </div>
         </div>
       </div>

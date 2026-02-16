@@ -1,7 +1,8 @@
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type CartItem = {
-  id: number;
+  id: number | string;
   name: string;
   quantity: number;
   price: number;
@@ -11,11 +12,15 @@ type CartItem = {
 type OrderSummaryProps = {
   cartItems: CartItem[];
   onConfirmOrder: () => void;
+  submitting?: boolean;
+  submitError?: string | null;
 };
 
 export default function OrderSummary({
   cartItems,
   onConfirmOrder,
+  submitting = false,
+  submitError = null,
 }: OrderSummaryProps) {
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -63,13 +68,17 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <button
+      {submitError && (
+        <p className="text-sm text-red-600 mt-2">{submitError}</p>
+      )}
+      <Button
         type="button"
         onClick={onConfirmOrder}
-        className="w-full mt-6 bg-black text-white py-3 rounded-full hover:bg-gray-800 transition font-medium"
+        disabled={submitting || cartItems.length === 0}
+        className="w-full mt-6 rounded-full"
       >
-        Confirm Order
-      </button>
+        {submitting ? "Placing order…" : "Confirm Order"}
+      </Button>
     </div>
   );
 }

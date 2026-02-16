@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, Play } from "lucide-react";
 import Layout from "@/components/Layout";
+import { Button } from "@/components/ui/button";
 
 const blogPosts = [
   {
@@ -158,15 +159,16 @@ export default function BlogPage() {
                 <h3 className="text-xl font-semibold mb-4">Categories</h3>
                 <div className="space-y-2">
                   {categories.map((category, index) => (
-                    <button
+                    <Button
                       key={index}
-                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg hover:bg-gray-100 transition text-left"
+                      variant="ghost"
+                      className="w-full flex items-center justify-between px-4 py-2 h-auto font-normal text-left"
                     >
                       <span>{category.name}</span>
                       <span className="text-gray-500 text-sm">
                         {category.count}
                       </span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -176,12 +178,9 @@ export default function BlogPage() {
                 <h3 className="text-xl font-semibold mb-4">Popular Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {popularTags.map((tag, index) => (
-                    <button
-                      key={index}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition"
-                    >
+                    <Button key={index} variant="secondary" size="sm" className="rounded-full">
                       {tag}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -238,9 +237,7 @@ export default function BlogPage() {
 
               {/* Load More Button */}
               <div className="text-center">
-                <button className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition">
-                  Load More
-                </button>
+                <Button className="rounded-full">Load More</Button>
               </div>
             </div>
           </div>
@@ -277,9 +274,9 @@ export default function BlogPage() {
                 Watch real testimonials and learn how BYOU has transformed
                 skincare routines around the world.
               </p>
-              <button className="bg-white text-black px-8 py-3 rounded-full hover:bg-gray-200 transition">
+              <Button variant="secondary" className="rounded-full bg-white text-black hover:bg-gray-200">
                 Watch More
-              </button>
+              </Button>
             </div>
           </div>
         </div>

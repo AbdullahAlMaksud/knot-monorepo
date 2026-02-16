@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type FAQItem = {
   question: string;
@@ -71,9 +72,10 @@ export default function FAQSection() {
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index} className="border-b border-gray-200 pb-4">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                    className="w-full flex items-center justify-between text-left py-2 hover:text-gray-600 transition"
+                    className="w-full flex items-center justify-between text-left py-2 hover:text-gray-600"
                   >
                     <span className="font-medium">{faq.question}</span>
                     {openFAQ === index ? (
@@ -81,7 +83,7 @@ export default function FAQSection() {
                     ) : (
                       <ChevronDown size={20} className="shrink-0 ml-2" />
                     )}
-                  </button>
+                  </Button>
                   {openFAQ === index && (
                     <div className="mt-2 text-sm text-gray-600 leading-relaxed">
                       {faq.answer}

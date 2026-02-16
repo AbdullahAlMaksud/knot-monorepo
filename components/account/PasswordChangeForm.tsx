@@ -6,6 +6,9 @@ import {
   UseFormWatch,
   UseFormHandleSubmit,
 } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 type PasswordFormData = {
   currentPassword: string;
@@ -28,7 +31,14 @@ export default function PasswordChangeForm({
   handleSubmit,
   onSubmit,
 }: PasswordChangeFormProps) {
+  const router = useRouter();
   const newPassword = watch("newPassword");
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/auth/signin");
+    router.refresh();
+  };
 
   return (
     <div className="bg-white">
@@ -98,17 +108,19 @@ export default function PasswordChangeForm({
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-        >
+        <Button type="submit" className="rounded-full">
           Change Password
-        </button>
+        </Button>
       </form>
 
-      <button className="mt-6 text-red-600 border border-red-600 px-6 py-2 rounded-full hover:bg-red-50 transition font-medium">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleSignOut}
+        className="mt-6 text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700"
+      >
         Log Out
-      </button>
+      </Button>
     </div>
   );
 }

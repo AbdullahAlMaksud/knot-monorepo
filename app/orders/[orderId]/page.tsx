@@ -1,74 +1,131 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import OrderHeader from "@/components/orders/OrderHeader";
 import OrderItemsList from "@/components/orders/OrderItemsList";
 import ShippingAddressCard from "@/components/orders/ShippingAddressCard";
 import SupportSection from "@/components/orders/SupportSection";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-const orderItems = [
-  {
-    id: 1,
-    name: "Hydrating Essence",
-    quantity: 1,
-    price: 48.0,
-    image: "/images/products/product1.jpg",
-  },
-  {
-    id: 2,
-    name: "Nourishing Cream",
-    quantity: 1,
-    price: 48.0,
-    image: "/images/products/product2.jpg",
-  },
-];
+type OrderData = {
+  orderId: string;
+  items: { name: string; image: string; price: number; quantity: number }[];
+  shipping: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    apartment: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  totals: { subtotal: number; shipping: number; total: number };
+  status: string;
+  date: string;
+};
 
 export default function OrderTrackingPage() {
+  const params = useParams();
+  const orderId = params?.orderId as string | undefined;
+  const [order, setOrder] = useState<OrderData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"summary" | "shipping">("summary");
   const [showReviewForm, setShowReviewForm] = useState(false);
+
+  useEffect(() => {
+    if (!orderId) return;
+    let cancelled = false;
+    fetch(`/api/orders/${encodeURIComponent(orderId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? "Order not found" : "Failed to load order");
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) {
+          setOrder({
+            ...data,
+            date: data.date ? new Date(data.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—",
+          });
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) setError(e.message ?? "Failed to load order");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
+
+  const orderItems = order?.items?.map((item, i) => ({ ...item, id: i })) ?? [];
+  const effectiveLoading = !!orderId && loading;
+  const effectiveError = !orderId ? "Missing order ID" : error;
+
+  if (effectiveLoading) {
+    return (
+      <Layout>
+        <div className="py-12 sm:py-16 lg:py-24 max-w-4xl mx-auto px-4 text-center">
+          <p className="text-gray-600">Loading order…</p>
+        </div>
+      </Layout>
+    );
+  }
+  if (effectiveError || !order) {
+    return (
+      <Layout>
+        <div className="py-12 sm:py-16 lg:py-24 max-w-4xl mx-auto px-4 text-center">
+          <p className="text-red-600 mb-4">{effectiveError ?? "Order not found"}</p>
+          <Link href="/account" className="text-black underline">Back to Account</Link>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="py-12 sm:py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <OrderHeader />
+          <OrderHeader orderId={order.orderId} date={order.date} status={order.status} />
 
-          {/* Tab Navigation with Write a Review button */}
           {!showReviewForm && (
             <div className="flex justify-between items-center mb-6">
               <div className="flex gap-4">
-                <button
+                <Button
+                  type="button"
                   onClick={() => setActiveTab("summary")}
-                  className={`px-6 py-2 rounded-full cursor-pointer font-medium transition ${
-                    activeTab === "summary"
-                      ? "bg-black text-white"
-                      : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
-                  }`}
+                  variant={activeTab === "summary" ? "default" : "outline"}
+                  className="rounded-full"
                 >
                   Summary
-                </button>
-                <button
+                </Button>
+                <Button
+                  type="button"
                   onClick={() => setActiveTab("shipping")}
-                  className={`px-6 py-2 rounded-full cursor-pointer font-medium transition ${
-                    activeTab === "shipping"
-                      ? "bg-black text-white"
-                      : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
-                  }`}
+                  variant={activeTab === "shipping" ? "default" : "outline"}
+                  className="rounded-full"
                 >
                   Shipping
-                </button>
+                </Button>
               </div>
-              <button
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setShowReviewForm(true)}
-                className="px-6 py-2 rounded-full cursor-pointer font-medium transition bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
+                className="rounded-full"
               >
                 Write a Review
-              </button>
+              </Button>
             </div>
           )}
 
-          {/* Review Form */}
           {showReviewForm && (
             <OrderItemsList
               orderItems={orderItems}
@@ -77,7 +134,6 @@ export default function OrderTrackingPage() {
             />
           )}
 
-          {/* Tab Content */}
           {!showReviewForm && activeTab === "summary" && (
             <>
               <OrderItemsList
@@ -91,7 +147,7 @@ export default function OrderTrackingPage() {
 
           {!showReviewForm && activeTab === "shipping" && (
             <>
-              <ShippingAddressCard />
+              <ShippingAddressCard shipping={order.shipping} />
               <SupportSection />
             </>
           )}

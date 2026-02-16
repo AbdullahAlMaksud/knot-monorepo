@@ -109,12 +109,12 @@ export default function PaymentMethodSection({
         )}
       </div>
 
-      <button
+      {/* <button
         type="submit"
         className="w-full mt-6 bg-black text-white py-3 rounded-full hover:bg-gray-800 transition font-medium"
       >
         Confirm
-      </button>
+      </button> */}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import {
   FieldErrors,
   UseFormHandleSubmit,
 } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 
 type ShippingFormData = {
   apartment: string;
@@ -119,12 +120,9 @@ export default function ShippingAddressForm({
           )}
         </div>
 
-        <button
-          type="submit"
-          className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-        >
+        <Button type="submit" className="rounded-full">
           Update Shipping Address
-        </button>
+        </Button>
       </form>
     </div>
   );

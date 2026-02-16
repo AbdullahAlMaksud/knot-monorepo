@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function OurJourneySection() {
   return (
@@ -27,11 +28,9 @@ export default function OurJourneySection() {
               notified with the Malaysian Health Ministry for your peace of
               mind.
             </p>
-            <Link href="/shop">
-              <button className="bg-white cursor-pointer text-black px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition-colors">
-                Shop Now
-              </button>
-            </Link>
+            <Button asChild className="bg-white text-black hover:bg-gray-100 rounded-full">
+              <Link href="/shop">Shop Now</Link>
+            </Button>
           </div>
         </div>
       </div>

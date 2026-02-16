@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
+import { CartProvider } from "@/lib/cart/CartContext";
 
 // Playfair Display for headings
 const playfairDisplay = Playfair_Display({
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfairDisplay.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        <CartProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        </CartProvider>
       </body>
     </html>
   );
