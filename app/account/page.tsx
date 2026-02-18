@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ import ShippingAddressForm from "@/components/account/ShippingAddressForm";
 import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 type ProfileFormData = {
   fullName: string;
@@ -19,11 +21,11 @@ type ProfileFormData = {
 };
 
 type ShippingFormData = {
-  apartment: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  apartment?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 };
 
 type PasswordFormData = {
@@ -36,6 +38,7 @@ export default function MyAccountPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [activeTab, setActiveTab] = useState<"profile" | "orders">("profile");
+  const [submittingShippingAddress, setSubmittingShippingAddress] = useState(false);
 
   const {
     register: registerProfile,
@@ -50,6 +53,7 @@ export default function MyAccountPage() {
     register: registerShipping,
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
+    setValue: setValueShipping, 
   } = useForm<ShippingFormData>();
 
   const {
@@ -86,9 +90,55 @@ export default function MyAccountPage() {
     alert("Profile updated successfully!");
   };
 
-  const onSubmitShipping = (data: ShippingFormData) => {
-    console.log("Shipping:", data);
-    alert("Shipping address updated successfully!");
+  const onSubmitShipping = async (data: ShippingFormData) => {
+    setSubmittingShippingAddress(true);
+
+    const payload = {
+      userId: session?.user?.id,
+      address: {
+        apartment: data.apartment,
+        city: data.city,
+        state: data.state,
+        postalCode: data.postalCode,
+        country: data.country,
+      }
+    }
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/shipping-address/update`, 
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const result = await res.json();
+
+      //  *Handle API validation errors
+      if (!res.ok) {
+        const message =
+          result?.data?.messageForUser ||
+          result?.message ||
+          "Failed to update shipping address.";
+        throw new Error(message);
+      }
+
+      //  after success
+      toast.success(result.message);
+      router.refresh();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(
+        error?.message || "There was an error updating the shipping address."
+      );
+    } finally {
+      setSubmittingShippingAddress(false);
+    }
   };
 
   const onSubmitPassword = (data: PasswordFormData) => {
@@ -125,11 +175,22 @@ export default function MyAccountPage() {
                 onSubmit={onSubmitProfile}
                 userImage={session.user.image ?? undefined}
               />
-              <ShippingAddressForm
+              {/* <ShippingAddressForm
                 register={registerShipping}
                 errors={errorsShipping}
                 handleSubmit={handleSubmitShipping}
                 onSubmit={onSubmitShipping}
+                isSubmitting={submittingShippingAddress}
+                userId={session.user.id}
+              /> */}
+              <ShippingAddressForm
+                register={registerShipping}
+                errors={errorsShipping}
+                handleSubmit={handleSubmitShipping}
+                setValue={setValueShipping}  
+                onSubmit={onSubmitShipping}
+                isSubmitting={submittingShippingAddress}
+                userId={session.user.id}
               />
               <PasswordChangeForm
                 register={registerPassword}

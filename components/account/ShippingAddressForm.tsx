@@ -4,124 +4,143 @@ import {
   UseFormRegister,
   FieldErrors,
   UseFormHandleSubmit,
+  UseFormSetValue,
 } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 type ShippingFormData = {
-  apartment: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  apartment?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 };
+
 
 type ShippingAddressFormProps = {
   register: UseFormRegister<ShippingFormData>;
   errors: FieldErrors<ShippingFormData>;
   handleSubmit: UseFormHandleSubmit<ShippingFormData>;
+  setValue: UseFormSetValue<ShippingFormData>;
   onSubmit: (data: ShippingFormData) => void;
+  isSubmitting: boolean;
+  userId: string;
 };
 
 export default function ShippingAddressForm({
   register,
   errors,
   handleSubmit,
+  setValue,
   onSubmit,
+  isSubmitting,
+  userId,
 }: ShippingAddressFormProps) {
+  useEffect(() => {
+    const getShippingAddressByUserId = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/shipping-address/by-user-id/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            cache: "no-store",
+          }
+        );
+
+        const result = await res.json();
+
+        if (!res.ok) return;
+
+        const data = result?.data;
+        if (!data) return;
+
+        // populate only if exists
+        if (data.apartment) setValue("apartment", data.apartment);
+        if (data.city) setValue("city", data.city);
+        if (data.state) setValue("state", data.state);
+        if (data.postalCode) setValue("postalCode", data.postalCode);
+        if (data.country) setValue("country", data.country);
+      } catch (error) {
+        console.error("Shipping fetch error:", error);
+      }
+    };
+
+    if (userId) getShippingAddressByUserId();
+  }, [userId, setValue]);
+
   return (
     <div className="bg-white">
       <h2 className="text-xl font-semibold mb-6">Shipping Address</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Apartment, suite, etc. (optional)
+          <label className="block text-sm font-medium mb-2">
+            Apartment, suite, etc.
           </label>
           <input
             type="text"
             {...register("apartment")}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+            className="w-full px-4 py-2 border rounded-lg"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              City
-            </label>
+            <label className="block text-sm font-medium mb-2">City</label>
             <input
               type="text"
-              {...register("city", {
-                required: "City is required",
-              })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+              {...register("city")}
+              className="w-full px-4 py-2 border rounded-lg"
             />
             {errors.city && (
-              <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
+              <p className="text-sm text-red-600">{errors.city.message}</p>
             )}
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2">
               State/Province
             </label>
             <select
-              {...register("state", {
-                required: "State is required",
-              })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none bg-white"
+              {...register("state")}
+              className="w-full px-4 py-2 border rounded-lg bg-white"
             >
               <option value="">Select</option>
               <option value="dhaka">Dhaka</option>
               <option value="ny">New York</option>
             </select>
-            {errors.state && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.state.message}
-              </p>
-            )}
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2">
               Postal Code
             </label>
             <input
               type="text"
-              {...register("postalCode", {
-                required: "Postal code is required",
-              })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+              {...register("postalCode")}
+              className="w-full px-4 py-2 border rounded-lg"
             />
-            {errors.postalCode && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.postalCode.message}
-              </p>
-            )}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Country
-          </label>
+          <label className="block text-sm font-medium mb-2">Country</label>
           <select
-            {...register("country", {
-              required: "Country is required",
-            })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none bg-white"
+            {...register("country")}
+            className="w-full px-4 py-2 border rounded-lg bg-white"
           >
             <option value="">Country</option>
             <option value="bangladesh">Bangladesh</option>
             <option value="usa">United States</option>
           </select>
-          {errors.country && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.country.message}
-            </p>
-          )}
         </div>
 
-        <Button type="submit" className="rounded-full">
-          Update Shipping Address
+        <Button type="submit" disabled={isSubmitting} className="rounded-full">
+          {isSubmitting ? "Updating..." : "Update Shipping Address"}
         </Button>
       </form>
     </div>

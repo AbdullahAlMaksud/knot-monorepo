@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import OrderHeader from "@/components/orders/OrderHeader";
 import OrderItemsList from "@/components/orders/OrderItemsList";
@@ -9,63 +8,41 @@ import ShippingAddressCard from "@/components/orders/ShippingAddressCard";
 import SupportSection from "@/components/orders/SupportSection";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
-type OrderData = {
-  orderId: string;
-  items: { name: string; image: string; price: number; quantity: number }[];
-  shipping: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    apartment: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  };
-  totals: { subtotal: number; shipping: number; total: number };
-  status: string;
-  date: string;
-};
+import { useParams } from "next/navigation";
+import { Order } from "@/lib/orders/types";
 
 export default function OrderTrackingPage() {
   const params = useParams();
   const orderId = params?.orderId as string | undefined;
-  const [order, setOrder] = useState<OrderData | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"summary" | "shipping">("summary");
   const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
-    if (!orderId) return;
-    let cancelled = false;
-    fetch(`/api/orders/${encodeURIComponent(orderId)}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(res.status === 404 ? "Order not found" : "Failed to load order");
-        return res.json();
-      })
-      .then((data) => {
-        if (!cancelled) {
-          setOrder({
-            ...data,
-            date: data.date ? new Date(data.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—",
-          });
+    const getOrderById = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, { cache: "no-store" });
+        if (res.status === 404) {
+          setError("Order not found");
+          setOrder(null);
+          return;
         }
-      })
-      .catch((e) => {
-        if (!cancelled) setError(e.message ?? "Failed to load order");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [orderId]);
-
-  const orderItems = order?.items?.map((item, i) => ({ ...item, id: i })) ?? [];
+        const data = await res.json();
+        setOrder(data.data || {});
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Failed to load order");
+        setOrder(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getOrderById()
+  }, [orderId])
+  
+  const orderItems: Order["items"] = order?.items ?? [];
   const effectiveLoading = !!orderId && loading;
   const effectiveError = !orderId ? "Missing order ID" : error;
 
@@ -93,7 +70,7 @@ export default function OrderTrackingPage() {
     <Layout>
       <div className="py-12 sm:py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <OrderHeader orderId={order.orderId} date={order.date} status={order.status} />
+          <OrderHeader orderId={order._id} date={order.createdAt ? new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—"} status={order.status} />
 
           {!showReviewForm && (
             <div className="flex justify-between items-center mb-6">
@@ -131,6 +108,10 @@ export default function OrderTrackingPage() {
               orderItems={orderItems}
               showReviewForm={showReviewForm}
               setShowReviewForm={setShowReviewForm}
+              totalAmount={order.totalAmount}
+              discountAmount={order.discountAmount}
+              shippingFee={order.shippingFee}
+              finalAmount={order.finalAmount}
             />
           )}
 
@@ -140,6 +121,10 @@ export default function OrderTrackingPage() {
                 orderItems={orderItems}
                 showReviewForm={false}
                 setShowReviewForm={setShowReviewForm}
+                totalAmount={order.totalAmount}
+                discountAmount={order.discountAmount}
+                shippingFee={order.shippingFee}
+                finalAmount={order.finalAmount}
               />
               <SupportSection />
             </>

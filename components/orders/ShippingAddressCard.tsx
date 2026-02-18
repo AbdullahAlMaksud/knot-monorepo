@@ -1,21 +1,6 @@
-type Shipping = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  apartment: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-};
+import { Order } from "@/lib/orders/types";
 
-type ShippingAddressCardProps = {
-  shipping: Shipping;
-};
-
-export default function ShippingAddressCard({ shipping }: ShippingAddressCardProps) {
-  const fullName = [shipping.firstName, shipping.lastName].filter(Boolean).join(" ") || "—";
+export default function ShippingAddressCard({ shipping }: { shipping: Order["shipping"] }) {
   const addressLines = [
     shipping.apartment,
     [shipping.city, shipping.state, shipping.postalCode].filter(Boolean).join(", "),
@@ -28,7 +13,7 @@ export default function ShippingAddressCard({ shipping }: ShippingAddressCardPro
         <div>
           <h2 className="text-lg font-semibold mb-4">Shipping Address</h2>
           <div className="text-sm text-gray-700 space-y-1">
-            <p className="font-medium">{fullName}</p>
+            <p className="font-medium">{shipping.name || "—"}</p>
             <p>{shipping.email || "—"}</p>
             <p>{shipping.phone || "—"}</p>
             {addressLines.length > 0 && (
