@@ -12,20 +12,13 @@ import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { ShippingAddress, useUpdateShippingAddress } from "@/hooks/useShippingAddress";
 
 type ProfileFormData = {
   fullName: string;
   lastName: string;
   email: string;
   phone: string;
-};
-
-type ShippingFormData = {
-  apartment?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
 };
 
 type PasswordFormData = {
@@ -38,7 +31,6 @@ export default function MyAccountPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [activeTab, setActiveTab] = useState<"profile" | "orders">("profile");
-  const [submittingShippingAddress, setSubmittingShippingAddress] = useState(false);
 
   const {
     register: registerProfile,
@@ -54,7 +46,7 @@ export default function MyAccountPage() {
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
     setValue: setValueShipping, 
-  } = useForm<ShippingFormData>();
+  } = useForm<ShippingAddress>();
 
   const {
     register: registerPassword,
@@ -75,70 +67,35 @@ export default function MyAccountPage() {
     if (!session?.user) return;
     const name = session.user.name ?? "";
     const nameParts = name.trim().split(/\s+/);
-    const fullName = nameParts[0] ?? "";
-    const lastName = nameParts.slice(1).join(" ") ?? "";
     resetProfile({
-      fullName,
-      lastName,
+      fullName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" ") ?? "",
       email: session.user.email ?? "",
-      phone: "",
+      phone: (session.user as any).phone ?? "",
     });
   }, [session?.user, resetProfile]);
 
-  const onSubmitProfile = (data: ProfileFormData) => {
-    console.log("Profile:", data);
-    alert("Profile updated successfully!");
-  };
-
-  const onSubmitShipping = async (data: ShippingFormData) => {
-    setSubmittingShippingAddress(true);
-
-    const payload = {
-      userId: session?.user?.id,
-      address: {
-        apartment: data.apartment,
-        city: data.city,
-        state: data.state,
-        postalCode: data.postalCode,
-        country: data.country,
-      }
-    }
-
+  const onSubmitProfile = async (data: ProfileFormData) => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/shipping-address/update`, 
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          cache: "no-store",
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const result = await res.json();
-
-      //  *Handle API validation errors
-      if (!res.ok) {
-        const message =
-          result?.data?.messageForUser ||
-          result?.message ||
-          "Failed to update shipping address.";
-        throw new Error(message);
-      }
-
-      //  after success
-      toast.success(result.message);
+      await authClient.updateUser({
+        name: `${data.fullName} ${data.lastName}`.trim(),
+        // @ts-expect-error — additionalFields
+        phone: data.phone,
+      });
+      toast.success("Profile updated successfully!");
       router.refresh();
     } catch (error: any) {
-      console.error(error);
-      toast.error(
-        error?.message || "There was an error updating the shipping address."
-      );
-    } finally {
-      setSubmittingShippingAddress(false);
+      toast.error(error?.message || "Failed to update profile.");
     }
+  };
+
+  const { mutate: updateShipping, isPending: isShippingUpdating } = useUpdateShippingAddress();
+
+  const onSubmitShipping = (data: ShippingAddress) => {
+    updateShipping({
+      userId: session!.user.id,
+      address: data,
+    });
   };
 
   const onSubmitPassword = (data: PasswordFormData) => {
@@ -175,21 +132,13 @@ export default function MyAccountPage() {
                 onSubmit={onSubmitProfile}
                 userImage={session.user.image ?? undefined}
               />
-              {/* <ShippingAddressForm
-                register={registerShipping}
-                errors={errorsShipping}
-                handleSubmit={handleSubmitShipping}
-                onSubmit={onSubmitShipping}
-                isSubmitting={submittingShippingAddress}
-                userId={session.user.id}
-              /> */}
               <ShippingAddressForm
                 register={registerShipping}
                 errors={errorsShipping}
                 handleSubmit={handleSubmitShipping}
                 setValue={setValueShipping}  
                 onSubmit={onSubmitShipping}
-                isSubmitting={submittingShippingAddress}
+                isSubmitting={isShippingUpdating}
                 userId={session.user.id}
               />
               <PasswordChangeForm

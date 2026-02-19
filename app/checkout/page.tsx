@@ -1,23 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import { useForm, UseFormRegister } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import Layout from "@/components/Layout";
 import ShippingForm from "@/components/checkout/ShippingForm";
 import PaymentMethodSection from "@/components/checkout/PaymentMethodSection";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCart } from "@/lib/cart/CartContext";
-import { toast } from "sonner";
 import { CheckoutFormData, DISCOUNT_AMOUNT, SHIPPING_FEE } from "@/lib/orders/types";
 import { authClient } from "@/lib/auth-client";
+import { OrderPayloadType, useCreateOrder } from "@/hooks/useOrders";
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const { data: session } = authClient.useSession();
   const { id: userId } = session?.user || {};
-  const { items: cartItems, clearCart } = useCart();
+  const { items: cartItems} = useCart();
 
   const {
     register,
@@ -27,7 +24,6 @@ export default function CheckoutPage() {
   } = useForm<CheckoutFormData>();
 
   const [paymentMethod, setPaymentMethod] = useState("bank-transfer");
-  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const subtotal = cartItems.reduce(
@@ -53,16 +49,22 @@ export default function CheckoutPage() {
     "payment.transactionId": "transactionId",
   };
 
-  const onSubmit = async (data: CheckoutFormData) => {
+  const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder({
+    onError: (error: Error & { field?: string }) => {
+      const formField = fieldMap[error.field ?? ""];
+      if (formField) {
+        setError(formField, { type: "server", message: error.message });
+      }
+    },
+  });
+
+  const onSubmit = (data: CheckoutFormData) => {
     if (cartItems.length === 0) {
       setSubmitError("Your cart is empty.");
       return;
     }
 
-    setSubmitError(null);
-    setSubmitting(true);
-
-    const payload = {
+    const payload: OrderPayloadType = {
       customerId: userId,
       shipping: {
         name: data.name,
@@ -91,58 +93,9 @@ export default function CheckoutPage() {
       shippingFee: SHIPPING_FEE,
       finalAmount: finalAmount,
     };
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/orders`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          cache: "no-store",
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const result = await res.json();
-
-      //  Handle API validation errors
-      if (!res.ok) {
-        const message =
-          result?.data?.messageForUser ||
-          result?.message ||
-          "Order failed";
-
-        const backendField = result?.data?.field;
-        const formField = fieldMap[backendField];
-
-        //  Set React Hook Form error if field exists
-        if (formField) {
-          setError(formField, {
-            type: "server",
-            message,
-          });
-        }
-
-        throw new Error(message);
-      }
-
-      //  after success
-      clearCart();
-      toast.success(result.message);
-      router.push("/checkout/success");
-      router.refresh();
-    } catch (error: any) {
-      console.error(error);
-      toast.error(
-        error?.message || "There was an issue processing your order."
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+    createOrder(payload);
+  }
+  
   return (
     <Layout>
       <section className="py-16 sm:py-36">
@@ -158,7 +111,7 @@ export default function CheckoutPage() {
                 <ShippingForm register={register} errors={errors} setValue={setValue} />
 
                 <PaymentMethodSection
-                  register={register as UseFormRegister<any>}
+                  register={register}
                   errors={errors}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
@@ -170,7 +123,7 @@ export default function CheckoutPage() {
               <OrderSummary
                 cartItems={cartItems}
                 onConfirmOrder={handleSubmit(onSubmit)}
-                submitting={submitting}
+                submitting={isCreatingOrder}
                 submitError={submitError}
               />
             </div>
