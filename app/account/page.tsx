@@ -45,13 +45,13 @@ export default function MyAccountPage() {
     register: registerShipping,
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
-    setValue: setValueShipping, 
+    setValue: setValueShipping,
   } = useForm<ShippingAddress>();
 
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
-    watch,
+    watch, reset: resetPassword,
     formState: { errors: errorsPassword },
   } = useForm<PasswordFormData>();
 
@@ -98,22 +98,20 @@ export default function MyAccountPage() {
     });
   };
 
-  const onSubmitPassword = (data: PasswordFormData) => {
-    console.log("Password:", data);
-    alert("Password changed successfully!");
-  };
+  const onSubmitPassword = async (data: PasswordFormData) => {
+    const { error } = await authClient.changePassword({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      revokeOtherSessions: true,
+    });
 
-  if (isPending || !session?.user) {
-    return (
-      <Layout>
-        <div className="py-44">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-gray-600">Loading…</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+    if (error) {
+      toast.error(error.message ?? "Failed to change password");
+      return;
+    }
+    toast.success("Password changed successfully!");
+    resetPassword();
+  };
 
   return (
     <Layout>
@@ -130,16 +128,16 @@ export default function MyAccountPage() {
                 errors={errorsProfile}
                 handleSubmit={handleSubmitProfile}
                 onSubmit={onSubmitProfile}
-                userImage={session.user.image ?? undefined}
+                userImage={session?.user?.image ?? undefined}
               />
               <ShippingAddressForm
                 register={registerShipping}
                 errors={errorsShipping}
                 handleSubmit={handleSubmitShipping}
-                setValue={setValueShipping}  
+                setValue={setValueShipping}
                 onSubmit={onSubmitShipping}
                 isSubmitting={isShippingUpdating}
-                userId={session.user.id}
+                userId={session?.user?.id ?? ""}
               />
               <PasswordChangeForm
                 register={registerPassword}
