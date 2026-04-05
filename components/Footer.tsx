@@ -26,11 +26,13 @@ export default function Footer() {
             <div className="space-y-4 text-sm text-gray-300">
               <div>
                 <p className="font-semibold text-white mb-1">Head Quarter</p>
-                <p>2972 Westheimer Rd. Santa Ana</p>
+                <p>AriMo Glow UK Ltd</p>
+                <p>124 City Road, Ec1v 2nx, London, United Kingdom</p>
               </div>
               <div>
                 <p className="font-semibold text-white mb-1">Local</p>
-                <p>2972 Westheimer Rd. Santa Ana</p>
+                <p>AriMo Glow Bangladesh Operation</p>
+                <p>Ventura Iconia, Level 3, Block H, Banani 11, Dhaka-1213</p>
               </div>
             </div>
           </div>
@@ -46,10 +48,7 @@ export default function Footer() {
                 className="h-16 w-auto"
               />
             </Link>
-            <p className="text-sm text-gray-300 mb-6 max-w-xs">
-              Lorem ipsum dolor sit amet consectetur. Scelerisque lectus
-              habitasse adipiscing.
-            </p>
+            <p className="text-sm text-gray-300 mb-6 max-w-xs">Just Be You</p>
             <div className="flex justify-center space-x-4">
               <a
                 href="#"

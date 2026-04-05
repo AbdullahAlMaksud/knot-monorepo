@@ -4,52 +4,52 @@ import SkinTypeIcon from "@/components/icons/SkinTypeIcon";
 import Ingredients from "@/components/icons/Ingredients";
 import Cruelty from "@/components/icons/Cruelty";
 import Eco from "@/components/icons/Eco";
+import type { InfoFeature } from "@/data/products";
 
-const features = [
+const icons = [
+  <DermatologistIcon key="dermatologist" />,
+  <SkinTypeIcon key="skintype" />,
+  <Ingredients key="ingredients" />,
+  <Cruelty key="cruelty" />,
+  <Eco key="eco" />,
+];
+
+const defaultFeatures: InfoFeature[] = [
   {
-    id: 1,
-    icon: <DermatologistIcon />,
-    title: "DERMATOLOGIST TESTED",
-    description: "Safe and effective, tested by professionals",
+    title: "Dermatologist Certified",
+    description: "Safe and effective to use",
   },
   {
-    id: 2,
-    icon: <SkinTypeIcon />,
-    title: "FOR ALL SKIN TYPES",
-    description: "Gentle formula suitable for sensitive skin",
+    title: "For All Skin Types",
+    description: "Gentle formulation suitable for all skin",
   },
   {
-    id: 3,
-    icon: <Ingredients />,
-    title: "MADE WITH PREMIUM INGREDIENTS",
-    description: "Formulated with high-quality active ingredients",
+    title: "Premium Quality Ingredients",
+    description: "Formulated with high quality active ingredients",
   },
   {
-    id: 4,
-    icon: <Cruelty />,
-    title: "CRUELTY-FREE",
-    description: "Never tested on animals",
+    title: "Formulated by Experts",
+    description: "Formulation developed by global formulation experts",
   },
   {
-    id: 5,
-    icon: <Eco />,
-    title: "ECO-FRIENDLY PACKAGING",
-    description: "Sustainable and recyclable materials",
+    title: "Climate Adapted Performance",
+    description: "Compatible in heat and humid weather",
   },
 ];
 
-const Info = () => {
+interface InfoProps {
+  features?: InfoFeature[];
+}
+
+const Info = ({ features = defaultFeatures }: InfoProps) => {
   return (
     <section className="py-16 sm:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6">
-          {features.map((feature) => (
-            <div
-              key={feature.id}
-              className="flex flex-col items-center text-center"
-            >
+          {features.map((feature, index) => (
+            <div key={index} className="flex flex-col items-center text-center">
               <div className="h-[34px] flex items-center justify-center mb-4">
-                {feature.icon}
+                {icons[index % icons.length]}
               </div>
               <h3 className="text-sm font-semibold tracking-wider mb-2 uppercase">
                 {feature.title}

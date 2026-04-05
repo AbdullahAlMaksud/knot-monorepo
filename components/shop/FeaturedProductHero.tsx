@@ -1,6 +1,13 @@
 "use client";
 
-import { ShoppingCart, ChevronLeft, ChevronRight, Star, ZoomIn, ArrowRight } from "lucide-react";
+import {
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  ZoomIn,
+  ArrowRight,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -32,13 +39,12 @@ export default function FeaturedProductHero({
     name: product?.name || "Glow Contour Lifting Peptide Mist",
     price: product?.price || 63.0,
     currency: product?.currency || "MYR",
-    images:
-      product?.images || [
-        "/images/products/product1.jpg",
-        "/images/products/product2.jpg",
-        "/images/products/product3.jpg",
-        "/images/products/product4.jpg",
-      ],
+    images: product?.images || [
+      "/images/products/product1.jpg",
+      "/images/products/product2.jpg",
+      "/images/products/product3.jpg",
+      "/images/products/product4.jpg",
+    ],
     description:
       product?.description ||
       "A revolutionary peptide mist that lifts, contours, and enhances your natural glow with advanced skincare technology.",
@@ -57,13 +63,13 @@ export default function FeaturedProductHero({
 
   const handlePreviousImage = () => {
     setSelectedImage((prev) =>
-      prev === 0 ? featuredProduct.images.length - 1 : prev - 1
+      prev === 0 ? featuredProduct.images.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
     setSelectedImage((prev) =>
-      prev === featuredProduct.images.length - 1 ? 0 : prev + 1
+      prev === featuredProduct.images.length - 1 ? 0 : prev + 1,
     );
   };
 
@@ -83,7 +89,9 @@ export default function FeaturedProductHero({
   const textColor = isDark ? "text-white" : "";
   const brandTextColor = isDark ? "text-gray-300" : "text-gray-600";
   const borderColor = isDark ? "border-white" : "border-black";
-  const hoverBg = isDark ? "hover:bg-white hover:text-black" : "hover:bg-black hover:text-white";
+  const hoverBg = isDark
+    ? "hover:bg-white hover:text-black"
+    : "hover:bg-black hover:text-white";
   const buttonPrimary = isDark
     ? "bg-white text-black hover:bg-gray-200"
     : "bg-black text-white hover:bg-gray-200 hover:text-black";
@@ -93,7 +101,9 @@ export default function FeaturedProductHero({
   const thumbnailRing = isDark ? "ring-white" : "ring-black";
   const dotColor = isDark ? "bg-white" : "bg-black";
   const dotColorInactive = isDark ? "bg-white/40" : "bg-black/40";
-  const zoomBg = isDark ? "bg-black/50 hover:bg-black/70" : "bg-white/50 hover:bg-white/70";
+  const zoomBg = isDark
+    ? "bg-black/50 hover:bg-black/70"
+    : "bg-white/50 hover:bg-white/70";
   const zoomTextColor = isDark ? "text-white" : "text-black";
   const starFill = isDark ? "fill-white text-white" : "fill-black text-black";
   const starEmpty = isDark ? "text-gray-500" : "text-gray-400";
@@ -183,7 +193,9 @@ export default function FeaturedProductHero({
                       variant="ghost"
                       onClick={() => setSelectedImage(index)}
                       className={`h-2 min-w-0 p-0 rounded-full transition-all ${
-                        selectedImage === index ? `${dotColor} w-8` : dotColorInactive
+                        selectedImage === index
+                          ? `${dotColor} w-8`
+                          : dotColorInactive
                       }`}
                       aria-label={`Go to image ${index + 1}`}
                     />
@@ -197,7 +209,9 @@ export default function FeaturedProductHero({
               <p className={`text-sm tracking-[0.2em] ${brandTextColor} mb-3`}>
                 {featuredProduct.brand}
               </p>
-              <h1 className={`text-[42px] font-semibold max-w-[300px] mb-4 leading-tight ${textColor}`}>
+              <h1
+                className={`text-[42px] font-semibold max-w-[300px] mb-4 leading-tight ${textColor}`}
+              >
                 {featuredProduct.name}
               </h1>
 
@@ -219,13 +233,15 @@ export default function FeaturedProductHero({
 
               {/* Description */}
               {featuredProduct.description && (
-                <p className={`${descriptionText} mb-6 leading-relaxed text-sm max-w-md`}>
+                <p
+                  className={`${descriptionText} mb-6 leading-relaxed text-sm max-w-md`}
+                >
                   {featuredProduct.description}
                 </p>
               )}
 
               <p className="text-xl font-bold mb-8">
-                Price: RM{featuredProduct.price.toFixed(2)}{" "}
+                Price: {featuredProduct.price.toFixed(2)}{" "}
                 {featuredProduct.currency}
               </p>
 
@@ -241,7 +257,9 @@ export default function FeaturedProductHero({
                 >
                   <span className="text-2xl leading-none">−</span>
                 </Button>
-                <span className={`text-3xl font-medium w-12 text-center ${textColor}`}>
+                <span
+                  className={`text-3xl font-medium w-12 text-center ${textColor}`}
+                >
                   {quantity}
                 </span>
                 <Button
@@ -266,7 +284,10 @@ export default function FeaturedProductHero({
                   Add to cart
                   <ArrowRight className="w-5 h-5" />
                 </Button>
-                <Button variant="outline" className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}>
+                <Button
+                  variant="outline"
+                  className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
+                >
                   Bye Now
                   <ShoppingCart className="w-5 h-5" />
                 </Button>
