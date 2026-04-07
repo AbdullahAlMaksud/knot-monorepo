@@ -56,14 +56,14 @@ const ConcernsSection = () => {
         {/* Header */}
         <div className="mb-12">
           <p className="text-gray-600 tracking-wider uppercase mb-2">
-            ADDRESS YOUR CONCERNS
+            Every Skin Has a Story
           </p>
           <h2 className="text-3xl font-semibold tracking-[0.2em] mb-4">
-            Every Skin Has a Story
+            Shop by Concerns
           </h2>
           <p className="text-gray-600 max-w-2xl text-sm">
-            Identify your unique skin concerns and discover targeted solutions
-            formulated with science-backed ingredients and halal-friendly care.
+            Click on your skin concern to discover the most suitable solution
+            tailored to your needs
           </p>
         </div>
 
