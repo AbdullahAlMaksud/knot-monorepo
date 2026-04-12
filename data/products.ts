@@ -91,7 +91,7 @@ export interface InfoFeature {
 
 /** Featured hero product: Glow Contour Lifting Peptide Mist. */
 export const featuredProductMist: FeaturedProduct = {
-  brand: "BYOU BEAUTY",
+  brand: "Just Be YOU",
   name: "Vitamin C 10% Face Serum",
   price: 1599,
   currency: "BDT",
@@ -108,7 +108,7 @@ export const featuredProductMist: FeaturedProduct = {
 
 /** Featured hero product: Radiance Boost Vitamin C Serum. */
 export const featuredProductVitaminC: FeaturedProduct = {
-  brand: "BYOU BEAUTY",
+  brand: "Just Be YOU",
   name: "Niacinamide 10% Face Serum",
   price: 1499,
   currency: "BDT",

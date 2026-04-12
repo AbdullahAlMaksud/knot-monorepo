@@ -7,6 +7,8 @@ import {
   Star,
   ZoomIn,
   ArrowRight,
+  Plus,
+  Minus,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -255,7 +257,7 @@ export default function FeaturedProductHero({
                   className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Decrease quantity"
                 >
-                  <span className="text-2xl leading-none">−</span>
+                  <Minus className="text-black text-6xl font-bold" />
                 </Button>
                 <span
                   className={`text-3xl font-medium w-12 text-center ${textColor}`}
@@ -270,7 +272,7 @@ export default function FeaturedProductHero({
                   className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Increase quantity"
                 >
-                  <span className="text-2xl leading-none">+</span>
+                  <Plus className="text-black text-6xl font-bold" />
                 </Button>
               </div>
 

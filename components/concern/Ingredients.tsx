@@ -1,29 +1,13 @@
 import { Sparkles } from "lucide-react";
+import type { Concern } from "@/data/concerns";
 
-const Ingredients = () => {
-  const ingredients = [
-    {
-      icon: Sparkles,
-      percentage: "2%",
-      name: "Alpha Arbutin",
-      description:
-        "A gentle brightening agent that effectively fades dark spots and hyperpigmentation without irritation.",
-    },
-    {
-      icon: Sparkles,
-      percentage: "5%",
-      name: "Niacinamide",
-      description:
-        "Vitamin B3 that strengthens skin barrier, evens tone, and reduces inflammation.",
-    },
-    {
-      icon: Sparkles,
-      percentage: "1%",
-      name: "Hyaluronic Acid",
-      description:
-        "Holds 1000x its weight in water to deliver intense, lasting hydration.",
-    },
-  ];
+interface IngredientsProps {
+  concern: Concern;
+}
+
+const Ingredients = ({ concern }: IngredientsProps) => {
+  const ingredients = concern.ingredients;
+  const Icon = Sparkles;
 
   return (
     <section className="py-16 sm:py-24 bg-white">
@@ -33,17 +17,16 @@ const Ingredients = () => {
             SCIENCE-BACKED INGREDIENTS
           </p>
           <h2 className="text-3xl font-semibold mb-6">
-            What Makes Our Formulas Effective
+            What Helps Improve {concern.title}
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto text-sm sm:text-base">
-            We use clinically-proven concentrations of premium ingredients,
-            ensuring maximum efficacy without compromise.
+            We focus on targeted active ingredients that support visible results
+            without making the routine feel overwhelming.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {ingredients.map((ingredient, index) => {
-            const Icon = ingredient.icon;
             return (
               <div
                 key={index}
