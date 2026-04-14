@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Droplets, Droplet, Hand, Sparkles, Clock, Leaf } from "lucide-react";
 import type { ProductDetail } from "@/data/products";
+import { Fragment } from "react/jsx-runtime";
 
 const stepIcons = [Sparkles, Droplet, Hand, Droplets, Clock];
 const ingredientIcons = [Leaf, Droplets, Sparkles, Droplet];
@@ -27,20 +28,12 @@ export default function WhyChooseSection({ detail }: WhyChooseSectionProps) {
               <h3 className="text-xl font-semibold mb-4">Ideal for</h3>
               <div className="grid grid-cols-[auto_1fr] text-sm">
                 {detail.whyChoose.idealFor.map((item) => (
-                  <>
-                    <span
-                      key={`${item.label}-label`}
-                      className="font-semibold text-black pr-6 py-1.5 whitespace-nowrap"
-                    >
+                  <Fragment key={item.label}>
+                    <span className="font-semibold text-black pr-6 py-1.5 whitespace-nowrap">
                       {item.label}
                     </span>
-                    <span
-                      key={`${item.label}-value`}
-                      className="text-gray-700 py-1.5"
-                    >
-                      {item.value}
-                    </span>
-                  </>
+                    <span className="text-gray-700 py-1.5">{item.value}</span>
+                  </Fragment>
                 ))}
               </div>
             </div>

@@ -61,12 +61,21 @@ export const allProducts: Product[] = [
   },
   {
     id: 3,
-    name: "Niacinamide 10% Face Serum",
-    price: "From ৳ 1499",
+    name: "Retinol 0.15% Face Serum",
+    price: "From ৳ 1599",
     rating: 5,
-    images: productImages.p1,
+    images: productImages.p3,
     description:
-      "Unlock your skin's natural radiance with this potent Vitamin C serum that fights dullness and evens skin tone.",
+      "A moderate-strength retinol serum that targets general signs of skin aging. This water-free serum keeps Retinol stable & also nourishes skin.",
+  },
+  {
+    id: 4,
+    name: "Salicylic Acid 2% Face Serum",
+    price: "From ৳ 1599",
+    rating: 5,
+    images: productImages.p4,
+    description:
+      "A gentle face serum that wards off acne, blackheads, whiteheads and keeps your oils in check for that flawless matt skin. Also allow your skin to heal. ",
   },
 ];
 
@@ -77,11 +86,13 @@ export const coreProducts: Product[] = allProducts.filter(
 
 /** Best seller (id 3) for shop page. */
 export const bestSellers: Product[] = allProducts.filter(
-  (p) => p.id === 2 || p.id === 1,
+  (p) => p.id === 1 || p.id === 2,
 );
 
 /** Second best seller set (id 2) for shop page. */
-export const bestSellers2: Product[] = allProducts.filter((p) => p.id === 4);
+export const bestSellers2: Product[] = allProducts.filter(
+  (p) => p.id === 3 || p.id === 4,
+);
 
 /** Info feature shown on product pages. */
 export interface InfoFeature {
@@ -123,10 +134,46 @@ export const featuredProductVitaminC: FeaturedProduct = {
   rating: 5,
 };
 
+/** Featured hero product: Retinol 0.15% Face Serum. */
+export const featuredProductRetinol: FeaturedProduct = {
+  brand: "Just Be YOU",
+  name: "Retinol 0.15% Face Serum",
+  price: 1599,
+  currency: "BDT",
+  images: [
+    productImages.p3,
+    productImages.p4,
+    productImages.p1,
+    productImages.p2,
+  ],
+  description:
+    "A moderate-strength retinol serum that targets general signs of skin aging. This water-free serum keeps Retinol stable & also nourishes skin.",
+  rating: 5,
+};
+
+/** Featured hero product: Salicylic Acid 2% Face Serum. */
+export const featuredProductSalicylicAcid: FeaturedProduct = {
+  brand: "Just Be YOU",
+  name: "Salicylic Acid 2% Face Serum",
+  price: 1599,
+  currency: "BDT",
+  images: [
+    productImages.p4,
+    productImages.p3,
+    productImages.p1,
+    productImages.p2,
+  ],
+  description:
+    "A gentle face serum that wards off acne, blackheads, whiteheads and keeps your oils in check for that flawless matt skin. Also allow your skin to heal.",
+  rating: 5,
+};
+
 /** Map product id to its FeaturedProduct hero data. */
 export const featuredProducts: Record<number, FeaturedProduct> = {
   1: featuredProductMist,
   2: featuredProductVitaminC,
+  3: featuredProductRetinol,
+  4: featuredProductSalicylicAcid,
 };
 
 /** Get FeaturedProduct by product id. */
@@ -360,6 +407,160 @@ export const productDetails: Record<number, ProductDetail> = {
           name: "N-Acetyl Glucosamine",
           benefit:
             "Not only lightens skin tone, it also promotes synthesis of Hyaluronic Acid to improve skin hydration",
+        },
+      ],
+    },
+  },
+
+  3: {
+    whyChoose: {
+      description:
+        "Choose B’You Retinol 0.15% Serum to visibly reduce fine lines and wrinkles , improve skin texture while supporting skin barrier repair. Dermatologist certified and formulated for Bangladeshi skin and climate for effective nighttime care.",
+      idealFor: [
+        {
+          label: "Skin type",
+          value: "Dry/Normal, Sensitive, Oily, Combination, Acne-Prone",
+        },
+        {
+          label: "Concerns",
+          value: "Fine Lines, Wrinkles & Loss of Elasticity",
+        },
+        { label: "Suitable for", value: "18+ years of age" },
+      ],
+      benefits: [
+        "Reduces the appearance of fine lines and wrinkles for smoother-looking skin",
+        "Improves skin texture and promotes a more even skin tone",
+        "Supports collagen production for firmer, youthful-looking skin",
+        "Enhances skin renewal for a brighter and more refined complexion",
+        "Helps strengthen the skin barrier with continued use",
+        "Dermatologist certified and suitable for Bangladeshi climate",
+      ],
+    },
+    howToUse: {
+      description:
+        "Cleanse your face, apply a few drops after your water-based serums. Follow with moisturizer and use of sunscreen is highly recommended while using this serum",
+      steps: [
+        {
+          title: "Cleanse",
+          description: "Wash your face thoroughly to remove dirt and oil.",
+        },
+        {
+          title: "Apply Drops",
+          description: "Take 2-3 drops of serum on your fingertips.",
+        },
+        {
+          title: "Spread Evenly",
+          description: "Smooth it gently over your face and neck.",
+        },
+        {
+          title: "Pat & Absorb",
+          description: "Pat lightly so the serum absorbs into your skin.",
+        },
+        {
+          title: "Follow Routine",
+          description:
+            "Use before moisturizer, PM. Start with every alternate day and after 2 weeks of usage, use it everyday.",
+        },
+      ],
+    },
+    ingredients: {
+      description:
+        "Our serum is formulated with a high-performance blend designed to support skin renewal, improve visible signs of aging, and refine overall skin texture. Each ingredient is selected to enhance cell regeneration while maintaining barrier comfort and balance.",
+      items: [
+        {
+          name: "Hero Ingredient: Retinol",
+          benefit:
+            "A potent Vitamin A derivative that promotes faster skin cell turnover and supports natural repair processes. It helps smooth fine lines, improve uneven texture, and reduce visible signs of photoaging for healthier-looking skin.",
+        },
+        {
+          name: "Bakuchiol Oil",
+          benefit:
+            "A plant-derived active known for supporting similar skin-renewal pathways as retinol. It helps improve firmness and smoothness while contributing to better skin tolerance and reduced irritation.",
+        },
+        {
+          name: "Ceramide Complex",
+          benefit:
+            "A skin-identical lipid blend that strengthens the skin barrier, improves hydration retention, and helps protect against dryness that may occur with active treatments.",
+        },
+        {
+          name: "Vitamin E",
+          benefit:
+            "A powerful antioxidant that helps protect the skin from environmental damage while supporting skin repair. It works synergistically with retinol to enhance skin barrier function, improve hydration, and reduce potential irritation, leaving the skin smoother and more resilient.",
+        },
+      ],
+    },
+  },
+  4: {
+    whyChoose: {
+      description:
+        "Choose B'You Salicylic Acid 2% Serum as solution for acne-prone skin to control excess oil and reduce blackheads & whiteheads. Dermatologist certified and specially formulated for Bangladeshi skin and climate to deliver clear, balanced results every day.",
+      idealFor: [
+        { label: "Skin type", value: "Combination / Oily Skin" },
+        {
+          label: "Concerns",
+          value: "Acne Prone, Oily Skin, Blackheads & Whiteheads",
+        },
+        { label: "Suitable for", value: "18+ years of age" },
+      ],
+      benefits: [
+        "Helps unclog pores to reduce acne and prevent future breakouts",
+        "Controls excess oil and reduces shine for a balanced look",
+        "Minimizes blackheads and whiteheads for clearer skin",
+        "Gently exfoliates to improve skin texture and smoothness",
+        "Helps calm acne-related redness and irritation",
+        "Dermatologist certified and suitable for Bangladeshi climate",
+      ],
+    },
+    howToUse: {
+      description:
+        "Cleanse your face, apply a few drops of serum, and gently pat until absorbed. Follow with a moisturizer for clear, balanced skin.",
+      steps: [
+        {
+          title: "Cleanse",
+          description: "Wash your face thoroughly to remove dirt and oil.",
+        },
+        {
+          title: "Apply Drops",
+          description: "Take 2-3 drops of serum on your fingertips.",
+        },
+        {
+          title: "Spread Evenly",
+          description: "Smooth it gently over your face and neck.",
+        },
+        {
+          title: "Pat & Absorb",
+          description: "Pat lightly so the serum absorbs into your skin.",
+        },
+        {
+          title: "Follow Routine",
+          description:
+            "Use before moisturizer, PM. Start with every alternate day and after 2 weeks of usage, use it everyday.",
+        },
+      ],
+    },
+    ingredients: {
+      description:
+        "Our serum is formulated to deeply cleanse pores, reduce excess oil, and target acne-related concerns. It works by exfoliating inside the pores while supporting a clearer and more balanced complexion.",
+      items: [
+        {
+          name: "Hero Ingredient: Salicylic Acid",
+          benefit:
+            "A beta hydroxy acid (BHA) that penetrates deep into pores to dissolve excess sebum and dead skin buildup. It helps reduce blackheads, whiteheads, and congestion while improving overall skin clarity and smoothness.",
+        },
+        {
+          name: "Oligopeptide-10",
+          benefit:
+            "A bioactive peptide that helps support the skin's defense against acne-causing bacteria, working in synergy with exfoliating actives for clearer skin.",
+        },
+        {
+          name: "Zinc PCA",
+          benefit:
+            "Helps regulate excess sebum production and supports antibacterial action, reducing shine and minimizing acne formation while maintaining skin balance.",
+        },
+        {
+          name: "EGCG (Green Tea Extract)",
+          benefit:
+            "A powerful antioxidant that helps reduce redness and inflammation while soothing stressed, acne-prone skin.",
         },
       ],
     },

@@ -41,491 +41,479 @@ export interface Concern {
 export const concerns: Concern[] = [
   {
     id: 1,
-    slug: "dullness-uneven-tone",
-    title: "Dullness & Uneven Tone",
-    subtitle: "RESTORE YOUR NATURAL RADIANCE",
+    slug: "acne-clogged-pores",
+    title: "Acne & Clogged Pores",
+    subtitle: "CLEAR CONGESTION, CALM BREAKOUTS",
     image: "/images/home/care 1.jpg",
     icon: Sparkles,
     summary:
-      "When skin looks tired or patchy, the right brightening actives can help bring back clarity and glow.",
+      "Congested pores and frequent breakouts need oil-balancing and pore-clearing actives used consistently.",
     heroDescription:
-      "Dullness and uneven tone can make skin look tired even when it is healthy. A targeted brightening routine helps revive radiance, smooth texture, and support a more balanced complexion.",
-    understandingTitle: "What Causes Dullness & Uneven Tone?",
+      "Acne and clogged pores often appear when excess sebum, dead skin buildup, and impurities stay trapped in the skin. A focused routine helps unclog pores, reduce active breakouts, and support clearer-looking skin.",
+    understandingTitle: "What Causes Acne & Clogged Pores?",
     understandingDescription:
-      "A buildup of dead skin cells, sun exposure, post-acne marks, and dehydration can all contribute to skin that looks flat or uneven. Consistent use of brightening, barrier-friendly ingredients helps restore clarity over time.",
+      "Overproduction of oil, inconsistent cleansing, and pore congestion can trigger acne and visible bumps. Using balancing and exfoliating ingredients gently can improve skin clarity over time.",
     symptoms: [
-      "Loss of natural glow",
-      "Patchy or uneven complexion",
-      "Lingering post-acne marks",
-      "Rough, tired-looking skin",
+      "Frequent breakouts",
+      "Clogged or enlarged pores",
+      "Inflamed pimples",
+      "Uneven, congested skin surface",
     ],
     understandingImage: "/images/home/care 1.jpg",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
-        percentage: "10%",
-        name: "Vitamin C",
+        percentage: "2%",
+        name: "Salicylic Acid",
         description:
-          "Helps brighten dull skin, improve visible clarity, and support a more even-looking tone.",
+          "Penetrates pores to dissolve buildup and reduce acne-causing congestion.",
       },
       {
-        percentage: "4%",
+        percentage: "10%",
         name: "Niacinamide",
         description:
-          "Strengthens the skin barrier while helping reduce the look of discoloration and uneven texture.",
+          "Helps regulate excess oil and supports calmer, clearer-looking skin.",
       },
       {
-        percentage: "2%",
-        name: "Alpha Arbutin",
+        percentage: "0.5%",
+        name: "Zinc PCA",
         description:
-          "Targets the appearance of dark spots gently for a more refined, balanced complexion.",
+          "Supports sebum balance and helps reduce visible inflammation.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Cleanse Gently",
-        description: "Start with a non-stripping cleanser to prep skin.",
+        title: "Cleanse Thoroughly",
+        description:
+          "Wash away oil and impurities without stripping your barrier.",
       },
       {
         number: "02",
-        title: "Apply Brightening Serum",
-        description:
-          "Press 2-3 drops into clean skin, focusing on uneven areas.",
+        title: "Apply Pore-Care Serum",
+        description: "Use 2-3 drops on acne-prone zones to target congestion.",
       },
       {
         number: "03",
-        title: "Seal With Moisture",
-        description: "Lock in hydration to support glow and smoother texture.",
+        title: "Moisturize Lightly",
+        description:
+          "Use an oil-free moisturizer to keep skin hydrated and balanced.",
       },
       {
         number: "04",
-        title: "Use SPF Daily",
+        title: "Protect With SPF",
         description:
-          "Protect your progress by minimizing fresh sun-triggered discoloration.",
+          "Wear sunscreen daily to prevent post-acne marks from darkening.",
       },
     ],
   },
   {
     id: 2,
-    slug: "dehydration-dryness",
-    title: "Dehydration & Dryness",
-    subtitle: "REPLENISH COMFORT AND BOUNCE",
+    slug: "blackheads-whiteheads",
+    title: "Blackheads and Whiteheads",
+    subtitle: "UNCLOG PORES, SMOOTH THE SURFACE",
     image: "/images/home/care 2.jpg",
     icon: Droplets,
     summary:
-      "Water loss leaves skin looking dull and feeling tight, but barrier-supportive hydration can quickly restore comfort.",
+      "Persistent blackheads and whiteheads usually point to trapped oil, debris, and slower surface renewal.",
     heroDescription:
-      "Dehydrated skin often feels tight, rough, or less supple. Rebuilding hydration levels and reinforcing the skin barrier helps restore bounce, softness, and a healthier-looking surface.",
-    understandingTitle: "What Causes Dehydration & Dryness?",
+      "Blackheads and whiteheads form when pores remain clogged with oil and dead skin cells. With regular exfoliation and balanced hydration, skin texture can look cleaner and more refined.",
+    understandingTitle: "Why Do Blackheads and Whiteheads Form?",
     understandingDescription:
-      "Harsh cleansers, over-exfoliation, weather changes, and barrier disruption can all lead to water loss. Even oily skin can become dehydrated when it lacks the hydration needed to stay balanced and resilient.",
+      "When pores are blocked, oxidation can create blackheads while closed buildup appears as whiteheads. Gentle exfoliation and non-comedogenic products help prevent recurring congestion.",
     symptoms: [
-      "Tightness after cleansing",
-      "Flaky or rough patches",
-      "Skin that looks tired or creased",
-      "Reduced softness and bounce",
+      "Dark pore dots around nose and T-zone",
+      "Small closed bumps under the skin",
+      "Uneven texture",
+      "Recurring pore congestion",
     ],
     understandingImage: "/images/home/care 2.jpg",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
-        percentage: "1%",
-        name: "Hyaluronic Acid",
+        percentage: "2%",
+        name: "BHA Blend",
         description:
-          "Draws water into the skin to improve softness, comfort, and plumpness.",
+          "Helps loosen pore buildup and reduce the appearance of blackheads.",
       },
       {
         percentage: "5%",
-        name: "Panthenol",
+        name: "Lactic Acid",
         description:
-          "Supports the barrier and helps reduce the tight, uncomfortable feel of dehydration.",
+          "Refines rough texture and supports smoother, more even skin.",
       },
       {
         percentage: "2%",
-        name: "Ceramide Complex",
+        name: "Niacinamide",
         description:
-          "Reinforces the skin barrier to help prevent future moisture loss.",
+          "Helps normalize pore appearance while supporting barrier health.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Use a Mild Cleanser",
+        title: "Start With Clean Skin",
         description:
-          "Avoid stripping formulas that leave skin squeaky and tight.",
+          "Use a gentle cleanser to remove buildup without irritation.",
       },
       {
         number: "02",
-        title: "Layer Hydration",
+        title: "Use Exfoliating Serum",
         description:
-          "Apply serum while skin is slightly damp for better moisture retention.",
+          "Apply targeted actives on congested areas, especially T-zone.",
       },
       {
         number: "03",
-        title: "Follow With Cream",
-        description: "Seal in hydration with a barrier-supportive moisturizer.",
+        title: "Hydrate Barrier",
+        description:
+          "Follow with lightweight moisturizer to avoid rebound oiliness.",
       },
       {
         number: "04",
-        title: "Stay Consistent",
+        title: "Repeat Consistently",
         description:
-          "Use morning and night to steadily restore comfort and resilience.",
+          "Stick to routine daily to minimize recurring blackheads and whiteheads.",
       },
     ],
   },
   {
     id: 3,
-    slug: "early-aging-signs",
-    title: "Early Aging Signs",
+    slug: "excess-oil-shine",
+    title: "Excess Oil and Shine",
     image: "/images/home/care 3.jpg",
     icon: Clock4,
     summary:
-      "Fine lines, reduced bounce, and early texture changes respond best to routines that support collagen and hydration together.",
+      "If skin looks greasy quickly after cleansing, it likely needs better oil regulation instead of harsh drying.",
     heroDescription:
-      "Early signs of aging often show up as fine lines, reduced elasticity, and skin that does not feel as smooth or plump as before. A preventive routine can help support firmer, healthier-looking skin.",
-    understandingTitle: "What Triggers Early Aging Signs?",
+      "Excess oil and constant shine can make skin feel heavy and increase pore congestion. The right balancing ingredients help control sebum while keeping skin comfortably hydrated.",
+    understandingTitle: "What Causes Excess Oil and Shine?",
     understandingDescription:
-      "Sun exposure, stress, dehydration, and natural collagen decline all contribute to changes in firmness and texture. Using targeted antioxidants and hydration can help skin stay resilient for longer.",
+      "Overactive sebaceous glands, heat, humidity, and over-cleansing can all trigger excess sebum. A balanced routine helps reduce shine without damaging the barrier.",
     symptoms: [
-      "Fine lines around eyes or mouth",
-      "Reduced bounce and firmness",
-      "Texture that feels less smooth",
-      "Skin looking less rested over time",
+      "Greasy T-zone within hours",
+      "Persistent facial shine",
+      "Frequent clogged pores",
+      "Makeup breaking down quickly",
     ],
     understandingImage: "/images/home/care 3.jpg",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
-        percentage: "5%",
-        name: "Peptides",
-        description:
-          "Support skin firmness and help soften the look of early fine lines.",
-      },
-      {
         percentage: "10%",
-        name: "Vitamin C",
+        name: "Niacinamide",
         description:
-          "Provides antioxidant support while improving brightness and overall skin vitality.",
+          "Helps control excess sebum and improve visible pore quality.",
       },
       {
-        percentage: "0.5%",
-        name: "Bakuchiol",
-        description:
-          "A gentle active that helps refine texture and support smoother-looking skin.",
+        percentage: "1%",
+        name: "Zinc PCA",
+        description: "Supports oil balance and helps keep skin looking fresh.",
+      },
+      {
+        percentage: "2%",
+        name: "Salicylic Acid",
+        description: "Helps clear oily buildup in pores and reduce congestion.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Prep Skin",
-        description:
-          "Cleanse and lightly hydrate so active ingredients apply evenly.",
+        title: "Cleanse Morning and Night",
+        description: "Use a gentle cleanser to remove excess oil and sweat.",
       },
       {
         number: "02",
-        title: "Apply Treatment",
-        description: "Use a collagen-supportive serum over face and neck.",
+        title: "Apply Oil-Control Serum",
+        description: "Focus on the T-zone and visibly shiny areas.",
       },
       {
         number: "03",
-        title: "Moisturize",
-        description: "Support elasticity with a nourishing barrier cream.",
+        title: "Use Gel Moisturizer",
+        description: "Hydrate skin lightly so it stays balanced, not greasy.",
       },
       {
         number: "04",
-        title: "Protect Daily",
-        description: "Finish with SPF every morning to limit photoaging.",
+        title: "Finish With Matte SPF",
+        description: "Protect skin daily without adding heavy shine.",
       },
     ],
   },
   {
     id: 4,
-    slug: "sensitivity",
-    title: "Sensitivity",
+    slug: "rough-skin-texture",
+    title: "Rough Skin Texture",
     image: "/images/home/care 4.jpg",
     icon: ShieldAlert,
     summary:
-      "Skin that reacts easily usually needs calm, low-irritation support that reinforces the barrier instead of pushing it harder.",
+      "Rough, bumpy texture often appears when dead skin buildup and dehydration are left untreated.",
     heroDescription:
-      "Sensitive skin can feel reactive, uncomfortable, and unpredictable. A minimalist routine focused on soothing ingredients and barrier repair helps reduce visible stress and improve tolerance over time.",
-    understandingTitle: "Why Does Skin Become Sensitive?",
+      "When skin texture feels uneven or coarse, it usually needs gentle resurfacing plus hydration support. Consistent smoothing care helps skin feel softer and look more refined.",
+    understandingTitle: "What Causes Rough Skin Texture?",
     understandingDescription:
-      "A weakened barrier, harsh products, environmental triggers, and overuse of strong actives can make skin feel more reactive. Gentle formulations help calm visible redness and reduce the chance of future flare-ups.",
+      "Dead skin accumulation, inadequate exfoliation, and barrier disruption can make skin feel rough to the touch. Mild exfoliants and moisture-binding ingredients can improve texture progressively.",
     symptoms: [
-      "Visible redness or flushing",
-      "Stinging after product use",
-      "Dry, compromised barrier",
-      "Skin that reacts to weather or friction",
+      "Bumpy or grainy skin feel",
+      "Uneven makeup application",
+      "Dry, flaky patches",
+      "Dull and coarse surface",
     ],
     understandingImage: "/images/home/care 4.jpg",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
         percentage: "5%",
-        name: "Panthenol",
+        name: "Lactic Acid",
         description:
-          "Helps calm stressed skin while improving overall comfort and hydration.",
+          "Gently exfoliates dead skin to improve softness and clarity.",
       },
       {
         percentage: "1%",
-        name: "Centella Asiatica",
-        description:
-          "Known for soothing visible irritation and supporting skin recovery.",
+        name: "Hyaluronic Acid",
+        description: "Hydrates skin deeply to reduce dry, rough feel.",
       },
       {
         percentage: "2%",
-        name: "Ceramides",
+        name: "Ceramide Complex",
         description:
-          "Strengthen the barrier to help skin become less reactive over time.",
+          "Supports barrier repair and keeps texture smooth over time.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Cleanse Carefully",
-        description:
-          "Use lukewarm water and a gentle cleanser with minimal friction.",
+        title: "Cleanse Gently",
+        description: "Use non-stripping cleanser to avoid worsening roughness.",
       },
       {
         number: "02",
-        title: "Apply Soothing Serum",
-        description: "Pat on a calming layer without over-rubbing the skin.",
+        title: "Apply Texture Serum",
+        description: "Use a mild resurfacing serum in a thin, even layer.",
       },
       {
         number: "03",
-        title: "Repair the Barrier",
-        description:
-          "Use a rich but breathable moisturizer to reduce transepidermal water loss.",
+        title: "Moisturize Well",
+        description: "Seal hydration with barrier-supportive moisturizer.",
       },
       {
         number: "04",
-        title: "Keep the Routine Simple",
+        title: "Use SPF Daily",
         description:
-          "Avoid layering too many strong actives while skin is reactive.",
+          "Protect newly resurfaced skin from sun-related roughness.",
       },
     ],
   },
   {
     id: 5,
-    slug: "dark-circles",
-    title: "Dark Circles",
+    slug: "fine-lines-wrinkles",
+    title: "Fine Lines and Wrinkles",
     image: "/images/home/care 5.jpg",
     icon: Eye,
     summary:
-      "Under-eye darkness often needs a mix of brightening, hydration, and barrier support to look fresher.",
+      "Visible lines and wrinkles respond best to routines that support renewal, hydration, and collagen care.",
     heroDescription:
-      "Dark circles can be influenced by fatigue, dehydration, pigmentation, and a thinner-looking under-eye area. A focused routine helps the eye area appear brighter, smoother, and more awake.",
-    understandingTitle: "What Makes Dark Circles More Visible?",
+      "Fine lines and wrinkles can show up from repeated facial movement, dehydration, and natural collagen decline. Consistent anti-aging support helps skin look smoother and more supple.",
+    understandingTitle: "Why Do Fine Lines and Wrinkles Develop?",
     understandingDescription:
-      "Lack of sleep, dryness, genetics, and pigmentation can all contribute to shadowing under the eyes. Gentle hydration and brightening support help the area look more even and refreshed.",
+      "Age, UV exposure, and reduced cell turnover gradually make lines more noticeable. Barrier-safe retinoid routines and hydration help soften these visible changes.",
     symptoms: [
-      "Shadowing beneath the eyes",
-      "Tired-looking eye contour",
-      "Dry or crepey under-eye skin",
-      "Uneven tone around the orbital area",
+      "Expression lines around eyes and mouth",
+      "Visible forehead creases",
+      "Loss of smoothness",
+      "Skin that appears less plump",
     ],
     understandingImage: "/images/home/care 5.jpg",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
-        percentage: "5%",
-        name: "Caffeine",
+        percentage: "0.15%",
+        name: "Retinol",
         description:
-          "Helps the under-eye area look more energized and less puffy.",
+          "Supports skin renewal and helps reduce the look of fine lines.",
       },
       {
-        percentage: "2%",
+        percentage: "1%",
         name: "Niacinamide",
         description:
-          "Supports a smoother-looking eye contour and more even visible tone.",
+          "Strengthens barrier function and supports smoother texture.",
       },
       {
         percentage: "1%",
         name: "Hyaluronic Acid",
         description:
-          "Hydrates the delicate eye area to soften the look of fine dehydration lines.",
+          "Hydrates skin to make lines appear softer and less pronounced.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Hydrate First",
-        description: "Apply on clean skin before heavier creams or sunscreen.",
+        title: "Cleanse and Dry",
+        description: "Start on clean, dry skin before applying treatment.",
       },
       {
         number: "02",
-        title: "Tap Gently",
+        title: "Apply Retinol Serum",
         description:
-          "Use your ring finger to press product around the eye contour.",
+          "Use a small amount at night and build frequency gradually.",
       },
       {
         number: "03",
-        title: "Seal With Moisture",
-        description: "Layer a gentle moisturizer to keep the area supple.",
+        title: "Moisturize",
+        description:
+          "Follow with moisturizer to reduce dryness and irritation.",
       },
       {
         number: "04",
-        title: "Use Consistently",
-        description:
-          "Daily use helps the eye area look brighter and less fatigued over time.",
+        title: "Morning SPF Is Essential",
+        description: "Protect skin daily to prevent further wrinkle formation.",
       },
     ],
   },
   {
     id: 6,
-    slug: "sun-damage",
-    title: "Sun Damage",
-    image: "/images/home/care 6.jpg",
+    slug: "uneven-skin-tone",
+    title: "Uneven Skin Tone",
+    image: "/images/concern/concern4.png",
     icon: Sun,
     summary:
-      "UV exposure can leave behind spots, roughness, and visible dullness that need brightening and daily protection.",
+      "Uneven tone and patchy complexion often improve with brightening actives and daily UV protection.",
     heroDescription:
-      "Sun damage often appears as uneven tone, rough texture, and loss of radiance. Recovery starts with brightening support, barrier care, and daily sun protection to prevent further visible damage.",
-    understandingTitle: "How Does Sun Damage Affect Skin?",
+      "Skin tone can look uneven due to sun exposure, acne marks, and inflammation. A targeted brightening routine helps improve clarity and restore a more balanced complexion.",
+    understandingTitle: "What Causes Uneven Skin Tone?",
     understandingDescription:
-      "Repeated UV exposure can speed up discoloration, dryness, and visible texture changes. A recovery-focused routine helps improve tone and texture while SPF protects against ongoing damage.",
+      "Pigmentation triggers like UV damage, post-inflammatory marks, and barrier stress can create patchiness. Gentle corrective ingredients and consistent SPF are key for visible improvement.",
     symptoms: [
-      "Dark spots after sun exposure",
-      "Rough or leathery texture",
-      "Dullness and uneven color",
-      "Skin that feels less resilient",
+      "Patchy complexion",
+      "Dark spots and marks",
+      "Uneven brightness across face",
+      "Post-acne discoloration",
     ],
-    understandingImage: "/images/home/care 6.jpg",
+    understandingImage: "/images/concern/concern4.png",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
         percentage: "10%",
         name: "Vitamin C",
-        description:
-          "Helps visibly brighten discoloration caused by repeated sun exposure.",
+        description: "Brightens skin and helps reduce the look of dark spots.",
       },
       {
         percentage: "2%",
         name: "Alpha Arbutin",
-        description:
-          "Works gradually on visible spot intensity for a more even look.",
+        description: "Targets uneven pigmentation for a more uniform tone.",
       },
       {
-        percentage: "1%",
-        name: "Ectoin",
+        percentage: "4%",
+        name: "Niacinamide",
         description:
-          "Supports stressed skin and helps maintain hydration in challenging environments.",
+          "Supports barrier health and improves overall tone consistency.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Cleanse and Reset",
-        description:
-          "Start with clean skin so brightening actives absorb evenly.",
+        title: "Cleanse Gently",
+        description: "Prep skin so brightening ingredients absorb evenly.",
       },
       {
         number: "02",
-        title: "Use Corrective Serum",
-        description:
-          "Apply a targeted serum over areas of discoloration and roughness.",
+        title: "Apply Brightening Serum",
+        description: "Focus on areas with dark spots and uneven tone.",
       },
       {
         number: "03",
-        title: "Moisturize Well",
+        title: "Hydrate and Seal",
         description:
-          "Support the barrier while skin recovers from visible UV stress.",
+          "Use moisturizer to support barrier repair during correction.",
       },
       {
         number: "04",
-        title: "Never Skip SPF",
+        title: "Use Broad-Spectrum SPF",
         description:
-          "Daily broad-spectrum protection is essential to prevent setbacks.",
+          "Daily sun protection prevents new discoloration and setbacks.",
       },
     ],
   },
   {
     id: 7,
-    slug: "sun-damage",
-    title: "Sun Damage",
-    image: "/images/home/care 6.jpg",
+    slug: "loss-of-firmness",
+    title: "Loss of Firmness",
+    image: "/images/concern/concern3.png",
     icon: Sun,
     summary:
-      "UV exposure can leave behind spots, roughness, and visible dullness that need brightening and daily protection.",
+      "When skin feels less bouncy or lifted, targeted firming actives and hydration can help restore resilience.",
     heroDescription:
-      "Sun damage often appears as uneven tone, rough texture, and loss of radiance. Recovery starts with brightening support, barrier care, and daily sun protection to prevent further visible damage.",
-    understandingTitle: "How Does Sun Damage Affect Skin?",
+      "Loss of firmness appears as reduced elasticity and softer facial contours over time. A routine focused on collagen support and hydration can improve skin's lifted appearance.",
+    understandingTitle: "Why Does Skin Lose Firmness?",
     understandingDescription:
-      "Repeated UV exposure can speed up discoloration, dryness, and visible texture changes. A recovery-focused routine helps improve tone and texture while SPF protects against ongoing damage.",
+      "Natural collagen decline, UV stress, and dehydration can make skin feel less taut. Consistent firming ingredients help strengthen and support visible structure.",
     symptoms: [
-      "Dark spots after sun exposure",
-      "Rough or leathery texture",
-      "Dullness and uneven color",
-      "Skin that feels less resilient",
+      "Reduced skin bounce",
+      "Softer jawline definition",
+      "Skin that feels thinner",
+      "Less elastic texture",
     ],
-    understandingImage: "/images/home/care 6.jpg",
+    understandingImage: "/images/concern/concern3.png",
     routineImage: "/images/concern/concern2.jpg",
     ingredients: [
       {
-        percentage: "10%",
-        name: "Vitamin C",
+        percentage: "5%",
+        name: "Peptide Complex",
         description:
-          "Helps visibly brighten discoloration caused by repeated sun exposure.",
+          "Supports firmer-feeling skin and improved visible elasticity.",
       },
       {
-        percentage: "2%",
-        name: "Alpha Arbutin",
+        percentage: "0.15%",
+        name: "Retinol",
         description:
-          "Works gradually on visible spot intensity for a more even look.",
+          "Promotes skin renewal and supports smoother, tighter-looking skin.",
       },
       {
         percentage: "1%",
-        name: "Ectoin",
+        name: "Hyaluronic Acid",
         description:
-          "Supports stressed skin and helps maintain hydration in challenging environments.",
+          "Improves hydration levels to maintain plump, resilient skin.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Cleanse and Reset",
-        description:
-          "Start with clean skin so brightening actives absorb evenly.",
+        title: "Cleanse and Prep",
+        description: "Use a mild cleanser before applying firming treatments.",
       },
       {
         number: "02",
-        title: "Use Corrective Serum",
-        description:
-          "Apply a targeted serum over areas of discoloration and roughness.",
+        title: "Apply Firming Serum",
+        description: "Focus on face and neck for better overall support.",
       },
       {
         number: "03",
-        title: "Moisturize Well",
-        description:
-          "Support the barrier while skin recovers from visible UV stress.",
+        title: "Moisturize Generously",
+        description: "Use a supportive cream to improve bounce and comfort.",
       },
       {
         number: "04",
-        title: "Never Skip SPF",
-        description:
-          "Daily broad-spectrum protection is essential to prevent setbacks.",
+        title: "Protect Every Morning",
+        description: "Use SPF to protect collagen from UV-related breakdown.",
       },
     ],
   },
   {
     id: 8,
-    slug: "sun-damage",
-    title: "Sun Damage",
+    slug: "dull-aging-skin",
+    title: "Dull and Aging Skin",
     image: "/images/home/care 6.jpg",
     icon: Sun,
     summary:
-      "UV exposure can leave behind spots, roughness, and visible dullness that need brightening and daily protection.",
+      "Aging skin can look tired and dull when renewal slows and hydration drops.",
     heroDescription:
-      "Sun damage often appears as uneven tone, rough texture, and loss of radiance. Recovery starts with brightening support, barrier care, and daily sun protection to prevent further visible damage.",
-    understandingTitle: "How Does Sun Damage Affect Skin?",
+      "Dull and aging skin often shows reduced glow, uneven texture, and lower resilience. A multi-action routine can help revive radiance while supporting long-term skin health.",
+    understandingTitle: "What Leads to Dull, Aging Skin?",
     understandingDescription:
-      "Repeated UV exposure can speed up discoloration, dryness, and visible texture changes. A recovery-focused routine helps improve tone and texture while SPF protects against ongoing damage.",
+      "As cell turnover slows with age, skin may appear less luminous and more fatigued. Combining brightening antioxidants, renewal support, and hydration helps restore a healthier look.",
     symptoms: [
-      "Dark spots after sun exposure",
-      "Rough or leathery texture",
-      "Dullness and uneven color",
-      "Skin that feels less resilient",
+      "Loss of glow",
+      "Tired-looking complexion",
+      "Uneven, rough texture",
+      "Visible early aging signs",
     ],
     understandingImage: "/images/home/care 6.jpg",
     routineImage: "/images/concern/concern2.jpg",
@@ -534,113 +522,44 @@ export const concerns: Concern[] = [
         percentage: "10%",
         name: "Vitamin C",
         description:
-          "Helps visibly brighten discoloration caused by repeated sun exposure.",
+          "Boosts radiance and supports a brighter, more energized appearance.",
       },
       {
-        percentage: "2%",
-        name: "Alpha Arbutin",
+        percentage: "0.15%",
+        name: "Retinol",
         description:
-          "Works gradually on visible spot intensity for a more even look.",
+          "Encourages renewal to smooth texture and soften aging signs.",
       },
       {
         percentage: "1%",
-        name: "Ectoin",
+        name: "Hyaluronic Acid",
         description:
-          "Supports stressed skin and helps maintain hydration in challenging environments.",
+          "Replenishes hydration to improve plumpness and skin comfort.",
       },
     ],
     routineSteps: [
       {
         number: "01",
-        title: "Cleanse and Reset",
+        title: "Cleanse Daily",
         description:
-          "Start with clean skin so brightening actives absorb evenly.",
+          "Start with clean skin to help active ingredients work better.",
       },
       {
         number: "02",
-        title: "Use Corrective Serum",
-        description:
-          "Apply a targeted serum over areas of discoloration and roughness.",
+        title: "Apply Brightening Treatment",
+        description: "Use antioxidant-rich serum to improve clarity and tone.",
       },
       {
         number: "03",
-        title: "Moisturize Well",
+        title: "Nourish With Moisture",
         description:
-          "Support the barrier while skin recovers from visible UV stress.",
+          "Apply a hydrating moisturizer to restore comfort and suppleness.",
       },
       {
         number: "04",
-        title: "Never Skip SPF",
+        title: "Protect With SPF",
         description:
-          "Daily broad-spectrum protection is essential to prevent setbacks.",
-      },
-    ],
-  },
-  {
-    id: 9,
-    slug: "sun-damage",
-    title: "Sun Damage",
-    image: "/images/home/care 6.jpg",
-    icon: Sun,
-    summary:
-      "UV exposure can leave behind spots, roughness, and visible dullness that need brightening and daily protection.",
-    heroDescription:
-      "Sun damage often appears as uneven tone, rough texture, and loss of radiance. Recovery starts with brightening support, barrier care, and daily sun protection to prevent further visible damage.",
-    understandingTitle: "How Does Sun Damage Affect Skin?",
-    understandingDescription:
-      "Repeated UV exposure can speed up discoloration, dryness, and visible texture changes. A recovery-focused routine helps improve tone and texture while SPF protects against ongoing damage.",
-    symptoms: [
-      "Dark spots after sun exposure",
-      "Rough or leathery texture",
-      "Dullness and uneven color",
-      "Skin that feels less resilient",
-    ],
-    understandingImage: "/images/home/care 6.jpg",
-    routineImage: "/images/concern/concern2.jpg",
-    ingredients: [
-      {
-        percentage: "10%",
-        name: "Vitamin C",
-        description:
-          "Helps visibly brighten discoloration caused by repeated sun exposure.",
-      },
-      {
-        percentage: "2%",
-        name: "Alpha Arbutin",
-        description:
-          "Works gradually on visible spot intensity for a more even look.",
-      },
-      {
-        percentage: "1%",
-        name: "Ectoin",
-        description:
-          "Supports stressed skin and helps maintain hydration in challenging environments.",
-      },
-    ],
-    routineSteps: [
-      {
-        number: "01",
-        title: "Cleanse and Reset",
-        description:
-          "Start with clean skin so brightening actives absorb evenly.",
-      },
-      {
-        number: "02",
-        title: "Use Corrective Serum",
-        description:
-          "Apply a targeted serum over areas of discoloration and roughness.",
-      },
-      {
-        number: "03",
-        title: "Moisturize Well",
-        description:
-          "Support the barrier while skin recovers from visible UV stress.",
-      },
-      {
-        number: "04",
-        title: "Never Skip SPF",
-        description:
-          "Daily broad-spectrum protection is essential to prevent setbacks.",
+          "Use SPF each morning to protect brightness and firmness gains.",
       },
     ],
   },
