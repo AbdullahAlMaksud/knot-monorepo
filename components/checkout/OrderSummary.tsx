@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { DISCOUNT_AMOUNT, SHIPPING_FEE } from "@/lib/orders/types";
 
 type CartItem = {
   id: number | string;
@@ -26,8 +27,8 @@ export default function OrderSummary({
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shipping = 5.99;
-  const total = subtotal + shipping;
+  const shipping = SHIPPING_FEE;
+  const total = (subtotal - DISCOUNT_AMOUNT) + shipping;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-4">
@@ -36,7 +37,7 @@ export default function OrderSummary({
       <div className="space-y-4 mb-6">
         {cartItems.map((item) => (
           <div key={item.id} className="flex gap-4">
-            <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+            <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden shrink-0 relative">
               <Image
                 src={item.image}
                 alt={item.name}
@@ -57,6 +58,10 @@ export default function OrderSummary({
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal</span>
           <span className="font-medium">${subtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Discount</span>
+          <span>${DISCOUNT_AMOUNT.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Shipping</span>

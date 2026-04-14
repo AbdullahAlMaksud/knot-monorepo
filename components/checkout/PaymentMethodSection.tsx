@@ -3,8 +3,7 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 
 type CheckoutFormData = {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phone: string;
   apartment: string;

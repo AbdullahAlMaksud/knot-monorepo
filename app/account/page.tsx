@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,20 +11,14 @@ import ShippingAddressForm from "@/components/account/ShippingAddressForm";
 import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { ShippingAddress, useUpdateShippingAddress } from "@/hooks/useShippingAddress";
 
 type ProfileFormData = {
   fullName: string;
   lastName: string;
   email: string;
   phone: string;
-};
-
-type ShippingFormData = {
-  apartment: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
 };
 
 type PasswordFormData = {
@@ -50,12 +45,13 @@ export default function MyAccountPage() {
     register: registerShipping,
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
-  } = useForm<ShippingFormData>();
+    setValue: setValueShipping,
+  } = useForm<ShippingAddress>();
 
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
-    watch,
+    watch, reset: resetPassword,
     formState: { errors: errorsPassword },
   } = useForm<PasswordFormData>();
 
@@ -71,42 +67,51 @@ export default function MyAccountPage() {
     if (!session?.user) return;
     const name = session.user.name ?? "";
     const nameParts = name.trim().split(/\s+/);
-    const fullName = nameParts[0] ?? "";
-    const lastName = nameParts.slice(1).join(" ") ?? "";
     resetProfile({
-      fullName,
-      lastName,
+      fullName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" ") ?? "",
       email: session.user.email ?? "",
-      phone: "",
+      phone: (session.user as any).phone ?? "",
     });
   }, [session?.user, resetProfile]);
 
-  const onSubmitProfile = (data: ProfileFormData) => {
-    console.log("Profile:", data);
-    alert("Profile updated successfully!");
+  const onSubmitProfile = async (data: ProfileFormData) => {
+    try {
+      await authClient.updateUser({
+        name: `${data.fullName} ${data.lastName}`.trim(),
+        // @ts-expect-error — additionalFields
+        phone: data.phone,
+      });
+      toast.success("Profile updated successfully!");
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update profile.");
+    }
   };
 
-  const onSubmitShipping = (data: ShippingFormData) => {
-    console.log("Shipping:", data);
-    alert("Shipping address updated successfully!");
+  const { mutate: updateShipping, isPending: isShippingUpdating } = useUpdateShippingAddress();
+
+  const onSubmitShipping = (data: ShippingAddress) => {
+    updateShipping({
+      userId: session!.user.id,
+      address: data,
+    });
   };
 
-  const onSubmitPassword = (data: PasswordFormData) => {
-    console.log("Password:", data);
-    alert("Password changed successfully!");
-  };
+  const onSubmitPassword = async (data: PasswordFormData) => {
+    const { error } = await authClient.changePassword({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      revokeOtherSessions: true,
+    });
 
-  if (isPending || !session?.user) {
-    return (
-      <Layout>
-        <div className="py-44">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-gray-600">Loading…</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+    if (error) {
+      toast.error(error.message ?? "Failed to change password");
+      return;
+    }
+    toast.success("Password changed successfully!");
+    resetPassword();
+  };
 
   return (
     <Layout>
@@ -123,13 +128,16 @@ export default function MyAccountPage() {
                 errors={errorsProfile}
                 handleSubmit={handleSubmitProfile}
                 onSubmit={onSubmitProfile}
-                userImage={session.user.image ?? undefined}
+                userImage={session?.user?.image ?? undefined}
               />
               <ShippingAddressForm
                 register={registerShipping}
                 errors={errorsShipping}
                 handleSubmit={handleSubmitShipping}
+                setValue={setValueShipping}
                 onSubmit={onSubmitShipping}
+                isSubmitting={isShippingUpdating}
+                userId={session?.user?.id ?? ""}
               />
               <PasswordChangeForm
                 register={registerPassword}
