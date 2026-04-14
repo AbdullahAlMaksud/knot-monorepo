@@ -21,7 +21,9 @@ export default function Header() {
   // Pages that start with transparent header
   const transparentPages = ["/", "/about", "/lab", "/blog", "/concern"];
   const isTransparentPage =
-    transparentPages.includes(pathname) || pathname.startsWith("/blog/");
+    transparentPages.includes(pathname) ||
+    pathname.startsWith("/blog/") ||
+    pathname.startsWith("/concern/");
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -56,11 +58,19 @@ export default function Header() {
         {/* Promo Banner */}
         <div className="bg-black text-white text-center py-2 px-4 text-xs sm:text-sm">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+            >
               &lt;
             </Button>
             <span>BUY 2 PRODUCTS AND GET A FREE GIFT!</span>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+            >
               &gt;
             </Button>
           </div>
@@ -85,7 +95,7 @@ export default function Header() {
             >
               <Link
                 href="/shop"
-                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/shop" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
               >
@@ -93,7 +103,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/about"
-                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/about" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
               >
@@ -101,7 +111,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/contact"
-                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/contact" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
               >
@@ -109,7 +119,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/lab"
-                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/lab" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
               >
@@ -154,7 +164,12 @@ export default function Header() {
                   {session.user.name ?? "Account"}
                 </Link>
               ) : (
-                <Button variant="ghost" size="icon" className="hover:opacity-70" asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:opacity-70"
+                  asChild
+                >
                   <Link href={profileHref} aria-label="Sign in">
                     <User size={20} />
                   </Link>
@@ -192,7 +207,7 @@ export default function Header() {
             >
               <Link
                 href="/shop"
-                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/shop" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -201,7 +216,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/about"
-                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/about" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -210,7 +225,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/contact"
-                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/contact" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -219,7 +234,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/lab"
-                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/lab" ? "after:w-full" : ""
                 } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
                 onClick={() => setMobileMenuOpen(false)}
