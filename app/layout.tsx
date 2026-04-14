@@ -3,6 +3,8 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import { CartProvider } from "@/lib/cart/CartContext";
+import { Toaster } from "sonner";
+import { TTQueryClientProvider } from "@/providers/TTQueryClientProvider";
 
 // Playfair Display for headings
 const playfairDisplay = Playfair_Display({
@@ -35,9 +37,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfairDisplay.variable} ${inter.variable}`}>
       <body className="font-sans antialiased">
-        <CartProvider>
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
-        </CartProvider>
+        <Toaster
+          position="bottom-right"
+          richColors={true}
+          toastOptions={{ duration: 4000 }}
+          closeButton={true}
+        />
+        <TTQueryClientProvider>
+          <CartProvider>
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          </CartProvider>
+        </TTQueryClientProvider>
       </body>
     </html>
   );

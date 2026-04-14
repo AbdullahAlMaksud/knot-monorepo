@@ -42,7 +42,8 @@ export interface OrderDocument {
   updatedAt: Date;
 }
 
-export const SHIPPING_FEE = 5.99;
+export const SHIPPING_FEE = 6;
+export const DISCOUNT_AMOUNT = 8;
 
 export function generateOrderId(): string {
   const bytes = new Uint8Array(18);
@@ -55,3 +56,42 @@ export function generateOrderId(): string {
     .replace(/=+$/, "");
   return `ORD_${base64}`;
 }
+
+export type CheckoutFormData = {
+  name: string;
+  email: string;
+  phone: string;
+  apartment: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  transactionId: string;
+};
+
+export type Order = {
+  _id: string;
+  customerId: string;
+  shipping: {
+    name: string;
+    email: string;
+    phone: string;
+    apartment?: string
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+  payment: {
+    method: string;
+    transactionId: string;
+  }
+  items: { productId: string; name: string; image: string; unitPrice: number; subtotal: number; quantity: number }[];
+  totalAmount: number;
+  discountAmount: number;
+  shippingFee: number;
+  finalAmount: number;
+  status: "Paid" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  createdAt: string;
+  updatedAt: string;
+};
