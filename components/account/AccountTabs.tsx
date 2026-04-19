@@ -1,6 +1,7 @@
 "use client";
 
 import { User, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type AccountTabsProps = {
   activeTab: "profile" | "orders";
@@ -13,28 +14,22 @@ export default function AccountTabs({
 }: AccountTabsProps) {
   return (
     <div className="flex gap-4 mb-8">
-      <button
+      <Button
         onClick={() => setActiveTab("profile")}
-        className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition ${
-          activeTab === "profile"
-            ? "bg-black text-white"
-            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-        }`}
+        variant={activeTab === "profile" ? "default" : "outline"}
+        className="rounded-full"
       >
-        <User size={20} />
+        <User size={20} className="mr-2" />
         Profile
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={() => setActiveTab("orders")}
-        className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition ${
-          activeTab === "orders"
-            ? "bg-black text-white"
-            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-        }`}
+        variant={activeTab === "orders" ? "default" : "outline"}
+        className="rounded-full"
       >
-        <Package size={20} />
+        <Package size={20} className="mr-2" />
         Order History
-      </button>
+      </Button>
     </div>
   );
 }

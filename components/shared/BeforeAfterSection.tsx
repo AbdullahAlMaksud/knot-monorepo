@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { Code } from "lucide-react";
+import SectionIntroCta from "@/components/common/SectionIntroCta";
 
 export default function BeforeAfterSection() {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -51,23 +51,13 @@ export default function BeforeAfterSection() {
 
   return (
     <section className="py-16 sm:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-10">
-        <h2 className="text-3xl font-semibold mb-6">
-          Simple, safe, and effective, glowing skin for everyone
-        </h2>
-        <p className="text-gray-600 max-w-4xl mx-auto mb-8">
-          Our face mists and serums are made with a gentle, halal-friendly
-          formula that works even for sensitive skin. With no unnecessary
-          additives, Byou helps you achieve a natural, radiant glow and feel
-          confident in your own skin, without the extra frills.
-        </p>
-        <Link
-          href="/shop"
-          className="inline-block bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition"
-        >
-          Shop Now
-        </Link>
-      </div>
+      <SectionIntroCta
+        title="Be the Best Version of You"
+        description="B'You products are formulated with gentle, skin-friendly ingredients suitable even for sensitive skin. Free from unnecessary additives, our science-backed formulas focus on safety, effectiveness, and compatibility with Bangladeshi skin and climate. We help improve skin clarity, balance, and overall health-so you can feel confident and be the best version of you."
+        strongText="B'You - Just Be You."
+        buttonLabel="Shop Now"
+        buttonHref="/shop"
+      />
 
       <div className="max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto">
         <div

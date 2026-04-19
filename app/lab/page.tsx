@@ -10,25 +10,7 @@ import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import Innovation from "@/components/lab/Innovation";
 import Journey from "@/components/lab/Journey";
 import Team2 from "@/components/home/Team2";
-
-const coreProducts = [
-  {
-    id: 1,
-    name: "Glow Getter Brightening & Hydrating Serum",
-    price: "From ₩925 DCU FR",
-    rating: 5,
-    images: "/images/products/product1.jpg",
-    description: "Scientifically formulated with advanced ingredients to enhance your natural radiance and restore skin's moisture balance.",
-  },
-  {
-    id: 2,
-    name: "Glow Getter Brightening & Hydrating Serum",
-    price: "From ₩925 DCU FR",
-    rating: 5,
-    images: "/images/products/product2.jpg",
-    description: "Lab-tested formula that combines brightening agents with hydrating compounds for optimal skin health.",
-  },
-];
+import { coreProducts } from "@/data/products";
 
 export default function LabPage() {
   const heroMedia = [

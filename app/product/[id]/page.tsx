@@ -6,42 +6,35 @@ import FromUsToYouSection from "@/components/product/FromUsToYouSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import Info from "@/components/home/Info";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
+import {
+  coreProducts,
+  getProductDetailById,
+  getFeaturedProductById,
+  getProductInfoFeaturesById,
+} from "@/data/products";
+import { notFound } from "next/navigation";
 
-const coreProducts = [
-  {
-    id: 1,
-    name: "Glow Getter Brightening & Hydrating Serum",
-    price: "From ₩925 DCU FR",
-    rating: 5,
-    images: "/images/products/product1.jpg",
-    description: "Discover the secret to radiant skin with this expertly crafted serum that brightens and hydrates in one step.",
-  },
-];
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const productId = Number(id);
+  const detail = getProductDetailById(productId);
+  const featuredProduct = getFeaturedProductById(productId);
+  const infoFeatures = getProductInfoFeaturesById(productId);
 
-export default function ProductDetailPage() {
+  if (!detail || !featuredProduct) {
+    notFound();
+  }
+
   return (
     <Layout>
       <div className="pt-32">
-        <FeaturedProductHero
-          variant="light"
-          product={{
-            brand: "BYOU BEAUTY",
-            name: "Glow Contour Lifting Peptide Mist",
-            price: 63.0,
-            currency: "MYR",
-            images: [
-              "/images/products/product1.jpg",
-              "/images/products/product2.jpg",
-              "/images/products/product3.jpg",
-              "/images/products/product4.jpg",
-            ],
-            description:
-              "A revolutionary peptide mist that lifts, contours, and enhances your natural glow with advanced skincare technology. Perfect for daily use to achieve a radiant, youthful complexion.",
-            rating: 5,
-          }}
-        />
-        <Info />
-        <WhyChooseSection />
+        <FeaturedProductHero variant="light" product={featuredProduct} />
+        <Info features={infoFeatures} />
+        <WhyChooseSection detail={detail} />
         <BeforeAfterSection />
         <FromUsToYouSection />
         <CoreProductsSection

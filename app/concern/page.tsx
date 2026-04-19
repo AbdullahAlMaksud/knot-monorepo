@@ -1,43 +1,36 @@
 import Layout from "@/components/Layout";
-import ConcernHero from "@/components/concern/ConcernHero";
-import Ingredients from "@/components/concern/Ingredients";
-import Routine from "@/components/concern/Routine";
-import Understanding from "@/components/concern/Understanding";
+import ConcernsSection from "@/components/home/ConcernsSection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
-
-const coreProducts = [
-  {
-    id: 1,
-    name: "Glow Getter Brightening & Hydrating Serum",
-    price: "From ₩925 DCU FR",
-    rating: 5,
-    images: "/images/products/product1.jpg",
-    description: "Targeted solution for dull, dehydrated skin. This serum addresses your specific concerns with proven ingredients.",
-  },
-  {
-    id: 2,
-    name: "Glow Getter Brightening & Hydrating Serum",
-    price: "From ₩925 DCU FR",
-    rating: 5,
-    images: "/images/products/product2.jpg",
-    description: "Formulated to address your unique skin needs, delivering visible results for a healthier, more radiant complexion.",
-  },
-];
+import { coreProducts } from "@/data/products";
 
 const page = () => {
   return (
     <Layout>
-      <ConcernHero />
-      <Understanding />
+      <section className="pt-32 pb-16 sm:pb-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-sm tracking-[0.2em] uppercase text-gray-600 mb-4">
+              Skin Concern Library
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-semibold tracking-[0.08em] mb-6">
+              Explore Solutions by Concern
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              Browse each concern to understand what may be causing it and
+              discover routines built to support calmer, clearer,
+              healthier-looking skin.
+            </p>
+          </div>
+        </div>
+      </section>
+      <ConcernsSection />
       <CoreProductsSection
         subtitle="Targeted Solutions"
         title="Products Designed for Your Needs"
         products={coreProducts}
       />
-      <Ingredients />
-      <Routine />
       <BeforeAfterSection />
       <TestimonialsSection />
     </Layout>

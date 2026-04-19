@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 type SignInFormData = {
   email: string;
@@ -9,15 +13,27 @@ type SignInFormData = {
 };
 
 export default function SignInForm() {
+  const router = useRouter();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<SignInFormData>();
 
-  const onSubmit = (data: SignInFormData) => {
-    console.log(data);
-    alert("Sign in functionality would be implemented here");
+  const onSubmit = async (data: SignInFormData) => {
+    setSubmitError(null);
+    const { error } = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+      callbackURL: "/account",
+    });
+    if (error) {
+      setSubmitError(error.message ?? "Sign in failed");
+      return;
+    }
+    router.push("/account");
+    router.refresh();
   };
 
   return (
@@ -75,13 +91,13 @@ export default function SignInForm() {
           )}
         </div>
 
+        {submitError && (
+          <p className="text-sm text-red-600">{submitError}</p>
+        )}
         <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-          >
+          <Button type="submit" className="rounded-full">
             Sign in
-          </button>
+          </Button>
           <Link
             href="/auth/signup"
             className="border-2 border-black text-black px-8 py-3 rounded-full hover:bg-black hover:text-white transition font-medium"

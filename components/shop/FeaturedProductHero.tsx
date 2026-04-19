@@ -1,9 +1,19 @@
 "use client";
 
-import { ShoppingCart, ChevronLeft, ChevronRight, Star, ZoomIn, ArrowRight } from "lucide-react";
+import {
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  ZoomIn,
+  ArrowRight,
+  Plus,
+  Minus,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart/CartContext";
 
 interface FeaturedProductHeroProps {
   product?: {
@@ -24,19 +34,19 @@ export default function FeaturedProductHero({
 }: FeaturedProductHeroProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   const featuredProduct = {
     brand: product?.brand || "BYOU BEAUTY",
     name: product?.name || "Glow Contour Lifting Peptide Mist",
     price: product?.price || 63.0,
     currency: product?.currency || "MYR",
-    images:
-      product?.images || [
-        "/images/products/product1.jpg",
-        "/images/products/product2.jpg",
-        "/images/products/product3.jpg",
-        "/images/products/product4.jpg",
-      ],
+    images: product?.images || [
+      "/images/products/product1.jpg",
+      "/images/products/product2.jpg",
+      "/images/products/product3.jpg",
+      "/images/products/product4.jpg",
+    ],
     description:
       product?.description ||
       "A revolutionary peptide mist that lifts, contours, and enhances your natural glow with advanced skincare technology.",
@@ -55,14 +65,24 @@ export default function FeaturedProductHero({
 
   const handlePreviousImage = () => {
     setSelectedImage((prev) =>
-      prev === 0 ? featuredProduct.images.length - 1 : prev - 1
+      prev === 0 ? featuredProduct.images.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
     setSelectedImage((prev) =>
-      prev === featuredProduct.images.length - 1 ? 0 : prev + 1
+      prev === featuredProduct.images.length - 1 ? 0 : prev + 1,
     );
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      id: "featured",
+      name: featuredProduct.name,
+      price: featuredProduct.price,
+      image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
+      quantity,
+    });
   };
 
   const isDark = variant === "dark";
@@ -71,7 +91,9 @@ export default function FeaturedProductHero({
   const textColor = isDark ? "text-white" : "";
   const brandTextColor = isDark ? "text-gray-300" : "text-gray-600";
   const borderColor = isDark ? "border-white" : "border-black";
-  const hoverBg = isDark ? "hover:bg-white hover:text-black" : "hover:bg-black hover:text-white";
+  const hoverBg = isDark
+    ? "hover:bg-white hover:text-black"
+    : "hover:bg-black hover:text-white";
   const buttonPrimary = isDark
     ? "bg-white text-black hover:bg-gray-200"
     : "bg-black text-white hover:bg-gray-200 hover:text-black";
@@ -81,7 +103,9 @@ export default function FeaturedProductHero({
   const thumbnailRing = isDark ? "ring-white" : "ring-black";
   const dotColor = isDark ? "bg-white" : "bg-black";
   const dotColorInactive = isDark ? "bg-white/40" : "bg-black/40";
-  const zoomBg = isDark ? "bg-black/50 hover:bg-black/70" : "bg-white/50 hover:bg-white/70";
+  const zoomBg = isDark
+    ? "bg-black/50 hover:bg-black/70"
+    : "bg-white/50 hover:bg-white/70";
   const zoomTextColor = isDark ? "text-white" : "text-black";
   const starFill = isDark ? "fill-white text-white" : "fill-black text-black";
   const starEmpty = isDark ? "text-gray-500" : "text-gray-400";
@@ -98,10 +122,12 @@ export default function FeaturedProductHero({
               {/* Thumbnail Gallery */}
               <div className="hidden lg:flex flex-col gap-3">
                 {featuredProduct.images.map((image, index) => (
-                  <button
+                  <Button
                     key={index}
+                    type="button"
+                    variant="ghost"
                     onClick={() => setSelectedImage(index)}
-                    className={`relative w-[140px] h-[140px] rounded-2xl overflow-hidden transition-all shrink-0 ${
+                    className={`relative w-[140px] h-[140px] rounded-2xl overflow-hidden transition-all shrink-0 p-0 ${
                       selectedImage === index
                         ? `ring-2 ${thumbnailRing}`
                         : "opacity-60 hover:opacity-100"
@@ -113,7 +139,7 @@ export default function FeaturedProductHero({
                       fill
                       className="object-cover"
                     />
-                  </button>
+                  </Button>
                 ))}
               </div>
 
@@ -131,20 +157,26 @@ export default function FeaturedProductHero({
                   {/* Navigation Arrows - Mobile Only */}
                   {isDark && (
                     <>
-                      <button
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handlePreviousImage}
-                        className="lg:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        className="lg:hidden absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full hover:bg-black/70 text-white"
                         aria-label="Previous image"
                       >
-                        <ChevronLeft className="w-6 h-6 text-white" />
-                      </button>
-                      <button
+                        <ChevronLeft className="w-6 h-6" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handleNextImage}
-                        className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition"
+                        className="lg:hidden absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full hover:bg-black/70 text-white"
                         aria-label="Next image"
                       >
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      </button>
+                        <ChevronRight className="w-6 h-6" />
+                      </Button>
                     </>
                   )}
 
@@ -157,12 +189,17 @@ export default function FeaturedProductHero({
                 {/* Mobile Thumbnail Dots */}
                 <div className="flex lg:hidden justify-center gap-2 mt-4">
                   {featuredProduct.images.map((_, index) => (
-                    <button
+                    <Button
                       key={index}
+                      type="button"
+                      variant="ghost"
                       onClick={() => setSelectedImage(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        selectedImage === index ? `${dotColor} w-8` : dotColorInactive
+                      className={`h-2 min-w-0 p-0 rounded-full transition-all ${
+                        selectedImage === index
+                          ? `${dotColor} w-8`
+                          : dotColorInactive
                       }`}
+                      aria-label={`Go to image ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -174,7 +211,9 @@ export default function FeaturedProductHero({
               <p className={`text-sm tracking-[0.2em] ${brandTextColor} mb-3`}>
                 {featuredProduct.brand}
               </p>
-              <h1 className={`text-[42px] font-semibold max-w-[300px] mb-4 leading-tight ${textColor}`}>
+              <h1
+                className={`text-[42px] font-semibold max-w-[300px] mb-4 leading-tight ${textColor}`}
+              >
                 {featuredProduct.name}
               </h1>
 
@@ -196,44 +235,61 @@ export default function FeaturedProductHero({
 
               {/* Description */}
               {featuredProduct.description && (
-                <p className={`${descriptionText} mb-6 leading-relaxed text-sm max-w-md`}>
+                <p
+                  className={`${descriptionText} mb-6 leading-relaxed text-sm max-w-md`}
+                >
                   {featuredProduct.description}
                 </p>
               )}
 
               <p className="text-xl font-bold mb-8">
-                Price: RM{featuredProduct.price.toFixed(2)}{" "}
+                Price: {featuredProduct.price.toFixed(2)}{" "}
                 {featuredProduct.currency}
               </p>
 
               {/* Quantity Controls */}
               <div className="flex items-center gap-6 mb-8">
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handleDecrease}
-                  className={`w-14 h-14 rounded-full cursor-pointer border-2 ${borderColor} flex items-center justify-center ${hoverBg} transition`}
+                  className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Decrease quantity"
                 >
-                  <span className="text-2xl leading-none">−</span>
-                </button>
-                <span className={`text-3xl font-medium w-12 text-center ${textColor}`}>
+                  <Minus className="text-black text-6xl font-bold" />
+                </Button>
+                <span
+                  className={`text-3xl font-medium w-12 text-center ${textColor}`}
+                >
                   {quantity}
                 </span>
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
                   onClick={handleIncrease}
-                  className={`w-14 h-14 rounded-full cursor-pointer border-2 ${borderColor} flex items-center justify-center ${hoverBg} transition`}
+                  className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Increase quantity"
                 >
-                  <span className="text-2xl leading-none">+</span>
-                </button>
+                  <Plus className="text-black text-6xl font-bold" />
+                </Button>
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-4">
-                <Button className={`w-full ${buttonPrimary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}>
+                <Button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className={`w-full ${buttonPrimary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
+                >
                   Add to cart
                   <ArrowRight className="w-5 h-5" />
                 </Button>
-                <Button variant="outline" className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}>
+                <Button
+                  variant="outline"
+                  className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
+                >
                   Bye Now
                   <ShoppingCart className="w-5 h-5" />
                 </Button>

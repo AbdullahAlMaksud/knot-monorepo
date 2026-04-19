@@ -1,7 +1,9 @@
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { DISCOUNT_AMOUNT, SHIPPING_FEE } from "@/lib/orders/types";
 
 type CartItem = {
-  id: number;
+  id: number | string;
   name: string;
   quantity: number;
   price: number;
@@ -11,18 +13,22 @@ type CartItem = {
 type OrderSummaryProps = {
   cartItems: CartItem[];
   onConfirmOrder: () => void;
+  submitting?: boolean;
+  submitError?: string | null;
 };
 
 export default function OrderSummary({
   cartItems,
   onConfirmOrder,
+  submitting = false,
+  submitError = null,
 }: OrderSummaryProps) {
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shipping = 5.99;
-  const total = subtotal + shipping;
+  const shipping = SHIPPING_FEE;
+  const total = (subtotal - DISCOUNT_AMOUNT) + shipping;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-4">
@@ -31,7 +37,7 @@ export default function OrderSummary({
       <div className="space-y-4 mb-6">
         {cartItems.map((item) => (
           <div key={item.id} className="flex gap-4">
-            <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+            <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden shrink-0 relative">
               <Image
                 src={item.image}
                 alt={item.name}
@@ -54,6 +60,10 @@ export default function OrderSummary({
           <span className="font-medium">${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Discount</span>
+          <span>${DISCOUNT_AMOUNT.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
           <span className="text-gray-600">Shipping</span>
           <span className="font-medium">${shipping.toFixed(2)}</span>
         </div>
@@ -63,13 +73,17 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <button
+      {submitError && (
+        <p className="text-sm text-red-600 mt-2">{submitError}</p>
+      )}
+      <Button
         type="button"
         onClick={onConfirmOrder}
-        className="w-full mt-6 bg-black text-white py-3 rounded-full hover:bg-gray-800 transition font-medium"
+        disabled={submitting || cartItems.length === 0}
+        className="w-full mt-6 rounded-full"
       >
-        Confirm Order
-      </button>
+        {submitting ? "Placing order…" : "Confirm Order"}
+      </Button>
     </div>
   );
 }

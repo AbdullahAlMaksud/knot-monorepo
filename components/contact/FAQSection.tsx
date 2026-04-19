@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type FAQItem = {
   question: string;
@@ -11,34 +12,49 @@ type FAQItem = {
 
 const faqs: FAQItem[] = [
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "What is B'You?",
     answer:
-      "Figma ipsum component variant main layer. Linc ellipse object list undo rectangle. Duplicate bold editor distribute overflow. Arrow italic ipsum device lorem ipsum elit line thumbnail. Vector auto prototype create create bullets link porttitor non. Edit porttitor ipsum figjam selection invite line. Auto italic list ipsum undo ipsum. arrange. Ipsum layer device bold invite outline polygon rotate library. Arrange boolean outline elit align ipsum invite. Image draft plu erat ullamcorper elit. Ipsum porttitor a ipsum sed. Commodo talis port hand lad- horizontal.",
+      "B'You is a science-backed skincare brand formulated specifically for Bangladeshi skin and climate. Our products are dermatologist certified and developed with expert guidance to deliver safe, effective, and relevant results.",
   },
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "Where can I purchase B'You products?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur. Detailed answer content goes here.",
+      "B'You products are available through our official website, Facebook page, Instagram and selected authorized retail partners. Please check our website for updated availability.",
   },
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "How can I contact the B'You team?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur. Detailed answer content goes here.",
+      "You can reach us through our website contact form, official email, or social media platforms. Our team is happy to assist you with knowledge, product information or order-related queries.",
   },
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "How long will my order take to arrive?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur. Detailed answer content goes here.",
+      "Delivery timelines may vary depending on your location, but most orders are delivered within 2-3 working days after confirmation.",
   },
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "How much does shipping cost?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur. Detailed answer content goes here.",
+      "Shipping charges depend on your delivery location and any ongoing promotional offers. Final shipping costs are shown at checkout.",
   },
   {
-    question: "Figma ipsum component variant main layer?",
+    question: "What is your return policy?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur. Detailed answer content goes here.",
+      "We accept returns for products that arrive damaged or incorrect. Please contact our support team within the specified return period for assistance.",
+  },
+  {
+    question: "How long does it take to see visible results?",
+    answer:
+      "Results vary depending on skin type and concern, but consistent daily use typically shows noticeable improvement within 2-4 weeks.",
+  },
+  {
+    question: "How should I store my products?",
+    answer:
+      "Store your products in a cool, dry place away from direct sunlight to maintain stability and effectiveness.",
+  },
+  {
+    question: "How do I conduct an at-home patch test?",
+    answer:
+      "Apply a small amount of product to the inside of your wrist or behind your ear and leave it for 24 hours. If no irritation occurs, the product is generally safe for use.",
   },
 ];
 
@@ -71,9 +87,10 @@ export default function FAQSection() {
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index} className="border-b border-gray-200 pb-4">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                    className="w-full flex items-center justify-between text-left py-2 hover:text-gray-600 transition"
+                    className="w-full flex items-center justify-between text-left py-2 hover:text-gray-600"
                   >
                     <span className="font-medium">{faq.question}</span>
                     {openFAQ === index ? (
@@ -81,7 +98,7 @@ export default function FAQSection() {
                     ) : (
                       <ChevronDown size={20} className="shrink-0 ml-2" />
                     )}
-                  </button>
+                  </Button>
                   {openFAQ === index && (
                     <div className="mt-2 text-sm text-gray-600 leading-relaxed">
                       {faq.answer}

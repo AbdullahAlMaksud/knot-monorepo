@@ -5,6 +5,9 @@ import Link from "next/link";
 import Layout from "@/components/Layout";
 import AuthHero from "@/components/auth/AuthHero";
 import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 type ForgotPasswordFormData = {
   email: string;
@@ -17,9 +20,22 @@ export default function ForgotPasswordPage() {
     formState: { errors },
   } = useForm<ForgotPasswordFormData>();
 
-  const onSubmit = (data: ForgotPasswordFormData) => {
-    console.log(data);
-    alert("Password reset link would be sent to your email");
+  // const onSubmit = (data: ForgotPasswordFormData) => {
+  //   console.log(data);
+  //   alert("Password reset link would be sent to your email");
+  // };
+
+  const onSubmit = async (data: ForgotPasswordFormData) => {
+    const { error } = await authClient.requestPasswordReset({
+      email: data.email,
+      redirectTo: "/auth/reset-password",
+    });
+
+    if (error) {
+      toast.error(error.message ?? "Failed to send reset link");
+      return;
+    }
+    toast.success("Password reset link sent! Check your email.");
   };
 
   return (
@@ -72,12 +88,9 @@ export default function ForgotPasswordPage() {
                   )}
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white px-8 py-3 rounded-full hover:bg-gray-800 transition font-medium"
-                >
+                <Button type="submit" className="w-full rounded-full">
                   Send Reset Link
-                </button>
+                </Button>
               </form>
 
               <div className="mt-8 text-center">

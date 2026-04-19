@@ -3,15 +3,8 @@
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+import { useCart } from "@/lib/cart/CartContext";
+import { Button } from "@/components/ui/button";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -19,40 +12,7 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "Hydrating Essence",
-      price: 48,
-      quantity: 1,
-      image: "/images/products/product1.jpg",
-    },
-    {
-      id: 2,
-      name: "Hydrating Essence",
-      price: 48,
-      quantity: 1,
-      image: "/images/products/product2.jpg",
-    },
-  ]);
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const { items: cartItems, updateQuantity, removeItem, total } = useCart();
 
   if (!isOpen) return null;
 
@@ -75,9 +35,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {/* Header */}
         <div className="bg-black text-white p-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Cart</h2>
-          <button onClick={onClose} className="hover:opacity-70 transition">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={onClose}>
             <X size={24} />
-          </button>
+          </Button>
         </div>
 
         {/* Cart Items */}
@@ -111,31 +71,40 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </h3>
                       <p className="text-base font-semibold">${item.price}</p>
                     </div>
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-700 transition"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 size={20} />
-                    </button>
+                    </Button>
                   </div>
 
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 hover:scale-110 transition-all"
+                      className="w-7 h-7 rounded-full"
                     >
                       <Minus size={14} />
-                    </button>
+                    </Button>
                     <span className="w-7 text-center font-medium text-sm">
                       {item.quantity}
                     </span>
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 hover:scale-110 transition-all"
+                      className="w-7 h-7 rounded-full"
                     >
                       <Plus size={14} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -149,11 +118,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
-          <Link href="/checkout">
-            <button className="w-full cursor-pointer bg-black text-white py-3 rounded-full font-semibold hover:bg-gray-800 hover:scale-[1.02] transition-all">
-              Check Out
-            </button>
-          </Link>
+          <Button className="w-full rounded-full font-semibold" asChild>
+            <Link href="/checkout">Check Out</Link>
+          </Button>
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Calendar, Share2 } from "lucide-react";
 import Layout from "@/components/Layout";
+import { Button } from "@/components/ui/button";
 
 export default function BlogPostPage() {
   const relatedPosts = [
@@ -194,12 +195,9 @@ export default function BlogPostPage() {
           <div className="mt-12 pt-8 border-t">
             <div className="flex flex-wrap gap-2 mb-6">
               {["Hair Care", "Skin Tips", "Makeup", "Trends"].map((tag) => (
-                <button
-                  key={tag}
-                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition"
-                >
+                <Button key={tag} variant="secondary" size="sm" className="rounded-full">
                   {tag}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -207,10 +205,10 @@ export default function BlogPostPage() {
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium">Share this article</p>
               <div className="flex items-center gap-3">
-                <button className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                <Button variant="secondary" size="icon" className="rounded-full">
                   <Share2 size={16} />
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                </Button>
+                <Button variant="secondary" size="icon" className="rounded-full">
                   <svg
                     className="w-4 h-4"
                     fill="currentColor"
@@ -218,8 +216,8 @@ export default function BlogPostPage() {
                   >
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
-                </button>
-                <button className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition">
+                </Button>
+                <Button variant="secondary" size="icon" className="rounded-full">
                   <svg
                     className="w-4 h-4"
                     fill="currentColor"
@@ -227,7 +225,7 @@ export default function BlogPostPage() {
                   >
                     <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
           </div>
