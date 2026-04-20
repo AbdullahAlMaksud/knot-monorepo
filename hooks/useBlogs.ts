@@ -21,12 +21,18 @@ export type Blog = {
   updatedAt: string;
 };
 
-export function useGetPublishedBlogs(category?: string) {
+export function useGetPublishedBlogs(
+  category?: string,
+  search?: string,
+  tag?: string
+) {
   const params = new URLSearchParams({ status: "Published" });
   if (category && category !== "All") params.set("category", category);
+  if (search && search.trim()) params.set("title", search.trim());
+  if (tag && tag.trim()) params.set("tag", tag.trim());
 
   return useQuery({
-    queryKey: ["blogs", "published", category ?? "all"],
+    queryKey: ["blogs", "published", category ?? "all", search ?? "", tag ?? ""],
     queryFn: () => apiFetch<Blog[]>(`/blogs?${params.toString()}`),
     select: (res: { data: Blog[]; message: string }) => res.data ?? [],
   });

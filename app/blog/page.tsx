@@ -1,20 +1,17 @@
 ﻿"use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Search, Play } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useGetPublishedBlogs, type Blog } from "@/hooks/useBlogs";
+import Image from "next/image";
 
-const CATEGORIES = [
-  "All", "Accessories", "Hair", "Skincare", "Makeup", "Wellness",
-  "Beauty", "Lifestyle", "Nails", "Fragrance", "Jewelry", "Other",
-];
-
-const popularTags = [
-  "Hair Care", "Skin Tips", "Makeup", "Wellness", "Tutorials", "Glow", "Styling",
-];
+// const CATEGORIES = [
+//   "All", "Accessories", "Hair", "Skincare", "Makeup", "Wellness",
+//   "Beauty", "Lifestyle", "Nails", "Fragrance", "Jewelry", "Other",
+// ];
 
 const videos = [
   { id: 1, thumbnail: "/images/video-1.jpg" },
@@ -40,27 +37,51 @@ const formatDate = (dateString: string) =>
     month: "short", day: "numeric", year: "numeric",
   });
 
-export default function BlogPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
 
+export default function BlogPage() {
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
+
+  // Debounce search input
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, 400);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchInput]);
+
+  // Filtered results for the main content area
   const { data: blogs = [], isLoading } = useGetPublishedBlogs(
-    activeCategory !== "All" ? activeCategory : undefined
+    activeCategory !== "All" ? activeCategory : undefined,
+    debouncedSearch,
+    activeTag
   );
 
-  const filteredBlogs = useMemo(() => {
-    if (!searchQuery.trim()) return blogs;
-    const q = searchQuery.toLowerCase();
-    return blogs.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.tags.some((t) => t.toLowerCase().includes(q)) ||
-        b.category.toLowerCase().includes(q)
-    );
-  }, [blogs, searchQuery]);
+  // Unfiltered — always all published blogs, used only for sidebar categories & tags
+  const { data: allPublishedBlogs = [] } = useGetPublishedBlogs();
 
-  const featuredBlog = filteredBlogs.find((b) => b.isFeatured) ?? filteredBlogs[0];
-  const gridBlogs = filteredBlogs.filter((b) => b._id !== featuredBlog?._id);
+  const allCategories = useMemo(() => {
+    const categoriesSet = new Set<string>();
+    allPublishedBlogs.forEach((b) => categoriesSet.add(b.category));
+    const sorted = Array.from(categoriesSet).sort((a, b) => a.localeCompare(b));
+    return ["All", ...sorted];
+  }, [allPublishedBlogs]);
+
+  const blogTags = useMemo(() => {
+    const tagsSet = new Set<string>();
+    allPublishedBlogs.forEach((b) => b.tags.forEach((t) => tagsSet.add(t)));
+    return Array.from(tagsSet);
+  }, [allPublishedBlogs]);
+
+  // No client-side filtering, use API results directly
+  const featuredBlog = blogs.find((b) => b.isFeatured) ?? blogs[0];
+  const gridBlogs = blogs.filter((b) => b._id !== featuredBlog?._id);
 
   return (
     <Layout>
@@ -79,8 +100,8 @@ export default function BlogPage() {
             <input
               type="text"
               placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-12 pr-4 py-3 rounded-full bg-white text-black outline-none focus:ring-2 focus:ring-white/50"
             />
           </div>
@@ -95,9 +116,9 @@ export default function BlogPage() {
             <div className="lg:col-span-3">
               {isLoading ? (
                 <div className="py-12 text-center text-gray-500">Loading articles...</div>
-              ) : filteredBlogs.length === 0 ? (
+              ) : blogs.length === 0 ? (
                 <div className="py-12 text-center text-gray-500">
-                  No articles found{searchQuery ? ` for "${searchQuery}"` : ""}.
+                  No articles found{debouncedSearch ? ` for "${debouncedSearch}"` : ""}.
                 </div>
               ) : (
                 <>
@@ -106,10 +127,10 @@ export default function BlogPage() {
                     <Link href={`/blog/${featuredBlog.slug}`} className="block mb-12 group">
                       <div className="relative h-75 sm:h-100 rounded-lg overflow-hidden mb-4">
                         {getFirstImage(featuredBlog) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={getFirstImage(featuredBlog)}
+                          <Image
+                            src={getFirstImage(featuredBlog as Blog) as string}
                             alt={featuredBlog.title}
+                            fill
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
@@ -171,12 +192,15 @@ export default function BlogPage() {
               <div>
                 <h3 className="text-xl font-semibold mb-4">Categories</h3>
                 <div className="space-y-1">
-                  {CATEGORIES.map((cat) => (
+                  {allCategories.map((cat) => (
                     <Button
                       key={cat}
                       variant={activeCategory === cat ? "default" : "ghost"}
                       className="w-full flex items-center justify-start px-4 py-2 h-auto font-normal text-left"
-                      onClick={() => setActiveCategory(cat)}
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setActiveTag(undefined);
+                      }}
                     >
                       {cat}
                     </Button>
@@ -188,13 +212,16 @@ export default function BlogPage() {
               <div>
                 <h3 className="text-xl font-semibold mb-4">Popular Tags</h3>
                 <div className="flex flex-wrap gap-2">
-                  {popularTags.map((tag, index) => (
+                  {blogTags.map((tag, index) => (
                     <Button
                       key={index}
-                      variant="secondary"
+                      variant={activeTag === tag ? "default" : "secondary"}
                       size="sm"
                       className="rounded-full"
-                      onClick={() => setSearchQuery(tag)}
+                      onClick={() => {
+                        setActiveTag(tag);
+                        setSearchInput("");
+                      }}
                     >
                       {tag}
                     </Button>
