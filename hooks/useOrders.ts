@@ -1,3 +1,4 @@
+import type { DeliveryArea } from "@/lib/checkout/constants";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { queryKeys } from "@/lib/query-keys";
@@ -6,8 +7,7 @@ import { Order } from "@/lib/orders/types";
 import { useCart } from "@/lib/cart/CartContext";
 import { useRouter } from "next/navigation";
 
-
-// Queries 
+// Queries
 export function useGetAllOrders() {
   return useQuery({
     queryKey: queryKeys.orders.all,
@@ -39,7 +39,6 @@ export function useGetOrderById(id: string) {
 //   const router = useRouter();
 //   const queryClient = useQueryClient();
 //     const { items: cartItems, clearCart } = useCart();
-  
 
 //   return useMutation({
 //     mutationFn: (orderData) => apiFetch("/orders", {
@@ -69,10 +68,13 @@ export type OrderPayloadType = {
     state: string;
     postalCode: string;
     country: string;
+    extraNotes?: string;
+    deliveryArea: DeliveryArea;
+    estimatedDelivery: string;
   };
   payment: {
     method: string;
-    transactionId: string;
+    transactionId?: string;
   };
   items: {
     productId: string;
@@ -89,6 +91,8 @@ export type OrderPayloadType = {
 };
 
 type CreateOrderOptions = {
+  clearCartOnSuccess?: boolean;
+  onSuccess?: () => void;
   onError?: (error: Error & { field?: string }) => void;
 };
 
@@ -98,7 +102,7 @@ export function useCreateOrder(options?: CreateOrderOptions) {
   const { clearCart } = useCart();
 
   return useMutation({
-    mutationFn: (orderData:OrderPayloadType) =>
+    mutationFn: (orderData: OrderPayloadType) =>
       apiFetch("/orders", {
         method: "POST",
         body: JSON.stringify(orderData),
@@ -106,7 +110,10 @@ export function useCreateOrder(options?: CreateOrderOptions) {
     onSuccess: ({ message }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
       toast.success(message);
-      clearCart();
+      if (options?.clearCartOnSuccess ?? true) {
+        clearCart();
+      }
+      options?.onSuccess?.();
       router.push("/checkout/success");
     },
     onError: (error: Error & { field?: string }) => {
@@ -115,8 +122,6 @@ export function useCreateOrder(options?: CreateOrderOptions) {
     },
   });
 }
-
-
 
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient();

@@ -5,11 +5,18 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { useGetOrdersByCustomerId } from "@/hooks/useOrders";
 import Loading from "../ui/loading";
 import ErrorState from "../ui/error";
+import CurrencyAmount from "@/components/ui/currency-amount";
 
 export default function OrderHistorySection() {
   const { userId } = useAuthUser();
 
-  const { data: userOrdersData, isLoading, isError, error, refetch } = useGetOrdersByCustomerId(userId as string);
+  const {
+    data: userOrdersData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetOrdersByCustomerId(userId as string);
 
   if (userOrdersData?.length === 0) {
     return (
@@ -21,7 +28,10 @@ export default function OrderHistorySection() {
   }
 
   if (isLoading) return <Loading fullPage={true} text="Fetching orders..." />;
-  if (isError) return <ErrorState fullPage={true} message={error?.message} onRetry={refetch} />;
+  if (isError)
+    return (
+      <ErrorState fullPage={true} message={error?.message} onRetry={refetch} />
+    );
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -35,12 +45,20 @@ export default function OrderHistorySection() {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold text-lg">Order {order._id}</h3>
-                <p className="text-sm text-gray-500">{order.createdAt ? new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "2-digit" }) : "—"} </p>
+                <p className="text-sm text-gray-500">
+                  {order.createdAt
+                    ? new Date(order.createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "2-digit",
+                      })
+                    : "—"}{" "}
+                </p>
               </div>
               <div className="text-right">
                 <p className="font-semibold capitalize">{order.status}</p>
                 <p className="text-gray-600">
-                  ${(order.finalAmount ?? 0).toFixed(2)}
+                  <CurrencyAmount amount={order.finalAmount ?? 0} />
                 </p>
               </div>
             </div>
@@ -52,7 +70,7 @@ export default function OrderHistorySection() {
                     {item.name} x {item.quantity}
                   </span>
                   <span className="text-gray-600">
-                    ${(item.unitPrice ?? 0).toFixed(2)}
+                    <CurrencyAmount amount={item.unitPrice ?? 0} />
                   </span>
                 </div>
               ))}

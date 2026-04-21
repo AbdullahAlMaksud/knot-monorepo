@@ -1,11 +1,23 @@
 import { Order } from "@/lib/orders/types";
+import { DELIVERY_OPTIONS } from "@/lib/checkout/constants";
 
-export default function ShippingAddressCard({ shipping }: { shipping: Order["shipping"] }) {
+export default function ShippingAddressCard({
+  shipping,
+}: {
+  shipping: Order["shipping"];
+}) {
   const addressLines = [
     shipping.apartment,
-    [shipping.city, shipping.state, shipping.postalCode].filter(Boolean).join(", "),
+    [shipping.city, shipping.state, shipping.postalCode]
+      .filter(Boolean)
+      .join(", "),
     shipping.country,
   ].filter(Boolean);
+  const deliveryArea = shipping.deliveryArea ?? "outside-dhaka";
+  const deliveryLabel = DELIVERY_OPTIONS[deliveryArea].label;
+  const estimatedDelivery =
+    shipping.estimatedDelivery ??
+    DELIVERY_OPTIONS[deliveryArea].estimatedDelivery;
 
   return (
     <div className="bg-white border rounded-lg p-6 mb-6">
@@ -21,13 +33,19 @@ export default function ShippingAddressCard({ shipping }: { shipping: Order["shi
                 <p className="pt-2">{addressLines.join(", ")}</p>
               </>
             )}
+            {shipping.extraNotes && (
+              <p className="pt-2 text-gray-600">Note: {shipping.extraNotes}</p>
+            )}
           </div>
         </div>
 
         <div className="border-t pt-6">
           <h3 className="text-lg font-semibold mb-2">Shipping Method</h3>
           <p className="text-sm text-gray-600">
-            Standard Shipping (5-7 business days)
+            Cash on Delivery • {deliveryLabel}
+          </p>
+          <p className="text-sm text-gray-600 mt-1">
+            Estimated delivery: {estimatedDelivery}
           </p>
         </div>
       </div>

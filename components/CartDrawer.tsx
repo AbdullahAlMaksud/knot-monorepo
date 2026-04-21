@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
+import CurrencyAmount from "@/components/ui/currency-amount";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -35,7 +36,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {/* Header */}
         <div className="bg-black text-white p-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Cart</h2>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/10"
+            onClick={onClose}
+          >
             <X size={24} />
           </Button>
         </div>
@@ -69,7 +75,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <h3 className="font-semibold text-sm mb-1">
                         {item.name}
                       </h3>
-                      <p className="text-base font-semibold">${item.price}</p>
+                      <p className="text-base font-semibold">
+                        <CurrencyAmount amount={item.price} />
+                      </p>
                     </div>
                     <Button
                       type="button"
@@ -116,7 +124,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         <div className="border-t p-5 space-y-3">
           <div className="flex items-center justify-between text-xl font-bold">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>
+              <CurrencyAmount amount={total} />
+            </span>
           </div>
           <Button className="w-full rounded-full font-semibold" asChild>
             <Link href="/checkout">Check Out</Link>

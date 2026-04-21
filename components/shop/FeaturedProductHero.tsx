@@ -5,15 +5,17 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
-  ZoomIn,
   ArrowRight,
   Plus,
   Minus,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import CurrencyAmount from "@/components/ui/currency-amount";
 import { useCart } from "@/lib/cart/CartContext";
+import { setStoredBuyNowItem } from "@/lib/checkout/buy-now";
 
 interface FeaturedProductHeroProps {
   product?: {
@@ -32,6 +34,7 @@ export default function FeaturedProductHero({
   product,
   variant = "dark",
 }: FeaturedProductHeroProps) {
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
@@ -77,12 +80,24 @@ export default function FeaturedProductHero({
 
   const handleAddToCart = () => {
     addItem({
-      id: "featured",
+      id: product?.name || featuredProduct.name,
       name: featuredProduct.name,
       price: featuredProduct.price,
       image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
       quantity,
     });
+  };
+
+  const handleBuyNow = () => {
+    setStoredBuyNowItem({
+      id: product?.name || featuredProduct.name,
+      name: featuredProduct.name,
+      price: featuredProduct.price,
+      image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
+      quantity,
+    });
+
+    router.push("/checkout?mode=buy-now");
   };
 
   const isDark = variant === "dark";
@@ -103,10 +118,6 @@ export default function FeaturedProductHero({
   const thumbnailRing = isDark ? "ring-white" : "ring-black";
   const dotColor = isDark ? "bg-white" : "bg-black";
   const dotColorInactive = isDark ? "bg-white/40" : "bg-black/40";
-  const zoomBg = isDark
-    ? "bg-black/50 hover:bg-black/70"
-    : "bg-white/50 hover:bg-white/70";
-  const zoomTextColor = isDark ? "text-white" : "text-black";
   const starFill = isDark ? "fill-white text-white" : "fill-black text-black";
   const starEmpty = isDark ? "text-gray-500" : "text-gray-400";
   const ratingText = isDark ? "text-gray-300" : "text-gray-600";
@@ -145,7 +156,7 @@ export default function FeaturedProductHero({
 
               {/* Main Product Image */}
               <div className="relative flex-1">
-                <div className="relative h-full w-full rounded-3xl overflow-hidden bg-gradient-to-br from-amber-100 to-stone-200">
+                <div className="relative h-full w-full rounded-3xl overflow-hidden bg-linear-to-br from-amber-100 to-stone-200">
                   <Image
                     src={featuredProduct.images[selectedImage]}
                     alt={featuredProduct.name}
@@ -243,8 +254,7 @@ export default function FeaturedProductHero({
               )}
 
               <p className="text-xl font-bold mb-8">
-                Price: {featuredProduct.price.toFixed(2)}{" "}
-                {featuredProduct.currency}
+                Price: <CurrencyAmount amount={featuredProduct.price} />
               </p>
 
               {/* Quantity Controls */}
@@ -288,9 +298,11 @@ export default function FeaturedProductHero({
                 </Button>
                 <Button
                   variant="outline"
+                  type="button"
+                  onClick={handleBuyNow}
                   className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
                 >
-                  Bye Now
+                  Buy Now
                   <ShoppingCart className="w-5 h-5" />
                 </Button>
               </div>

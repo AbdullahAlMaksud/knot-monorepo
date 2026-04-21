@@ -1,25 +1,34 @@
+import type { DeliveryArea } from "@/lib/checkout/constants";
+
 export interface OrderItemSnapshot {
+  productId?: string;
   name: string;
   image: string;
-  price: number;
+  price?: number;
+  unitPrice?: number;
   quantity: number;
+  subtotal?: number;
 }
 
 export interface OrderShipping {
-  firstName: string;
-  lastName: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
-  apartment: string;
+  apartment?: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
+  extraNotes?: string;
+  deliveryArea?: DeliveryArea;
+  estimatedDelivery?: string;
 }
 
 export interface OrderPayment {
   method: string;
-  transactionId: string;
+  transactionId?: string;
 }
 
 export interface OrderTotals {
@@ -42,8 +51,7 @@ export interface OrderDocument {
   updatedAt: Date;
 }
 
-export const SHIPPING_FEE = 6;
-export const DISCOUNT_AMOUNT = 8;
+export const DISCOUNT_AMOUNT = 0;
 
 export function generateOrderId(): string {
   const bytes = new Uint8Array(18);
@@ -66,7 +74,7 @@ export type CheckoutFormData = {
   state: string;
   postalCode: string;
   country: string;
-  transactionId: string;
+  extraNotes: string;
 };
 
 export type Order = {
@@ -76,17 +84,27 @@ export type Order = {
     name: string;
     email: string;
     phone: string;
-    apartment?: string
+    apartment?: string;
     city: string;
     state: string;
     postalCode: string;
     country: string;
-  }
+    extraNotes?: string;
+    deliveryArea?: DeliveryArea;
+    estimatedDelivery?: string;
+  };
   payment: {
     method: string;
-    transactionId: string;
-  }
-  items: { productId: string; name: string; image: string; unitPrice: number; subtotal: number; quantity: number }[];
+    transactionId?: string;
+  };
+  items: {
+    productId: string;
+    name: string;
+    image: string;
+    unitPrice: number;
+    subtotal: number;
+    quantity: number;
+  }[];
   totalAmount: number;
   discountAmount: number;
   shippingFee: number;
