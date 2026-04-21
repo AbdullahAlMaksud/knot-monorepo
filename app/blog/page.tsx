@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
@@ -7,11 +7,6 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useGetPublishedBlogs, type Blog } from "@/hooks/useBlogs";
 import Image from "next/image";
-
-// const CATEGORIES = [
-//   "All", "Accessories", "Hair", "Skincare", "Makeup", "Wellness",
-//   "Beauty", "Lifestyle", "Nails", "Fragrance", "Jewelry", "Other",
-// ];
 
 const videos = [
   { id: 1, thumbnail: "/images/video-1.jpg" },
@@ -86,7 +81,7 @@ export default function BlogPage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative h-100 sm:h-125 bg-linear-to-r from-gray-300 to-gray-400">
+      <section className="relative h-[400px] sm:h-[500px] bg-linear-to-r from-gray-300 to-gray-400">
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center items-center text-white text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-4">
@@ -125,7 +120,7 @@ export default function BlogPage() {
                   {/* Featured Post */}
                   {featuredBlog && (
                     <Link href={`/blog/${featuredBlog.slug}`} className="block mb-12 group">
-                      <div className="relative h-75 sm:h-100 rounded-lg overflow-hidden mb-4">
+                      <div className="relative h-[300px] sm:h-[400px] rounded-lg overflow-hidden mb-4">
                         {getFirstImage(featuredBlog) ? (
                           <Image
                             src={getFirstImage(featuredBlog as Blog) as string}

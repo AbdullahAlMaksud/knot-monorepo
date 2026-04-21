@@ -1,10 +1,6 @@
-"use client";
-
 import { Facebook, Linkedin, Twitter } from "lucide-react";
 
-export default function ShareButtons({ title }: { title: string }) {
-    const url = typeof window !== "undefined" ? window.location.href : "";
-
+export default function ShareButtons({ title, url }: { title: string; url: string }) {
     const share = {
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,

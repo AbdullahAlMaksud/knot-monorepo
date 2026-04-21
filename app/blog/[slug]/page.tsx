@@ -1,29 +1,13 @@
-import { Calendar} from "lucide-react";
+import { Calendar } from "lucide-react";
 import Link from "next/link";
 import Layout from "@/components/Layout";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { headers } from "next/headers";
 import ShareButtons from "@/components/shared/ShareButtons";
+import { Blog } from "@/hooks/useBlogs";
+import { sanitizeContent } from "@/lib/sanitize";
 
-type BlogContent = {
-    order: number;
-    type: "text" | "image" | "video";
-    content: string;
-    contentKey?: string;
-};
-
-type Blog = {
-    _id: string;
-    title: string;
-    slug: string;
-    category: string;
-    tags: string[];
-    status: string;
-    isFeatured: boolean;
-    contents: BlogContent[];
-    createdAt: string;
-    updatedAt: string;
-};
 
 async function getBlogBySlug(slug: string): Promise<Blog | null> {
     try {
@@ -68,6 +52,10 @@ export default async function BlogPostPage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+    const headersList = await headers();
+    const host = headersList.get("host") ?? "";
+    const protocol = host.startsWith("localhost") ? "http" : "https";
+    const canonicalUrl = `${protocol}://${host}/blog/${slug}`;
     const blog = await getBlogBySlug(slug);
 
     if (!blog || blog.status !== "Published") {
@@ -88,9 +76,9 @@ export default async function BlogPostPage({
 
     return (
         <Layout>
-            <div className="max-w-270 mx-auto ">
+            <div className="max-w-[1080px] mx-auto ">
                 {/* Hero */}
-                <section className="relative h-100 mt-40 sm:h-125 rounded-lg overflow-hidden mb-2">
+                <section className="relative h-100 mt-40 sm:h-[500px] rounded-lg overflow-hidden mb-2">
                     {heroImage ? (
                         <Image src={heroImage} fill alt={blog.title} className="w-full h-full object-cover" />
                     ) : (
@@ -100,13 +88,13 @@ export default async function BlogPostPage({
                         <p className="bg-white w-fit text-black px-4 py-2 rounded-full text-sm font-semibold">
                             {blog.category}
                         </p>
-                        <h1 className="text-3xl text-white sm:text-4xl font-light line-clamp3">
+                        <h1 className="text-3xl text-white sm:text-4xl font-light">
                             {blog.title}
                         </h1>
                         <p className="text-white/85 text-sm line-clamp-2">{description}</p>
                     </div>
                 </section>
-                <div className="max-w-270 mx-auto flex items-center justify-end text-gray-500 gap-1">
+                <div className="max-w-[1080px] mx-auto flex items-center justify-end text-gray-500 gap-1">
                     <Calendar size={16} />
                     <span>{formatDate(blog.createdAt)}</span>
                 </div>
@@ -115,9 +103,6 @@ export default async function BlogPostPage({
                 {/* Article Content */}
                 <article className="py-16 sm:py-24">
                     <div className="">
-                        {/* Header */}
-
-
                         {/* Body — render contents in order */}
                         <div className="space-y-6">
                             {sortedContents.map((item) => {
@@ -126,7 +111,7 @@ export default async function BlogPostPage({
                                         <div
                                             key={item.order}
                                             className="prose prose-lg max-w-none text-gray-700 leading-relaxed [&_a]:underline [&_a]:text-black [&_strong]:font-semibold [&_em]:italic"
-                                            dangerouslySetInnerHTML={{ __html: item.content }}
+                                            dangerouslySetInnerHTML={{ __html: sanitizeContent(item.content) }}
                                         />
                                     );
                                 }
@@ -166,7 +151,7 @@ export default async function BlogPostPage({
                         <div className="border-b pb-5 mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
                             <p>Share this article</p>
 
-                            <ShareButtons title={blog.title} />
+                            <ShareButtons title={blog.title} url={canonicalUrl} />
                         </div>
                     </div>
                 </article>

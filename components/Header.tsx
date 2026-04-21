@@ -154,7 +154,7 @@ export default function Header() {
               {session?.user ? (
                 <Link
                   href={profileHref}
-                  className={`max-w-35 truncate text-sm font-medium hover:opacity-70 transition ${
+                  className={`max-w-[140px] truncate text-sm font-medium hover:opacity-70 transition ${
                     isSolid ? "text-black" : "text-white"
                   }`}
                   title={session.user.name ?? "My account"}
@@ -177,7 +177,7 @@ export default function Header() {
               >
                 <ShoppingBag size={20} />
                 {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 min-w-4.5 h-4.5 flex items-center justify-center rounded-full bg-black text-white text-xs font-medium px-1">
+                  <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-black text-white text-xs font-medium px-1">
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 )}
@@ -206,6 +206,15 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Shop
+              </Link>
+              <Link
+                href="/blog"
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
+                  pathname === "/shop" ? "after:w-full" : ""
+                } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blogs
               </Link>
               <Link
                 href="/about"
