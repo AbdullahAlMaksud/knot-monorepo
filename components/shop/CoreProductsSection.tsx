@@ -23,7 +23,9 @@ export default function CoreProductsSection({
   title,
   products,
 }: CoreProductsSectionProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState<Record<number, number>>({});
+  const [currentImageIndex, setCurrentImageIndex] = useState<
+    Record<number, number>
+  >({});
   const { addItem } = useCart();
 
   const getProductImages = (product: Product): string[] => {
@@ -35,7 +37,11 @@ export default function CoreProductsSection({
     return currentImageIndex[productId] || 0;
   };
 
-  const goToPrevious = (productId: number, totalImages: number, e: React.MouseEvent) => {
+  const goToPrevious = (
+    productId: number,
+    totalImages: number,
+    e: React.MouseEvent,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => ({
@@ -44,7 +50,11 @@ export default function CoreProductsSection({
     }));
   };
 
-  const goToNext = (productId: number, totalImages: number, e: React.MouseEvent) => {
+  const goToNext = (
+    productId: number,
+    totalImages: number,
+    e: React.MouseEvent,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setCurrentImageIndex((prev) => ({
@@ -73,10 +83,7 @@ export default function CoreProductsSection({
                 key={product.id}
                 className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
               >
-                <Link
-                  href={`/product/${product.id}`}
-                  className="w-full"
-                >
+                <Link href={`/product/${product.id}`} className="w-full">
                   <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
                     {images.map((image, index) => (
                       <div
@@ -93,7 +100,7 @@ export default function CoreProductsSection({
                         />
                       </div>
                     ))}
-                    
+
                     {/* Navigation Arrows */}
                     {hasMultipleImages && (
                       <>
@@ -101,7 +108,9 @@ export default function CoreProductsSection({
                           type="button"
                           variant="secondary"
                           size="icon"
-                          onClick={(e) => goToPrevious(product.id, images.length, e)}
+                          onClick={(e) =>
+                            goToPrevious(product.id, images.length, e)
+                          }
                           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Previous image"
                         >
@@ -111,7 +120,9 @@ export default function CoreProductsSection({
                           type="button"
                           variant="secondary"
                           size="icon"
-                          onClick={(e) => goToNext(product.id, images.length, e)}
+                          onClick={(e) =>
+                            goToNext(product.id, images.length, e)
+                          }
                           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Next image"
                         >
@@ -148,7 +159,7 @@ export default function CoreProductsSection({
                     )}
                   </div>
                 </Link>
-                
+
                 <div className="px-6 pb-6 w-full flex flex-col items-center">
                   <Link href={`/product/${product.id}`}>
                     <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition text-center">
@@ -156,12 +167,14 @@ export default function CoreProductsSection({
                     </h3>
                   </Link>
                   {product.description && (
-                    <p className="text-sm text-gray-500 mb-2 text-center max-w-md">
+                    <p className="text-sm text-gray-500 mb-2 text-center max-w-md line-clamp-2">
                       {product.description}
                     </p>
                   )}
-                  <p className="text-gray-600 mb-2 font-medium">{product.price}</p>
-                 
+                  <p className="text-gray-600 mb-2 font-medium">
+                    {product.price}
+                  </p>
+
                   <div className="flex items-center gap-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star key={star} size={16} fill="black" />
@@ -178,7 +191,10 @@ export default function CoreProductsSection({
                         id: product.id,
                         name: product.name,
                         price: parsePrice(product.price),
-                        image: typeof product.images === "string" ? product.images : product.images[0] ?? "",
+                        image:
+                          typeof product.images === "string"
+                            ? product.images
+                            : (product.images[0] ?? ""),
                         quantity: 1,
                       });
                     }}

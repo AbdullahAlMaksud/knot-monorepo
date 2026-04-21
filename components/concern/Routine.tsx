@@ -1,28 +1,12 @@
 import Image from "next/image";
+import type { Concern } from "@/data/concerns";
 
-const Routine = () => {
-  const steps = [
-    {
-      number: "01",
-      title: "Cleanse",
-      description: "Start with a clean, dry face",
-    },
-    {
-      number: "02",
-      title: "Apply Serum",
-      description: "Use 2-3 drops and gently press into skin",
-    },
-    {
-      number: "03",
-      title: "Mist & Set",
-      description: "Follow with peptide mist for hydration lock",
-    },
-    {
-      number: "04",
-      title: "Consistency",
-      description: "Use morning and night for visible results in 2 weeks",
-    },
-  ];
+interface RoutineProps {
+  concern: Concern;
+}
+
+const Routine = ({ concern }: RoutineProps) => {
+  const steps = concern.routineSteps;
 
   return (
     <section className="py-16 sm:py-24 bg-black">
@@ -31,8 +15,8 @@ const Routine = () => {
           {/* Left Image */}
           <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden">
             <Image
-              src="/images/concern/concern2.jpg"
-              alt="Skincare Routine"
+              src={concern.routineImage}
+              alt={`${concern.title} routine`}
               fill
               className="object-cover"
             />
@@ -44,7 +28,7 @@ const Routine = () => {
               YOUR ROUTINE
             </p>
             <h2 className="text-3xl font-semibold mb-12">
-              How to Use for Best Results
+              How to Build a Routine for {concern.title}
             </h2>
 
             <div className="space-y-8">

@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { Check } from "lucide-react";
+import type { Concern } from "@/data/concerns";
 
-const Understanding = () => {
-  const symptoms = [
-    "Tight, uncomfortable feeling",
-    "Flaky patches",
-    "Increased fine lines",
-    "Loss of plumpness",
-  ];
+interface UnderstandingProps {
+  concern: Concern;
+}
+
+const Understanding = ({ concern }: UnderstandingProps) => {
+  const symptoms = concern.symptoms;
 
   return (
     <section className="py-16 sm:py-24">
@@ -19,17 +19,14 @@ const Understanding = () => {
               UNDERSTANDING THE ISSUE
             </p>
             <h2 className="text-3xl font-semibold mb-6">
-              What Causes Dehydration?
+              {concern.understandingTitle}
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed mb-12">
-              Dehydration can result from various factors including
-              environmental stressors, lifestyle habits, and natural aging
-              processes. Recognizing the symptoms early allows you to take
-              targeted action.
+              {concern.understandingDescription}
             </p>
 
             <div className="mb-4">
-              <h3 className="text-sm font-semibold tracking-[0.1em] uppercase mb-6">
+              <h3 className="text-sm font-semibold tracking-widest uppercase mb-6">
                 COMMON SYMPTOMS
               </h3>
               <div className="space-y-4">
@@ -48,8 +45,8 @@ const Understanding = () => {
           {/* Right Image */}
           <div className="relative h-[400px] sm:h-[500px] rounded-3xl overflow-hidden">
             <Image
-              src="/images/concern/concern1.jpg"
-              alt="Understanding Dehydration"
+              src={concern.understandingImage}
+              alt={`Understanding ${concern.title}`}
               fill
               className="object-cover"
             />

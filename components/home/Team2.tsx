@@ -30,15 +30,15 @@ const Team2 = () => {
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="text-gray-600 tracking-wider mb-3 text-sm">
-            Our Trusted Dermatologists
+            Our Advisory Board
           </p>
           <h2 className="text-3xl sm:text-4xl font-semibold mb-6 leading-tight">
-            Meet the Experts Behind Byou
+            Meet the Experts & Advisors Behind B&apos;You
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm leading-relaxed">
-            Our team of dedicated professionals combines years of expertise in
-            dermatology and cosmetic science to create products that truly make
-            a difference.
+            Discover the global formulation experts and skincare advisors whose
+            experience and research shape every B&apos;You product with science,
+            safety, and precision.
           </p>
         </div>
 

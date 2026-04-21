@@ -1,27 +1,87 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import Image from "next/image";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "@/components/ui/combobox";
+import {
+  countryPhoneOptions,
+  getCountryPhoneOption,
+} from "@/lib/country-phone-options";
 import { Button } from "../ui/button";
 
 type FormData = {
   name: string;
   email: string;
+  countryIso2: string;
+  phone: string;
   message: string;
 };
 
 export default function ContactFormSection() {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<FormData>();
+    setValue,
+  } = useForm<FormData>({
+    defaultValues: {
+      countryIso2: "BD",
+      phone: "",
+    },
+  });
+
+  const selectedCountryIso2 = useWatch({
+    control,
+    name: "countryIso2",
+  });
+  const currentPhone = useWatch({
+    control,
+    name: "phone",
+  });
+  const selectedCountry = getCountryPhoneOption(selectedCountryIso2);
+
+  useEffect(() => {
+    if (
+      currentPhone &&
+      currentPhone.length > selectedCountry.maxNationalNumberLength
+    ) {
+      setValue(
+        "phone",
+        currentPhone.slice(0, selectedCountry.maxNationalNumberLength),
+        { shouldValidate: true },
+      );
+    }
+  }, [currentPhone, selectedCountry.maxNationalNumberLength, setValue]);
 
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    const country = getCountryPhoneOption(data.countryIso2);
+
+    console.log({
+      ...data,
+      countryName: country.name,
+      dialCode: country.dialCode,
+      fullPhone: `${country.dialCode}${data.phone}`,
+    });
     alert("Thank you for your message! We will get back to you soon.");
-    reset();
+    reset({
+      name: "",
+      email: "",
+      countryIso2: "BD",
+      phone: "",
+      message: "",
+    });
   };
 
   return (
@@ -48,7 +108,12 @@ export default function ContactFormSection() {
                 <input
                   type="text"
                   id="name"
-                  {...register("name", { required: "Name is required" })}
+                  {...register("name", {
+                    required: "Name is required",
+                    validate: (value) =>
+                      value.trim().length >= 2 ||
+                      "Name must be at least 2 characters",
+                  })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                   placeholder="Your name"
                 />
@@ -87,6 +152,124 @@ export default function ContactFormSection() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Number
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)] gap-3">
+                  <div>
+                    <Controller
+                      name="countryIso2"
+                      control={control}
+                      rules={{
+                        required: "Country code is required",
+                      }}
+                      render={({ field }) => (
+                        <Combobox
+                          items={countryPhoneOptions}
+                          value={getCountryPhoneOption(field.value)}
+                          onValueChange={(value) =>
+                            field.onChange(value?.iso2 ?? "")
+                          }
+                          itemToStringValue={(item) => item.label}
+                        >
+                          <ComboboxTrigger
+                            render={
+                              <Button
+                                type="button"
+                                variant="outline"
+                                aria-invalid={
+                                  errors.countryIso2 ? true : undefined
+                                }
+                                className="w-full h-12 justify-between overflow-hidden font-normal rounded-lg border-gray-300 px-4"
+                              >
+                                <ComboboxValue placeholder="Select code" />
+                              </Button>
+                            }
+                          />
+                          <ComboboxContent>
+                            <ComboboxInput
+                              showTrigger={false}
+                              placeholder="Search country..."
+                            />
+                            <ComboboxEmpty>No country found.</ComboboxEmpty>
+                            <ComboboxList>
+                              {(item) => (
+                                <ComboboxItem key={item.iso2} value={item}>
+                                  <div className="flex w-full min-w-0 items-center justify-between gap-3">
+                                    <span className="truncate">
+                                      {item.name}
+                                    </span>
+                                    <span className="shrink-0 text-xs text-gray-500">
+                                      {item.dialCode}
+                                    </span>
+                                  </div>
+                                </ComboboxItem>
+                              )}
+                            </ComboboxList>
+                          </ComboboxContent>
+                        </Combobox>
+                      )}
+                    />
+                    {errors.countryIso2 && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.countryIso2.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Controller
+                      name="phone"
+                      control={control}
+                      rules={{
+                        required: "Contact number is required",
+                        validate: {
+                          digitsOnly: (value) =>
+                            /^\d+$/.test(value) || "Only numbers are allowed",
+                          minLength: (value) =>
+                            value.length >= 7 ||
+                            "Contact number must be at least 7 digits",
+                          maxLength: (value) =>
+                            value.length <=
+                              selectedCountry.maxNationalNumberLength ||
+                            `Contact number can be at most ${selectedCountry.maxNationalNumberLength} digits`,
+                        },
+                      }}
+                      render={({ field }) => (
+                        <input
+                          type="tel"
+                          id="phone"
+                          inputMode="numeric"
+                          autoComplete="tel-national"
+                          maxLength={selectedCountry.maxNationalNumberLength}
+                          pattern="[0-9]*"
+                          value={field.value}
+                          onChange={(event) => {
+                            const digitsOnly = event.target.value
+                              .replace(/\D/g, "")
+                              .slice(
+                                0,
+                                selectedCountry.maxNationalNumberLength,
+                              );
+
+                            field.onChange(digitsOnly);
+                          }}
+                          className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                          placeholder={`Up to ${selectedCountry.maxNationalNumberLength} digits`}
+                          aria-invalid={errors.phone ? true : undefined}
+                        />
+                      )}
+                    />
+                    {errors.phone && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.phone.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
                 <label
                   htmlFor="message"
                   className="block text-sm font-medium text-gray-700 mb-2"
@@ -98,6 +281,9 @@ export default function ContactFormSection() {
                   rows={6}
                   {...register("message", {
                     required: "Message is required",
+                    validate: (value) =>
+                      value.trim().length >= 10 ||
+                      "Message must be at least 10 characters",
                   })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition resize-none"
                   placeholder="Tell us about your inquiry..."

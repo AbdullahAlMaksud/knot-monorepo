@@ -1,65 +1,16 @@
 import Image from "next/image";
-import { Droplets, Droplet, Hand, Sparkles, Clock, Leaf, Flower2 } from "lucide-react";
+import { Droplets, Droplet, Hand, Sparkles, Clock, Leaf } from "lucide-react";
+import type { ProductDetail } from "@/data/products";
+import { Fragment } from "react/jsx-runtime";
 
-export default function WhyChooseSection() {
-  const benefits = [
-    "100% Organic – no chemicals, no preservatives",
-    "Universal Care – suitable for every hair type",
-    "Naturally Effective – nourishes, strengthens, and adds shine",
-    "Safe & Gentle – long-term care without damage",
-  ];
+const stepIcons = [Sparkles, Droplet, Hand, Droplets, Clock];
+const ingredientIcons = [Leaf, Droplets, Sparkles, Droplet];
 
-  const howToSteps = [
-    {
-      icon: Sparkles,
-      title: "Cleanse",
-      description: "Wash your face thoroughly to remove dirt and oil.",
-    },
-    {
-      icon: Droplet,
-      title: "Apply Drops",
-      description: "Take 2-3 drops of serum on your fingertips.",
-    },
-    {
-      icon: Hand,
-      title: "Spread Evenly",
-      description: "Smooth it gently over your face and neck.",
-    },
-    {
-      icon: Droplets,
-      title: "Pat & Absorb",
-      description: "Pat lightly so the serum absorbs into your skin.",
-    },
-    {
-      icon: Clock,
-      title: "Follow Routine",
-      description: "Use before moisturizer, morning and night.",
-    },
-  ];
+interface WhyChooseSectionProps {
+  detail: ProductDetail;
+}
 
-  const ingredients = [
-    {
-      icon: Leaf,
-      name: "Hyaluronic Acid",
-      benefit: "Deep hydration and plumping effect for youthful skin.",
-    },
-    {
-      icon: Flower2,
-      name: "Niacinamide",
-      benefit: "Reduces pores, evens skin tone, and strengthens barrier.",
-    },
-    {
-      icon: Droplets,
-      name: "Peptides",
-      benefit: "Stimulates collagen production for firmer, smoother skin.",
-    },
-    {
-      icon: Sparkles,
-      name: "Vitamin C",
-      benefit: "Brightens complexion and protects against free radicals.",
-    },
-  ];
-
+export default function WhyChooseSection({ detail }: WhyChooseSectionProps) {
   return (
     <section className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,36 +20,36 @@ export default function WhyChooseSection() {
             <h2 className="text-3xl sm:text-5xl font-semibold mb-8">
               Why choose this serum?
             </h2>
-            <p className="text-gray-700 mb-12 text-sm leading-relaxed">
-              Our 100% organic Jojoba oil–based hair serum is crafted for all
-              hair types. Free from harsh chemicals and preservatives, it uses
-              only powerful natural ingredients to keep your hair healthy,
-              shiny, and strong, just the way it&apos;s meant to be.
+            <p className="text-gray-700 mb-8 text-sm leading-relaxed">
+              {detail.whyChoose.description}
             </p>
 
-            <div className="mb-12">
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-4">Ideal for</h3>
+              <div className="grid grid-cols-[auto_1fr] text-sm">
+                {detail.whyChoose.idealFor.map((item) => (
+                  <Fragment key={item.label}>
+                    <span className="font-semibold text-black pr-6 py-1.5 whitespace-nowrap">
+                      {item.label}
+                    </span>
+                    <span className="text-gray-700 py-1.5">{item.value}</span>
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <h3 className="text-2xl sm:text-3xl font-semibold mb-6">
                 Key Benefits
               </h3>
               <ul className="space-y-3">
-                {benefits.map((benefit, index) => (
+                {detail.whyChoose.benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-3 text-sm">
                     <span className="text-black mt-1">•</span>
                     <span className="text-gray-700">{benefit}</span>
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div>
-              <h3 className="text-2xl sm:text-3xl font-semibold mb-4">
-                Make the Switch
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-sm">
-                Stop damaging your hair with chemical-heavy products. Embrace
-                organic beauty rituals and let this nourishing blend elevate
-                your hair care routine.
-              </p>
             </div>
           </div>
 
@@ -131,14 +82,12 @@ export default function WhyChooseSection() {
               How to Use
             </h2>
             <p className="text-gray-300 mb-12 leading-relaxed text-sm">
-              Cleanse your face, apply a few drops of serum, and gently pat
-              until absorbed. Follow with moisturizer twice daily for a healthy,
-              glowing complexion.
+              {detail.howToUse.description}
             </p>
 
             <div className="space-y-8">
-              {howToSteps.map((step, index) => {
-                const Icon = step.icon;
+              {detail.howToUse.steps.map((step, index) => {
+                const Icon = stepIcons[index % stepIcons.length];
                 return (
                   <div key={index} className="flex items-start gap-4">
                     <div className="shrink-0">
@@ -167,14 +116,12 @@ export default function WhyChooseSection() {
               Key Ingredients
             </h2>
             <p className="text-gray-700 mb-12 text-sm leading-relaxed">
-              Our serum is formulated with carefully selected, potent ingredients
-              that work in harmony to deliver visible results. Each component is
-              chosen for its proven efficacy and gentle nature on all skin types.
+              {detail.ingredients.description}
             </p>
 
             <div className="space-y-6">
-              {ingredients.map((ingredient, index) => {
-                const Icon = ingredient.icon;
+              {detail.ingredients.items.map((ingredient, index) => {
+                const Icon = ingredientIcons[index % ingredientIcons.length];
                 return (
                   <div key={index} className="flex items-start gap-4">
                     <div className="shrink-0">
