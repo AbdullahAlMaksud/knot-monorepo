@@ -102,6 +102,14 @@ export default function Header() {
                 Shop
               </Link>
               <Link
+                href="/blog"
+                className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
+                  pathname === "/blog" ? "after:w-full" : ""
+                } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
+              >
+                Blogs
+              </Link>
+              <Link
                 href="/about"
                 className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                   pathname === "/about" ? "after:w-full" : ""
@@ -125,7 +133,7 @@ export default function Header() {
               >
                 Lab
               </Link>
-              {/* <Link href="/blog" className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:transition-all after:duration-300 hover:after:w-full ${
+              {/* <Link href="/blog" className={`relative pb-1 transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
                 pathname === "/blog" ? "after:w-full" : ""
               } ${isSolid ? "after:bg-black" : "after:bg-white"}`}>
                 Blog
@@ -213,6 +221,15 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Shop
+              </Link>
+              <Link
+                href="/blog"
+                className={`relative pb-1 w-fit transition after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:transition-all after:duration-300 hover:after:w-full ${
+                  pathname === "/shop" ? "after:w-full" : ""
+                } ${isSolid ? "after:bg-black" : "after:bg-white"}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blogs
               </Link>
               <Link
                 href="/about"

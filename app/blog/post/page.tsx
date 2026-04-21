@@ -35,8 +35,8 @@ export default function BlogPostPage() {
   return (
     <Layout>
       {/* Hero Image */}
-      <section className="relative h-[400px] sm:h-[500px]">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400" />
+      <section className="relative h-100 sm:h-125">
+        <div className="absolute inset-0 bg-linear-to-br from-gray-300 to-gray-400" />
         <div className="absolute top-4 left-4">
           <span className="bg-white px-4 py-2 rounded-full text-sm font-semibold">
             Wellness
@@ -140,7 +140,7 @@ export default function BlogPostPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 my-8">
               <div className="relative h-64 rounded-lg overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400" />
+                <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-400" />
               </div>
               <div className="bg-gray-50 p-6 rounded-lg">
                 <p className="text-gray-700">
@@ -185,7 +185,7 @@ export default function BlogPostPage() {
                   key={item}
                   className="relative h-32 rounded-lg overflow-hidden"
                 >
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400" />
+                  <div className="w-full h-full bg-linear-to-br from-gray-300 to-gray-400" />
                 </div>
               ))}
             </div>
@@ -239,7 +239,7 @@ export default function BlogPostPage() {
             {relatedPosts.map((post) => (
               <Link key={post.id} href="/blog/post" className="group">
                 <div className="relative h-48 rounded-lg overflow-hidden mb-3">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-br from-gray-300 to-gray-400 group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute top-3 left-3">
                     <span className="bg-white px-3 py-1 rounded-full text-xs font-semibold">
                       {post.category}
