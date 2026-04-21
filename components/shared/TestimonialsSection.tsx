@@ -58,9 +58,7 @@ export default function TestimonialsSection() {
                 TESTIMONIALS
               </p>
               <h2 className="text-white text-4xl sm:text-5xl lg:text-6xl font-light leading-tight">
-                What our customers
-                <br />
-                have experienced
+                Customer&apos;s Review
               </h2>
             </div>
           </div>

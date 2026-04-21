@@ -24,11 +24,18 @@ export default function OurJourneySection() {
               We care about quality and safety to bring you trusted skincare
             </h2>
             <p className="text-gray-300 mb-8 text-sm leading-relaxed italic">
-              Developed in collaboration with award-winning laboratories and
-              notified with the Malaysian Health Ministry for your peace of
-              mind.
+              At <span className="font-bold">B&apos;You</span>, efficacy,
+              quality and safety are at the core of every formulation. Our
+              products are developed with carefully selected, science-backed
+              ingredients and undergo dermatological and patch testing to ensure
+              effectiveness, tolerance, and reliability. Designed specifically
+              for Bangladeshi skin and climate, we are committed to delivering
+              trusted skincare that you can confidently use every day.
             </p>
-            <Button asChild className="bg-white text-black hover:bg-gray-100 rounded-full">
+            <Button
+              asChild
+              className="bg-white text-black hover:bg-gray-100 rounded-full"
+            >
               <Link href="/shop">Shop Now</Link>
             </Button>
           </div>

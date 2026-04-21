@@ -8,15 +8,18 @@ const Innovation = () => {
           {/* Left Content */}
           <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
             <h2 className="text-3xl max-w-[300px] font-semibold mb-8">
-              Innovation rooted in science and care
+              Innovation Rooted in Science and Care
             </h2>
             <p className="text-gray-700 text-sm leading-relaxed">
-              At Byou Labs, our mission is to bridge the gap between traditional
-              dermatological science and modern consumer needs. Every product we
-              develop undergoes rigorous testing in our state-of-the-art
-              facilities, ensuring safety, efficacy, and ethical compliance. We
-              collaborate with award-winning laboratories and follow strict
-              quality protocols approved by the Malaysian Health Ministry.
+              At <span className="font-bold">B&apos;</span>You, our mission is
+              to combine trusted dermatological science with modern skincare
+              needs. Each product is developed in advanced facilities,
+              rigorously tested for safety, effectiveness, and ethical
+              standards. We collaborate with leading global experts &
+              laboratories and adhere to strict quality protocols, ensuring
+              premium, reliable skincare formulated specifically for Bangladeshi
+              skin and climate.
+              <strong className="block mt-4">B’You — Just be you.</strong>
             </p>
           </div>
 

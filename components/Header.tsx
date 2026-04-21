@@ -21,7 +21,9 @@ export default function Header() {
   // Pages that start with transparent header
   const transparentPages = ["/", "/about", "/lab", "/blog", "/concern"];
   const isTransparentPage =
-    transparentPages.includes(pathname) || pathname.startsWith("/blog/");
+    transparentPages.includes(pathname) ||
+    pathname.startsWith("/blog/") ||
+    pathname.startsWith("/concern/");
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -56,11 +58,19 @@ export default function Header() {
         {/* Promo Banner */}
         <div className="bg-black text-white text-center py-2 px-4 text-xs sm:text-sm">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+            >
               &lt;
             </Button>
             <span>BUY 2 PRODUCTS AND GET A FREE GIFT!</span>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/10"
+            >
               &gt;
             </Button>
           </div>
@@ -162,7 +172,12 @@ export default function Header() {
                   {session.user.name ?? "Account"}
                 </Link>
               ) : (
-                <Button variant="ghost" size="icon" className="hover:opacity-70" asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:opacity-70"
+                  asChild
+                >
                   <Link href={profileHref} aria-label="Sign in">
                     <User size={20} />
                   </Link>
