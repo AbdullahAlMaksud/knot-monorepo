@@ -148,6 +148,8 @@ export default function Header() {
                   alt="Logo"
                   width={100}
                   height={40}
+                  loading="eager"
+                  className="h-auto w-auto"
                 />
               </Link>
             </div>

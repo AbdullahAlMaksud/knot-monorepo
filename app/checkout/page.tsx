@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Layout from "@/components/Layout";
@@ -36,6 +36,14 @@ const formatBangladeshPhone = (phone: string): string => {
 };
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutPageContent />
+    </Suspense>
+  );
+}
+
+function CheckoutPageContent() {
   const { data: session } = authClient.useSession();
   const { id: userId } = session?.user || {};
   const searchParams = useSearchParams();

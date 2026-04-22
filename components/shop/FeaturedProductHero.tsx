@@ -148,6 +148,7 @@ export default function FeaturedProductHero({
                       src={image}
                       alt={`Product view ${index + 1}`}
                       fill
+                      sizes="140px"
                       className="object-cover"
                     />
                   </Button>
@@ -161,6 +162,7 @@ export default function FeaturedProductHero({
                     src={featuredProduct.images[selectedImage]}
                     alt={featuredProduct.name}
                     fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
                     className="object-cover"
                     priority
                   />

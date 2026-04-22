@@ -310,6 +310,7 @@ export default function ContactFormSection() {
               src="/images/contact/contact1.jpg"
               alt="Get in Touch"
               fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </div>
