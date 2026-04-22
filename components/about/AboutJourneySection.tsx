@@ -30,6 +30,7 @@ export default function AboutJourneySection() {
               src="/images/about/journey.jpg"
               alt="Our Journey"
               fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </div>
@@ -97,6 +98,7 @@ export default function AboutJourneySection() {
               src="/images/about/product.jpg"
               alt="Our Philosophy"
               fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </div>
@@ -110,6 +112,7 @@ export default function AboutJourneySection() {
               src="/images/about/product.jpg"
               alt="Our Mission"
               fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </div>

@@ -88,6 +88,7 @@ export default function TestimonialsSection() {
                         src={testimonial.image1}
                         alt="Product"
                         fill
+                        sizes="80px"
                         className="object-cover"
                       />
                     </div>
@@ -96,6 +97,7 @@ export default function TestimonialsSection() {
                         src={testimonial.image2}
                         alt="Product"
                         fill
+                        sizes="80px"
                         className="object-cover"
                       />
                     </div>

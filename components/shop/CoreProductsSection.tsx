@@ -92,6 +92,7 @@ export default function CoreProductsSection({
                           src={image}
                           alt={`${product.name} - Image ${index + 1}`}
                           fill
+                          sizes="(min-width: 640px) 50vw, 100vw"
                           className="object-cover"
                         />
                       </div>
