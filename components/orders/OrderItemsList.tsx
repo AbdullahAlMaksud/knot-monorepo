@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Star, Upload, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Order } from "@/lib/orders/types";
+import CurrencyAmount from "@/components/ui/currency-amount";
 
 type OrderItemsListProps = {
   orderItems: Order["items"];
@@ -28,12 +29,6 @@ export default function OrderItemsList({
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [reviewBody, setReviewBody] = useState("");
-
-  // const subtotal = 152.0;
-  // const discount = 35.99;
-  // const shipping = 5.99;
-  // const tax = 15.99;
-  // const total = 157.99;
 
   if (showReviewForm) {
     return (
@@ -61,12 +56,16 @@ export default function OrderItemsList({
                   />
                 </div>
                 <div>
-                  <h4 className="font-medium">{item.name || "Unknown Product"}</h4>
+                  <h4 className="font-medium">
+                    {item.name || "Unknown Product"}
+                  </h4>
                   <p className="text-sm text-gray-600">
                     Quantity: {item.quantity || 1}
                   </p>
                 </div>
-                <p className="font-semibold ml-auto">${item.subtotal || 0}</p>
+                <p className="font-semibold ml-auto">
+                  <CurrencyAmount amount={item.subtotal || 0} />
+                </p>
               </div>
             ))}
           </div>
@@ -157,11 +156,17 @@ export default function OrderItemsList({
               />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold mb-1">{item.name || "Unknown Product"}</h3>
-              <p className="text-sm text-gray-600">Quantity: {item.quantity || 1}</p>
+              <h3 className="font-semibold mb-1">
+                {item.name || "Unknown Product"}
+              </h3>
+              <p className="text-sm text-gray-600">
+                Quantity: {item.quantity || 1}
+              </p>
             </div>
             <div className="text-right">
-              <p className="font-semibold">${item.subtotal.toFixed(2) || 0}</p>
+              <p className="font-semibold">
+                <CurrencyAmount amount={item.subtotal || 0} />
+              </p>
             </div>
           </div>
         ))}
@@ -171,23 +176,29 @@ export default function OrderItemsList({
         <h3 className="font-semibold mb-4">Billing Information</h3>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal</span>
-          <span>${totalAmount}</span>
+          <span>
+            <CurrencyAmount amount={totalAmount} />
+          </span>
         </div>
-        <div className="flex justify-between text-sm text-green-600">
-          <span>Discount</span>
-          <span>-${discountAmount.toFixed(2)}</span>
-        </div>
+        {discountAmount > 0 && (
+          <div className="flex justify-between text-sm text-green-600">
+            <span>Discount</span>
+            <span>
+              <CurrencyAmount amount={-discountAmount} />
+            </span>
+          </div>
+        )}
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Shipping</span>
-          <span>${shippingFee.toFixed(2)}</span>
+          <span>
+            <CurrencyAmount amount={shippingFee} />
+          </span>
         </div>
-        {/* <div className="flex justify-between text-sm">
-          <span className="text-gray-600">TAX</span>
-          <span>${tax.toFixed(2)}</span>
-        </div> */}
         <div className="flex justify-between text-lg font-bold border-t pt-3 mt-3">
           <span>Total</span>
-          <span>${finalAmount.toFixed(2)}</span>
+          <span>
+            <CurrencyAmount amount={finalAmount} />
+          </span>
         </div>
       </div>
     </div>

@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import { getDb } from "@/lib/mongodb";
 import {
   generateOrderId,
-  SHIPPING_FEE,
   type OrderDocument,
   type OrderItemSnapshot,
   type OrderShipping,
@@ -19,29 +18,32 @@ export async function POST(request: NextRequest) {
       shipping,
       payment,
       items,
+      shippingFee,
+      finalAmount,
+      totalAmount,
     }: {
       shipping: OrderShipping;
       payment: OrderPayment;
       items: OrderItemSnapshot[];
+      shippingFee?: number;
+      finalAmount?: number;
+      totalAmount?: number;
     } = body;
 
-    if (
-      !shipping ||
-      !payment ||
-      !Array.isArray(items) ||
-      items.length === 0
-    ) {
+    if (!shipping || !payment || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: "Missing shipping, payment, or items" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const subtotal = items.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
-    );
-    const total = subtotal + SHIPPING_FEE;
+    const subtotal = items.reduce((sum, item) => {
+      const lineSubtotal =
+        item.subtotal ?? (item.unitPrice ?? item.price ?? 0) * item.quantity;
+      return sum + lineSubtotal;
+    }, 0);
+    const resolvedShippingFee = shippingFee ?? 0;
+    const total = finalAmount ?? totalAmount ?? subtotal + resolvedShippingFee;
 
     const orderId = generateOrderId();
     const now = new Date();
@@ -50,6 +52,9 @@ export async function POST(request: NextRequest) {
       userId: session?.user?.id,
       items,
       shipping: {
+        name:
+          shipping.name ??
+          [shipping.firstName, shipping.lastName].filter(Boolean).join(" "),
         firstName: shipping.firstName ?? "",
         lastName: shipping.lastName ?? "",
         email: shipping.email ?? "",
@@ -59,12 +64,15 @@ export async function POST(request: NextRequest) {
         state: shipping.state ?? "",
         postalCode: shipping.postalCode ?? "",
         country: shipping.country ?? "",
+        extraNotes: shipping.extraNotes ?? "",
+        deliveryArea: shipping.deliveryArea,
+        estimatedDelivery: shipping.estimatedDelivery,
       },
       payment: {
-        method: payment.method ?? "bank-transfer",
+        method: payment.method ?? "cash-on-delivery",
         transactionId: payment.transactionId ?? "",
       },
-      totals: { subtotal, shipping: SHIPPING_FEE, total },
+      totals: { subtotal, shipping: resolvedShippingFee, total },
       status: "pending",
       createdAt: now,
       updatedAt: now,
@@ -78,7 +86,7 @@ export async function POST(request: NextRequest) {
     console.error("Order create error:", e);
     return NextResponse.json(
       { error: "Failed to create order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,7 +96,10 @@ export async function GET(request: NextRequest) {
   const mine = searchParams.get("mine") === "1";
 
   if (!mine) {
-    return NextResponse.json({ error: "Use ?mine=1 to list your orders" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Use ?mine=1 to list your orders" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -119,7 +130,7 @@ export async function GET(request: NextRequest) {
     console.error("Orders list error:", e);
     return NextResponse.json(
       { error: "Failed to list orders" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

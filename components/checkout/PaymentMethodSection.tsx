@@ -1,119 +1,64 @@
 "use client";
 
-import { UseFormRegister, FieldErrors } from "react-hook-form";
-
-type CheckoutFormData = {
-  name: string;
-  email: string;
-  phone: string;
-  apartment: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  transactionId: string;
-};
+import CurrencyAmount from "@/components/ui/currency-amount";
+import { DELIVERY_OPTIONS, type DeliveryArea } from "@/lib/checkout/constants";
+import { CurrencyIcon, HandCoins, PackageCheck } from "lucide-react";
 
 type PaymentMethodSectionProps = {
-  register: UseFormRegister<CheckoutFormData>;
-  errors: FieldErrors<CheckoutFormData>;
-  paymentMethod: string;
-  setPaymentMethod: (method: string) => void;
+  deliveryArea: DeliveryArea;
+  selectedDistrict?: string;
 };
 
 export default function PaymentMethodSection({
-  register,
-  errors,
-  paymentMethod,
-  setPaymentMethod,
+  deliveryArea,
+  selectedDistrict,
 }: PaymentMethodSectionProps) {
+  const activeOption = DELIVERY_OPTIONS[deliveryArea];
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
+      <h2 className="text-xl font-semibold mb-6">Payment & Delivery</h2>
 
-      <div className="space-y-3">
-        <label className="flex items-center justify-between p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              value="bank-transfer"
-              checked={paymentMethod === "bank-transfer"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="mr-3"
-            />
-            <span className="font-medium">Bank Transfer</span>
-          </div>
-        </label>
-
-        <label className="flex items-center justify-between p-4 border-2 border-pink-500 bg-pink-50 rounded-lg cursor-pointer">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              value="bkash"
-              checked={paymentMethod === "bkash"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="mr-3"
-            />
-            <span className="font-medium text-pink-600">Bkash</span>
-          </div>
-        </label>
-
-        <label className="flex items-center justify-between p-4 border-2 border-orange-500 bg-orange-50 rounded-lg cursor-pointer">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              value="nagad"
-              checked={paymentMethod === "nagad"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="mr-3"
-            />
-            <span className="font-medium text-orange-600">Nagad</span>
-          </div>
-        </label>
+      <div className="rounded-2xl border border-black bg-black px-5 py-4 text-white mb-6 flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <p className="text-sm uppercase tracking-[0.18em] text-white/70 mb-2">
+            Payment Method
+          </p>
+          <p className="text-lg font-semibold">Cash on Delivery</p>
+          <p className="text-sm text-white/70 mt-1">
+            Pay in cash when your order arrives.
+          </p>
+        </div>
+        <PackageCheck color="white" size={40} className="font-extralight" />
       </div>
 
-      {paymentMethod === "bank-transfer" && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Account Name:</span>
-            <span className="font-medium">Name</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Country:</span>
-            <span className="font-medium">Bangladesh</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Merchant Number:</span>
-            <span className="font-medium">00000000000</span>
+      <div>
+        <p className="text-sm uppercase tracking-[0.18em] text-gray-500 mb-3">
+          Delivery Area
+        </p>
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-medium text-gray-900">{activeOption.label}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Estimated delivery: {activeOption.estimatedDelivery}
+              </p>
+              <p className="text-xs text-gray-500 mt-3">
+                {selectedDistrict
+                  ? `Automatically set from district: ${selectedDistrict}`
+                  : "Select your district above to calculate the delivery area automatically."}
+              </p>
+            </div>
+
+            <div className="text-right shrink-0">
+              <p className="font-semibold text-gray-900">
+                <CurrencyAmount amount={activeOption.shippingFee} />
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Shipping</p>
+            </div>
           </div>
         </div>
-      )}
-
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Transaction ID
-        </label>
-        <input
-          type="text"
-          {...register("transactionId", {
-            required: "Transaction ID is required",
-          })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
-          placeholder="Enter transaction ID"
-        />
-        {errors.transactionId && (
-          <p className="mt-1 text-sm text-red-600">
-            {errors.transactionId.message}
-          </p>
-        )}
       </div>
-
-      {/* <button
-        type="submit"
-        className="w-full mt-6 bg-black text-white py-3 rounded-full hover:bg-gray-800 transition font-medium"
-      >
-        Confirm
-      </button> */}
     </div>
   );
 }

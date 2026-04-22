@@ -6,7 +6,8 @@
 export interface Product {
   id: number;
   name: string;
-  price: string;
+  price: number;
+  pricePrefix?: string;
   rating: number;
   images: string | string[];
   description?: string;
@@ -34,7 +35,8 @@ export const allProducts: Product[] = [
   {
     id: 1,
     name: "Vitamin C 10% Face Serum",
-    price: "From ৳ 1599",
+    price: 1599,
+    pricePrefix: "From",
     rating: 5,
     images: [
       productImages.p1,
@@ -48,7 +50,8 @@ export const allProducts: Product[] = [
   {
     id: 2,
     name: "Niacinamide 10% Face Serum",
-    price: "From ৳ 1299",
+    price: 1299,
+    pricePrefix: "From",
     rating: 5,
     images: [
       productImages.p3,
@@ -62,7 +65,8 @@ export const allProducts: Product[] = [
   {
     id: 3,
     name: "Retinol 0.15% Face Serum",
-    price: "From ৳ 1599",
+    price: 1599,
+    pricePrefix: "From",
     rating: 5,
     images: productImages.p3,
     description:
@@ -71,7 +75,8 @@ export const allProducts: Product[] = [
   {
     id: 4,
     name: "Salicylic Acid 2% Face Serum",
-    price: "From ৳ 1599",
+    price: 1599,
+    pricePrefix: "From",
     rating: 5,
     images: productImages.p4,
     description:

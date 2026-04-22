@@ -5,17 +5,13 @@ import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
+import CurrencyAmount from "@/components/ui/currency-amount";
 import type { Product } from "@/data/products";
 
 interface CoreProductsSectionProps {
   subtitle?: string;
   title: string;
   products: Product[];
-}
-
-function parsePrice(price: string): number {
-  const n = parseFloat(price.replace(/[^\d.]/g, ""));
-  return Number.isFinite(n) && n > 0 ? n : 48;
 }
 
 export default function CoreProductsSection({
@@ -171,9 +167,11 @@ export default function CoreProductsSection({
                       {product.description}
                     </p>
                   )}
-                  <p className="text-gray-600 mb-2 font-medium">
-                    {product.price}
-                  </p>
+                  <CurrencyAmount
+                    amount={product.price}
+                    prefix={product.pricePrefix}
+                    className="text-gray-600 mb-2 font-medium"
+                  />
 
                   <div className="flex items-center gap-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -190,7 +188,7 @@ export default function CoreProductsSection({
                       addItem({
                         id: product.id,
                         name: product.name,
-                        price: parsePrice(product.price),
+                        price: product.price,
                         image:
                           typeof product.images === "string"
                             ? product.images
