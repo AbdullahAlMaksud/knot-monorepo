@@ -12,8 +12,6 @@
 //   plugins: [nextCookies()],
 // });
 
-
-
 // import { Resend } from "resend";
 // const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -37,6 +35,12 @@ export const auth = betterAuth({
     //     html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
     //   });
     // },
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
   },
   plugins: [nextCookies()],
   user: {

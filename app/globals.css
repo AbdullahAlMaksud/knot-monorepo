@@ -120,21 +120,28 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+      var(--font-inter),
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     font-weight: 400 !important; /* Inter Regular - override any thin weights */
   }
 
   /* Playfair Display for main headings (h1, h2) */
   h1,
   h2 {
-    font-family: var(--font-playfair, "Playfair Display"), "Playfair Display", Georgia, serif !important;
+    font-family:
+      var(--font-playfair, "Playfair Display"), "Playfair Display", Georgia,
+      serif !important;
     font-weight: 400;
     letter-spacing: 0.02em;
   }
-  
+
   /* Ensure Playfair Display works even with Tailwind utility classes */
   h1.font-semibold,
   h1.font-bold,
@@ -146,7 +153,8 @@
   h2.font-medium,
   h2.font-light,
   h2.font-normal {
-    font-family: var(--font-playfair), "Playfair Display", Georgia, serif !important;
+    font-family:
+      var(--font-playfair), "Playfair Display", Georgia, serif !important;
   }
 
   /* Inter Regular for body text and functional elements - override thin/light weights */
@@ -162,40 +170,61 @@
   select,
   button,
   div {
-    font-family: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+      var(--font-inter),
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     font-weight: 400 !important; /* Inter Regular - override thin weights */
   }
-  
+
   /* Override Tailwind font-light (300) and font-thin (100) classes - force Regular (400) */
   .font-light,
   .font-thin {
     font-weight: 400 !important; /* Force Regular weight instead of thin/light */
   }
-  
+
   /* Exception: Allow font-semibold (600) and font-bold (700) to work */
   .font-semibold {
     font-weight: 600 !important;
   }
-  
+
   .font-bold {
     font-weight: 700 !important;
   }
-  
+
   /* Inter Semibold for subheadings (h3, h4, h5, h6) */
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+    font-family:
+      var(--font-inter),
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     font-weight: 600 !important; /* Inter Semibold */
     letter-spacing: 0.01em;
   }
-  
+
   /* Subheadings should always be Semibold, even with font-light class */
   h3.font-light,
   h4.font-light,
   h5.font-light,
   h6.font-light {
     font-weight: 600 !important; /* Force Semibold for subheadings */
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
