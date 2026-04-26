@@ -2,13 +2,19 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface MediaItem {
   type: "image" | "video";
   src: string;
   alt?: string;
+}
+
+export interface HeroSearchBarProps {
+  placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 export interface HeroCarouselProps {
@@ -19,6 +25,7 @@ export interface HeroCarouselProps {
   buttonLink?: string;
   autoPlay?: boolean;
   autoPlayInterval?: number;
+  searchBar?: HeroSearchBarProps;
 }
 
 export default function HeroCarousel({
@@ -29,6 +36,7 @@ export default function HeroCarousel({
   buttonLink = "/shop",
   autoPlay = true,
   autoPlayInterval = 5000,
+  searchBar,
 }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -156,14 +164,29 @@ export default function HeroCarousel({
                 {description}
               </p>
             )}
-            {buttonText && (
+            {searchBar ? (
+              <div className="relative mt-2 w-full max-w-[28rem]">
+                <Search
+                  className="absolute left-5 top-1/2 -translate-y-1/2 text-black/40"
+                  size={18}
+                  strokeWidth={2}
+                />
+                <input
+                  type="search"
+                  value={searchBar.value ?? ""}
+                  onChange={(e) => searchBar.onChange?.(e.target.value)}
+                  placeholder={searchBar.placeholder ?? "Search..."}
+                  className="h-[3.25rem] w-full rounded-full bg-white pl-12 pr-6 text-[0.96rem] text-black placeholder:text-black/38 focus:outline-none"
+                />
+              </div>
+            ) : buttonText ? (
               <Button
                 asChild
                 className="min-w-[160px] rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-[180px]"
               >
                 <Link href={buttonLink}>{buttonText}</Link>
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
