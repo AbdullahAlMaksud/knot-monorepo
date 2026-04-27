@@ -182,6 +182,29 @@ vercel deploy
 
 Or deploy to other platforms like Netlify, AWS, or your own server.
 
+### Google OAuth Production Setup
+
+Set these environment variables in production so Better Auth generates the correct Google callback URL:
+
+```bash
+BETTER_AUTH_URL=https://byou.vercel.app
+NEXT_PUBLIC_BETTER_AUTH_URL=https://byou.vercel.app
+```
+
+If you serve the app from more than one valid host, add them as a comma-separated list:
+
+```bash
+BETTER_AUTH_ALLOWED_HOSTS=byou.vercel.app
+```
+
+In Google Cloud Console, add this exact Authorized redirect URI for your production site:
+
+```bash
+https://byou.vercel.app/api/auth/callback/google
+```
+
+If the production domain changes, update both the environment variables and the Google redirect URI together.
+
 ## 🌐 Current Status
 
 ✅ Development server is running at http://localhost:3000
