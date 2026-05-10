@@ -7,7 +7,7 @@ import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
 import { concerns, getConcernBySlug } from "@/data/concerns";
-import { coreProducts } from "@/data/products";
+import { getPublishedProducts } from "@/services/products/api";
 import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
@@ -26,15 +26,25 @@ export default async function ConcernDetailPage({
     notFound();
   }
 
+  let products: import("@/services/products/type").ApiProduct[] = [];
+  try {
+    const result = await getPublishedProducts();
+    products = result.data;
+  } catch {
+    // fall through with empty list
+  }
+
   return (
     <Layout>
       <ConcernHero concern={concern} />
       <Understanding concern={concern} />
-      <CoreProductsSection
-        subtitle="Targeted Solutions"
-        title="Products Designed for Your Needs"
-        products={coreProducts}
-      />
+      {products.length > 0 && (
+        <CoreProductsSection
+          subtitle="Targeted Solutions"
+          title="Products Designed for Your Needs"
+          products={products}
+        />
+      )}
       <Ingredients concern={concern} />
       <Routine concern={concern} />
       <BeforeAfterSection />

@@ -1,57 +1,18 @@
-"use client";
+import BlogPageClient from "@/components/blog/BlogPageClient";
+import type { Blog } from "@/services/blogs/type";
+import { getPublishedBlogs } from "@/services/blogs/api";
 
-import { useState } from "react";
+export const dynamic = "force-dynamic";
 
-import Layout from "@/components/Layout";
-import BlogPostsSection from "@/components/blog/BlogPostsSection";
-import RealStoriesSliderSection from "@/components/blog/RealStoriesSliderSection";
-import { useGetPublishedBlogs } from "@/hooks/useBlogs";
-import TestimonialsSection from "@/components/shared/TestimonialsSection";
-import HeroCarousel from "@/components/shared/HeroCarousel";
+async function fetchPublishedBlogs(): Promise<Blog[]> {
+  try {
+    return await getPublishedBlogs();
+  } catch {
+    return [];
+  }
+}
 
-export default function BlogPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { data: blogs = [], isLoading } = useGetPublishedBlogs(
-    undefined,
-    searchQuery,
-  );
-
-  const heroMedia = [{ type: "image" as const, src: "/images/blog/cover.jpg" }];
-  return (
-    <Layout>
-      {/* Hero Section */}
-      <HeroCarousel
-        mediaItems={heroMedia}
-        title={
-          <>
-            Your Daily Glow
-            <br />
-            Guide
-          </>
-        }
-        description={
-          <>
-            From expert tips to real stories, explore everything you need for
-            healthier skin.
-          </>
-        }
-        searchBar={{
-          placeholder: "Search articles...",
-          value: searchQuery,
-          onChange: setSearchQuery,
-        }}
-      />
-
-      <BlogPostsSection
-        blogs={blogs}
-        isLoading={isLoading}
-        searchQuery={searchQuery}
-      />
-
-      <RealStoriesSliderSection />
-
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-    </Layout>
-  );
+export default async function BlogPage() {
+  const blogs = await fetchPublishedBlogs();
+  return <BlogPageClient initialBlogs={blogs} />;
 }

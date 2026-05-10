@@ -23,11 +23,14 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => getStoredCart());
+  const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    queueMicrotask(() => setHydrated(true));
+    queueMicrotask(() => {
+      setItems(getStoredCart());
+      setHydrated(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -44,23 +47,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return prev.map((i) =>
             String(i.id) === String(item.id)
               ? { ...i, quantity: i.quantity + qty }
-              : i
+              : i,
           );
         }
         return [...prev, { ...item, quantity: qty }];
       });
     },
-    []
+    [],
   );
 
-  const updateQuantity = useCallback((id: number | string, quantity: number) => {
-    if (quantity < 1) return;
-    setItems((prev) =>
-      prev.map((i) =>
-        String(i.id) === String(id) ? { ...i, quantity } : i
-      )
-    );
-  }, []);
+  const updateQuantity = useCallback(
+    (id: number | string, quantity: number) => {
+      if (quantity < 1) return;
+      setItems((prev) =>
+        prev.map((i) => (String(i.id) === String(id) ? { ...i, quantity } : i)),
+      );
+    },
+    [],
+  );
 
   const removeItem = useCallback((id: number | string) => {
     setItems((prev) => prev.filter((i) => String(i.id) !== String(id)));
@@ -72,11 +76,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const total = useMemo(
     () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
-    [items]
+    [items],
   );
   const itemCount = useMemo(
     () => items.reduce((sum, i) => sum + i.quantity, 0),
-    [items]
+    [items],
   );
 
   const value = useMemo<CartContextValue>(
@@ -89,12 +93,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       total,
       itemCount,
     }),
-    [items, addItem, updateQuantity, removeItem, clearCart, total, itemCount]
+    [items, addItem, updateQuantity, removeItem, clearCart, total, itemCount],
   );
 
-  return (
-    <CartContext.Provider value={value}>{children}</CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart(): CartContextValue {

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import type { Blog } from "@/hooks/useBlogs";
+import type { Blog } from "@/services/blogs/type";
 
 interface BlogPostCardProps {
   blog: Blog;

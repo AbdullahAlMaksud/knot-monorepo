@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { Blog } from "@/hooks/useBlogs";
+import type { Blog } from "@/services/blogs/type";
 import { ChevronDown } from "lucide-react";
 
 import BlogPostCard from "@/components/blog/BlogPostCard";

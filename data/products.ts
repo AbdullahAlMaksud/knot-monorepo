@@ -581,3 +581,27 @@ export function getProductDetailById(id: number): ProductDetail | undefined {
 export function getProductById(id: number): Product | undefined {
   return allProducts.find((p) => p.id === id);
 }
+
+/** Slug → numeric id map for static detail data lookup. */
+const slugToId: Record<string, number> = {
+  "vitamin-c-10-face-serum": 1,
+  "niacinamide-10-face-serum": 2,
+  "retinol-0-15-face-serum": 3,
+  "salicylic-acid-2-face-serum": 4,
+};
+
+/** Get detail data by product slug. */
+export function getProductDetailBySlug(
+  slug: string,
+): ProductDetail | undefined {
+  const id = slugToId[slug];
+  return id !== undefined ? productDetails[id] : undefined;
+}
+
+/** Get Info features by product slug. */
+export function getProductInfoFeaturesBySlug(
+  slug: string,
+): InfoFeature[] | undefined {
+  const id = slugToId[slug];
+  return id !== undefined ? productInfoFeatures[id] : undefined;
+}

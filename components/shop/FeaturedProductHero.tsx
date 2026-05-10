@@ -19,6 +19,9 @@ import { setStoredBuyNowItem } from "@/lib/checkout/buy-now";
 
 interface FeaturedProductHeroProps {
   product?: {
+    _id?: string;
+    variantId?: string;
+    slug?: string;
     brand?: string;
     name?: string;
     price?: number;
@@ -80,7 +83,8 @@ export default function FeaturedProductHero({
 
   const handleAddToCart = () => {
     addItem({
-      id: product?.name || featuredProduct.name,
+      id: product?._id || product?.name || featuredProduct.name,
+      variantId: product?.variantId,
       name: featuredProduct.name,
       price: featuredProduct.price,
       image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
@@ -90,7 +94,8 @@ export default function FeaturedProductHero({
 
   const handleBuyNow = () => {
     setStoredBuyNowItem({
-      id: product?.name || featuredProduct.name,
+      id: product?._id || product?.name || featuredProduct.name,
+      variantId: product?.variantId,
       name: featuredProduct.name,
       price: featuredProduct.price,
       image: featuredProduct.images[0] ?? "/images/products/product1.jpg",

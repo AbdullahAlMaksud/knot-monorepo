@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { useGetOrdersByCustomerId } from "@/hooks/useOrders";
+import { useGetOrdersByCustomerId } from "@/services/orders/query";
 import Loading from "../ui/loading";
 import ErrorState from "../ui/error";
 import CurrencyAmount from "@/components/ui/currency-amount";

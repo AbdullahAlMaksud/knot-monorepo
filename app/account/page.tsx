@@ -12,7 +12,8 @@ import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
-import { ShippingAddress, useUpdateShippingAddress } from "@/hooks/useShippingAddress";
+import { useUpdateShippingAddress } from "@/services/shipping-address/mutation";
+import type { ShippingAddress } from "@/services/shipping-address/type";
 
 type ProfileFormData = {
   fullName: string;
@@ -51,7 +52,8 @@ export default function MyAccountPage() {
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
-    watch, reset: resetPassword,
+    watch,
+    reset: resetPassword,
     formState: { errors: errorsPassword },
   } = useForm<PasswordFormData>();
 
@@ -89,7 +91,8 @@ export default function MyAccountPage() {
     }
   };
 
-  const { mutate: updateShipping, isPending: isShippingUpdating } = useUpdateShippingAddress();
+  const { mutate: updateShipping, isPending: isShippingUpdating } =
+    useUpdateShippingAddress();
 
   const onSubmitShipping = (data: ShippingAddress) => {
     updateShipping({

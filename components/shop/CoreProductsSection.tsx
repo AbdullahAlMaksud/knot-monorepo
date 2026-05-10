@@ -6,12 +6,13 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import CurrencyAmount from "@/components/ui/currency-amount";
-import type { Product } from "@/data/products";
+import { getR2ImageUrl } from "@/lib/utils";
+import type { ApiProduct } from "@/services/products/type";
 
 interface CoreProductsSectionProps {
   subtitle?: string;
   title: string;
-  products: Product[];
+  products: ApiProduct[];
 }
 
 export default function CoreProductsSection({
@@ -20,21 +21,22 @@ export default function CoreProductsSection({
   products,
 }: CoreProductsSectionProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState<
-    Record<number, number>
+    Record<string, number>
   >({});
   const { addItem } = useCart();
 
-  const getProductImages = (product: Product): string[] => {
-    // Normalize to array: if it's a string, convert to array; if already array, use it
-    return Array.isArray(product.images) ? product.images : [product.images];
+  const getProductImages = (product: ApiProduct): string[] => {
+    const display = getR2ImageUrl(product.displayImageKey);
+    const related = product.relatedImagesKeys.map(getR2ImageUrl);
+    return [display, ...related];
   };
 
-  const getCurrentIndex = (productId: number): number => {
+  const getCurrentIndex = (productId: string): number => {
     return currentImageIndex[productId] || 0;
   };
 
   const goToPrevious = (
-    productId: number,
+    productId: string,
     totalImages: number,
     e: React.MouseEvent,
   ) => {
@@ -47,7 +49,7 @@ export default function CoreProductsSection({
   };
 
   const goToNext = (
-    productId: number,
+    productId: string,
     totalImages: number,
     e: React.MouseEvent,
   ) => {
@@ -71,15 +73,18 @@ export default function CoreProductsSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {products.map((product) => {
             const images = getProductImages(product);
-            const currentIndex = getCurrentIndex(product.id);
+            const currentIndex = getCurrentIndex(product._id);
             const hasMultipleImages = images.length > 1;
+            const defaultVariant =
+              product.variants.find((v) => v.isDefault) ?? product.variants[0];
+            const price = defaultVariant?.price ?? 0;
 
             return (
               <div
-                key={product.id}
+                key={product._id}
                 className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
               >
-                <Link href={`/product/${product.id}`} className="w-full">
+                <Link href={`/product/${product.slug}`} className="w-full">
                   <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
                     {images.map((image, index) => (
                       <div
@@ -106,7 +111,7 @@ export default function CoreProductsSection({
                           variant="secondary"
                           size="icon"
                           onClick={(e) =>
-                            goToPrevious(product.id, images.length, e)
+                            goToPrevious(product._id, images.length, e)
                           }
                           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Previous image"
@@ -118,7 +123,7 @@ export default function CoreProductsSection({
                           variant="secondary"
                           size="icon"
                           onClick={(e) =>
-                            goToNext(product.id, images.length, e)
+                            goToNext(product._id, images.length, e)
                           }
                           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black rounded-full"
                           aria-label="Next image"
@@ -141,7 +146,7 @@ export default function CoreProductsSection({
                               e.stopPropagation();
                               setCurrentImageIndex((prev) => ({
                                 ...prev,
-                                [product.id]: index,
+                                [product._id]: index,
                               }));
                             }}
                             className={`h-2 min-w-0 p-0 rounded-full transition-all ${
@@ -158,7 +163,7 @@ export default function CoreProductsSection({
                 </Link>
 
                 <div className="px-6 pb-6 w-full flex flex-col items-center">
-                  <Link href={`/product/${product.id}`}>
+                  <Link href={`/product/${product.slug}`}>
                     <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition text-center">
                       {product.name}
                     </h3>
@@ -169,8 +174,8 @@ export default function CoreProductsSection({
                     </p>
                   )}
                   <CurrencyAmount
-                    amount={product.price}
-                    prefix={product.pricePrefix}
+                    amount={price}
+                    prefix="From"
                     className="text-gray-600 mb-2 font-medium"
                   />
 
@@ -185,15 +190,12 @@ export default function CoreProductsSection({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const images = getProductImages(product);
                       addItem({
-                        id: product.id,
+                        id: product._id,
+                        variantId: defaultVariant?._id,
                         name: product.name,
-                        price: product.price,
-                        image:
-                          typeof product.images === "string"
-                            ? product.images
-                            : (product.images[0] ?? ""),
+                        price,
+                        image: images[0] ?? "",
                         quantity: 1,
                       });
                     }}

@@ -21,9 +21,7 @@ export default function Header() {
   // Pages that start with transparent header
   const transparentPages = ["/", "/about", "/lab", "/blog", "/concern"];
   const isTransparentPage =
-    transparentPages.includes(pathname) ||
-    pathname.startsWith("/blog/") ||
-    pathname.startsWith("/concern/");
+    transparentPages.includes(pathname) || pathname.startsWith("/concern/");
 
   const [isScrolled, setIsScrolled] = useState(false);
 
