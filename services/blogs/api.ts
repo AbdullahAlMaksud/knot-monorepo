@@ -11,7 +11,7 @@ export const getPublishedBlogs = async (
   search?: string,
   tag?: string,
 ): Promise<Blog[]> => {
-  const params = new URLSearchParams({ status: "Published" });
+  const params = new URLSearchParams();
   if (category && category !== "All") params.set("category", category);
   if (search && search.trim()) params.set("title", search.trim());
   if (tag && tag.trim()) params.set("tag", tag.trim());
