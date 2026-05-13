@@ -1,7 +1,6 @@
 import Layout from "@/components/Layout";
 import HeroCarousel from "@/components/shared/HeroCarousel";
 import Info from "@/components/home/Info";
-import Team from "@/components/home/Team";
 import OurJourneySection from "@/components/home/OurJourneySection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
 import ConcernsSection from "@/components/home/ConcernsSection";
@@ -10,12 +9,18 @@ import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import Innovation from "@/components/lab/Innovation";
 import Journey from "@/components/lab/Journey";
 import Team2 from "@/components/home/Team2";
-import { coreProducts } from "@/data/products";
+import { getPublishedProducts } from "@/services/products/api";
 
-export default function LabPage() {
-  const heroMedia = [
-    { type: "image" as const, src: "/images/lab/lab-bg.jpg" },
-  ];
+export default async function LabPage() {
+  const heroMedia = [{ type: "image" as const, src: "/images/lab/lab-bg.jpg" }];
+
+  let products: import("@/services/products/type").ApiProduct[] = [];
+  try {
+    const result = await getPublishedProducts();
+    products = result.data;
+  } catch {
+    // fall through with empty list
+  }
 
   return (
     <Layout>
@@ -42,14 +47,15 @@ export default function LabPage() {
       <Info />
       <Journey />
       <OurJourneySection />
-      <CoreProductsSection
-        subtitle="MADE JUST FOR YOU"
-        title="Our Core Products"
-        products={coreProducts}
-      />
+      {products.length > 0 && (
+        <CoreProductsSection
+          subtitle="MADE JUST FOR YOU"
+          title="Our Core Products"
+          products={products}
+        />
+      )}
       <ConcernsSection />
       <BeforeAfterSection />
-
       <TestimonialsSection />
     </Layout>
   );

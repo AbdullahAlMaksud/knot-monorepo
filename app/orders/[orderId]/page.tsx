@@ -9,7 +9,7 @@ import SupportSection from "@/components/orders/SupportSection";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import { Order } from "@/lib/orders/types";
-import { useGetOrderById } from "@/hooks/useOrders";
+import { useGetOrderById } from "@/services/orders/query";
 import ErrorState from "@/components/ui/error";
 import Loading from "@/components/ui/loading";
 
@@ -19,17 +19,37 @@ export default function OrderTrackingPage() {
   const [activeTab, setActiveTab] = useState<"summary" | "shipping">("summary");
   const [showReviewForm, setShowReviewForm] = useState(false);
 
-  const { data: orderDetails, isLoading, isError, error, refetch } = useGetOrderById(orderId as string);
+  const {
+    data: orderDetails,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetOrderById(orderId as string);
   const orderItems: Order["items"] = orderDetails?.items ?? [];
 
   if (isLoading) return <Loading fullPage={true} text="Fetching orders..." />;
-  if (isError) return <ErrorState fullPage={true} message={error.message} onRetry={refetch} />;
+  if (isError)
+    return (
+      <ErrorState fullPage={true} message={error.message} onRetry={refetch} />
+    );
 
   return (
     <Layout>
       <div className="py-12 sm:py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <OrderHeader orderId={orderDetails?._id ?? "Unknown"} date={orderDetails?.createdAt ? new Date(orderDetails.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—"} status={orderDetails?.status ?? "Unknown"} />
+          <OrderHeader
+            orderId={orderDetails?._id ?? "Unknown"}
+            date={
+              orderDetails?.createdAt
+                ? new Date(orderDetails.createdAt).toLocaleDateString(
+                    undefined,
+                    { year: "numeric", month: "short", day: "numeric" },
+                  )
+                : "—"
+            }
+            status={orderDetails?.status ?? "Unknown"}
+          />
 
           {!showReviewForm && (
             <div className="flex justify-between items-center mb-6">
@@ -91,7 +111,9 @@ export default function OrderTrackingPage() {
 
           {!showReviewForm && activeTab === "shipping" && (
             <>
-              <ShippingAddressCard shipping={orderDetails?.shipping as Order["shipping"]} />
+              <ShippingAddressCard
+                shipping={orderDetails?.shipping as Order["shipping"]}
+              />
               <SupportSection />
             </>
           )}

@@ -3,9 +3,17 @@ import ConcernsSection from "@/components/home/ConcernsSection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
-import { coreProducts } from "@/data/products";
+import { getPublishedProducts } from "@/services/products/api";
 
-const page = () => {
+export default async function page() {
+  let products: import("@/services/products/type").ApiProduct[] = [];
+  try {
+    const result = await getPublishedProducts();
+    products = result.data;
+  } catch {
+    // fall through with empty list
+  }
+
   return (
     <Layout>
       <section className="pt-32 pb-16 sm:pb-20 bg-white">
@@ -26,15 +34,15 @@ const page = () => {
         </div>
       </section>
       <ConcernsSection />
-      <CoreProductsSection
-        subtitle="Targeted Solutions"
-        title="Products Designed for Your Needs"
-        products={coreProducts}
-      />
+      {products.length > 0 && (
+        <CoreProductsSection
+          subtitle="Targeted Solutions"
+          title="Products Designed for Your Needs"
+          products={products}
+        />
+      )}
       <BeforeAfterSection />
       <TestimonialsSection />
     </Layout>
   );
-};
-
-export default page;
+}

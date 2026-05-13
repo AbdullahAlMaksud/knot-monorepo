@@ -64,6 +64,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     src={item.image}
                     alt={item.name}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover"
                   />
                 </div>

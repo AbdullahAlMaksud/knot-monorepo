@@ -59,6 +59,7 @@ export default function WhyChooseSection({ detail }: WhyChooseSectionProps) {
               src="/images/shop/choose.jpg"
               alt="Why choose this serum"
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-cover"
             />
           </div>
@@ -72,6 +73,7 @@ export default function WhyChooseSection({ detail }: WhyChooseSectionProps) {
               src="/images/shop/how.jpg"
               alt="How to use"
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="object-cover"
             />
           </div>
