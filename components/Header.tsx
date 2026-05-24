@@ -7,7 +7,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import CartDrawer from "./CartDrawer";
 import { useCart } from "@/lib/cart/CartContext";
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
@@ -15,7 +15,7 @@ export default function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const pathname = usePathname();
   const { itemCount } = useCart();
-  const { data: session } = authClient.useSession();
+  const { data: session } = useAuthSession();
   const profileHref = session?.user ? "/account" : "/auth/signin";
 
   // Pages that start with transparent header

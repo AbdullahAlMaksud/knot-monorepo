@@ -17,3 +17,9 @@ export interface Blog {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface BlogDetailResponse {
+  data: Blog;
+  message: string;
+  meta: null;
+}

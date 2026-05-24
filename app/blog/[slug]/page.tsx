@@ -7,33 +7,14 @@ import { headers } from "next/headers";
 import ShareButtons from "@/components/shared/ShareButtons";
 import type { Blog } from "@/services/blogs/type";
 import { sanitizeContent } from "@/lib/sanitize";
-
-async function getBlogBySlug(slug: string): Promise<Blog | null> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/blogs/slug/${slug}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data ?? null;
-  } catch {
-    return null;
-  }
-}
+import { getBlogBySlug, getPublishedBlogs } from "@/services/blogs/api";
 
 async function getRelatedBlogs(
   category: string,
   excludeSlug: string,
 ): Promise<Blog[]> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/blogs?status=Published&category=${encodeURIComponent(category)}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return [];
-    const json = await res.json();
-    const blogs: Blog[] = json.data ?? [];
+    const blogs = await getPublishedBlogs(category);
     return blogs.filter((b) => b.slug !== excludeSlug).slice(0, 4);
   } catch {
     return [];
@@ -50,6 +31,9 @@ const formatDate = (dateString: string) =>
 const getFirstImage = (blog: Blog) =>
   blog.contents.find((c) => c.type === "image")?.content;
 
+const isPublishedBlog = (blog: Blog) =>
+  blog.status.trim().toUpperCase() === "PUBLISHED";
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -60,9 +44,15 @@ export default async function BlogPostPage({
   const host = headersList.get("host") ?? "";
   const protocol = host.startsWith("localhost") ? "http" : "https";
   const canonicalUrl = `${protocol}://${host}/blog/${slug}`;
-  const blog = await getBlogBySlug(slug);
+  let blog: Blog | null = null;
 
-  if (!blog || blog.status !== "Published") {
+  try {
+    blog = await getBlogBySlug(slug);
+  } catch {
+    blog = null;
+  }
+
+  if (!blog || !isPublishedBlog(blog)) {
     notFound();
   }
 

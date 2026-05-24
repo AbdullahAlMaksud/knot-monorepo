@@ -6,8 +6,11 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import CurrencyAmount from "@/components/ui/currency-amount";
-import { getR2ImageUrl } from "@/lib/utils";
 import type { ApiProduct } from "@/services/products/type";
+import {
+  getDefaultProductVariant,
+  getProductImages,
+} from "@/services/products/utils";
 
 interface CoreProductsSectionProps {
   subtitle?: string;
@@ -24,12 +27,6 @@ export default function CoreProductsSection({
     Record<string, number>
   >({});
   const { addItem } = useCart();
-
-  const getProductImages = (product: ApiProduct): string[] => {
-    const display = getR2ImageUrl(product.displayImageKey);
-    const related = product.relatedImagesKeys.map(getR2ImageUrl);
-    return [display, ...related];
-  };
 
   const getCurrentIndex = (productId: string): number => {
     return currentImageIndex[productId] || 0;
@@ -75,33 +72,46 @@ export default function CoreProductsSection({
             const images = getProductImages(product);
             const currentIndex = getCurrentIndex(product._id);
             const hasMultipleImages = images.length > 1;
-            const defaultVariant =
-              product.variants.find((v) => v.isDefault) ?? product.variants[0];
+            const defaultVariant = getDefaultProductVariant(product);
             const price = defaultVariant?.price ?? 0;
+            const defaultVariantInStock =
+              typeof defaultVariant?.quantity === "number"
+                ? defaultVariant.quantity > 0
+                : Boolean(defaultVariant);
+            const rating = Math.max(
+              0,
+              Math.min(5, Math.round(product.rating ?? 0)),
+            );
 
             return (
               <div
                 key={product._id}
                 className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
               >
-                <Link href={`/product/${product.slug}`} className="w-full">
+                <Link href={`/product/${product._id}`} className="w-full">
                   <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
-                    {images.map((image, index) => (
-                      <div
-                        key={index}
-                        className={`absolute inset-0 transition-opacity duration-500 ${
-                          index === currentIndex ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        <Image
-                          src={image}
-                          alt={`${product.name} - Image ${index + 1}`}
-                          fill
-                          sizes="(min-width: 640px) 50vw, 100vw"
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
+                    {images.length > 0 ? (
+                      images.map((image, index) => (
+                        <div
+                          key={index}
+                          className={`absolute inset-0 transition-opacity duration-500 ${
+                            index === currentIndex
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                        >
+                          <Image
+                            src={image}
+                            alt={`${product.name} - Image ${index + 1}`}
+                            fill
+                            sizes="(min-width: 640px) 50vw, 100vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="absolute inset-0 bg-gray-100" />
+                    )}
 
                     {/* Navigation Arrows */}
                     {hasMultipleImages && (
@@ -163,7 +173,7 @@ export default function CoreProductsSection({
                 </Link>
 
                 <div className="px-6 pb-6 w-full flex flex-col items-center">
-                  <Link href={`/product/${product.slug}`}>
+                  <Link href={`/product/${product._id}`}>
                     <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition text-center">
                       {product.name}
                     </h3>
@@ -181,18 +191,31 @@ export default function CoreProductsSection({
 
                   <div className="flex items-center gap-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} size={16} fill="black" />
+                      <Star
+                        key={star}
+                        size={16}
+                        className={
+                          star <= rating
+                            ? "fill-black text-black"
+                            : "text-gray-300"
+                        }
+                      />
                     ))}
                   </div>
                   <Button
                     type="button"
                     className="w-full rounded-full"
+                    disabled={!defaultVariant?._id || !defaultVariantInStock}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      if (!defaultVariant?._id || !defaultVariantInStock) {
+                        return;
+                      }
+
                       addItem({
                         id: product._id,
-                        variantId: defaultVariant?._id,
+                        variantId: defaultVariant._id,
                         name: product.name,
                         price,
                         image: images[0] ?? "",

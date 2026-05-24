@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { authClient, signInWithGoogle } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 type SignInFormData = {
@@ -15,6 +15,7 @@ type SignInFormData = {
 export default function SignInForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isGooglePending, setIsGooglePending] = useState(false);
   const {
     register,
     handleSubmit,
@@ -34,6 +35,16 @@ export default function SignInForm() {
     }
     router.push("/account");
     router.refresh();
+  };
+
+  const handleGoogleSignIn = async () => {
+    setSubmitError(null);
+    setIsGooglePending(true);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setSubmitError(error.message ?? "Google sign in failed");
+      setIsGooglePending(false);
+    }
   };
 
   return (
@@ -114,12 +125,8 @@ export default function SignInForm() {
         </div>
         <button
           type="button"
-          onClick={() =>
-            authClient.signIn.social({
-              provider: "google",
-              callbackURL: "/account",
-            })
-          }
+          onClick={handleGoogleSignIn}
+          disabled={isGooglePending}
           className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-full px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
         >
           <svg
@@ -145,7 +152,7 @@ export default function SignInForm() {
               fill="#EA4335"
             />
           </svg>
-          Continue with Google
+          {isGooglePending ? "Connecting..." : "Continue with Google"}
         </button>
       </div>
 

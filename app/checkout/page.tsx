@@ -9,9 +9,11 @@ import PaymentMethodSection from "@/components/checkout/PaymentMethodSection";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCart } from "@/lib/cart/CartContext";
 import { CheckoutFormData, DISCOUNT_AMOUNT } from "@/lib/orders/types";
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/auth-client";
 import { useCreateOrder } from "@/services/orders/mutation";
 import type { OrderPayloadType } from "@/services/orders/type";
+import { getProductById } from "@/services/products/api";
+import { getDefaultProductVariant } from "@/services/products/utils";
 import {
   clearStoredBuyNowItem,
   getStoredBuyNowItem,
@@ -45,7 +47,7 @@ export default function CheckoutPage() {
 }
 
 function CheckoutPageContent() {
-  const { data: session } = authClient.useSession();
+  const { data: session } = useAuthSession();
   const { id: userId } = session?.user || {};
   const searchParams = useSearchParams();
   const { items: cartItems } = useCart();
@@ -111,34 +113,67 @@ function CheckoutPageContent() {
     },
   });
 
-  const onSubmit = (data: CheckoutFormData) => {
+  const resolveCheckoutItems = async () => {
+    return Promise.all(
+      checkoutItems.map(async (item) => {
+        if (item.variantId) {
+          return {
+            variantId: item.variantId,
+            quantity: item.quantity,
+          };
+        }
+
+        const product = await getProductById(String(item.id));
+        const defaultVariant = getDefaultProductVariant(product);
+
+        return {
+          variantId: defaultVariant?._id ?? "",
+          quantity: item.quantity,
+        };
+      }),
+    );
+  };
+
+  const onSubmit = async (data: CheckoutFormData) => {
     if (checkoutItems.length === 0) {
       setSubmitError("Your cart is empty.");
+      return;
+    }
+
+    let items: OrderPayloadType["items"] = [];
+    try {
+      items = await resolveCheckoutItems();
+    } catch {
+      setSubmitError("Unable to verify cart item variants. Please try again.");
+      return;
+    }
+
+    const hasInvalidItem = items.some((item) => !item.variantId);
+
+    if (hasInvalidItem) {
+      setSubmitError("One or more cart items are missing a valid variant.");
       return;
     }
 
     setSubmitError(null);
 
     const payload: OrderPayloadType = {
-      customerId: userId,
-      items: checkoutItems.map((i) => ({
-        variantId: i.variantId ?? String(i.id),
-        quantity: i.quantity,
-      })),
+      ...(userId ? { customerId: userId } : {}),
+      items,
       shipment: {
-        name: data.name,
-        email: data.email,
+        name: data.name.trim(),
+        email: data.email.trim(),
         phone: formatBangladeshPhone(data.phone),
-        apartment: data.apartment || undefined,
-        city: data.city,
-        district: data.state.toUpperCase(),
-        postalCode: data.postalCode,
+        apartment: data.apartment?.trim() || undefined,
+        city: data.city.trim(),
+        district: data.state.trim().toUpperCase(),
+        postalCode: data.postalCode.trim(),
         country: DEFAULT_COUNTRY,
       },
       payment: {
         method: "CASH",
       },
-      note: data.extraNotes || undefined,
+      note: data.extraNotes?.trim() || undefined,
     };
     createOrder(payload);
   };

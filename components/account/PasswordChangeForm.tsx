@@ -7,7 +7,7 @@ import {
   UseFormHandleSubmit,
 } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { signOutEverywhere } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 type PasswordFormData = {
@@ -35,7 +35,7 @@ export default function PasswordChangeForm({
   const newPassword = watch("newPassword");
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await signOutEverywhere();
     router.push("/auth/signin");
     router.refresh();
   };

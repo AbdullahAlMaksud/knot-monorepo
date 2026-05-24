@@ -1,5 +1,9 @@
 import apiClient from "@/lib/axios";
-import type { ApiProduct, ProductsListResponse } from "./type";
+import type {
+  ApiProduct,
+  ProductDetailResponse,
+  ProductsListResponse,
+} from "./type";
 
 export const getPublishedProducts = async (): Promise<ProductsListResponse> => {
   const response = await apiClient.get<ProductsListResponse>(
@@ -15,4 +19,11 @@ export const getProductBySlug = async (
     "/products/published",
   );
   return response.data.data.find((p) => p.slug === slug);
+};
+
+export const getProductById = async (id: string): Promise<ApiProduct> => {
+  const response = await apiClient.get<ProductDetailResponse>(
+    `/products/${id}`,
+  );
+  return response.data.data;
 };

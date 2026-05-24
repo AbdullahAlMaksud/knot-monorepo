@@ -4,7 +4,11 @@ import CoreProductsSection from "@/components/shop/CoreProductsSection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import { getPublishedProducts } from "@/services/products/api";
-import { getR2ImageUrl } from "@/lib/utils";
+import {
+  getDefaultProductVariant,
+  getProductImages,
+  getProductVariants,
+} from "@/services/products/utils";
 
 export default async function ShopPage() {
   let products: import("@/services/products/type").ApiProduct[] = [];
@@ -17,23 +21,20 @@ export default async function ShopPage() {
 
   const featured = products.find((p) => p.isFeatured);
 
-  const featuredDefaultVariant =
-    featured?.variants.find((v) => v.isDefault) ?? featured?.variants[0];
+  const featuredDefaultVariant = getDefaultProductVariant(featured);
 
   const featuredHeroProduct = featured
     ? {
         _id: featured._id,
         variantId: featuredDefaultVariant?._id,
+        variants: getProductVariants(featured),
         slug: featured.slug,
         brand: "Just Be YOU",
         name: featured.name,
         price: featuredDefaultVariant?.price ?? 0,
-        images: [
-          getR2ImageUrl(featured.displayImageKey),
-          ...featured.relatedImagesKeys.map(getR2ImageUrl),
-        ],
+        images: getProductImages(featured),
         description: featured.description,
-        rating: featured.rating || 5,
+        rating: featured.rating ?? 0,
       }
     : undefined;
 

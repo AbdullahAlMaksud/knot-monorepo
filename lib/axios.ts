@@ -1,7 +1,26 @@
 import axios, { AxiosError } from "axios";
 
+type ApiErrorResponse = {
+  message?: string;
+  field?: string;
+  data?: {
+    field?: string;
+    messageForUser?: string;
+  };
+};
+
+const configuredBackendUrl = (
+  process.env.NEXT_PUBLIC_API_URL || "https://byou-api.nexulyze.com"
+).replace(/\/$/, "");
+const backendApiBaseURL = configuredBackendUrl.endsWith("/api/v1")
+  ? configuredBackendUrl
+  : `${configuredBackendUrl}/api/v1`;
+const apiBaseURL =
+  typeof window === "undefined" ? backendApiBaseURL : "/api/v1";
+
 const apiClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
+  baseURL: apiBaseURL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,14 +31,14 @@ apiClient.interceptors.response.use(
   (response) => {
     return response;
   },
-  (
-    error: AxiosError<{ message?: string; data?: { messageForUser?: string } }>,
-  ) => {
+  (error: AxiosError<ApiErrorResponse>) => {
     const message =
       error.response?.data?.data?.messageForUser ||
       error.response?.data?.message ||
       error.message ||
       "Something went wrong";
+    const field =
+      error.response?.data?.field || error.response?.data?.data?.field;
 
     if (process.env.NODE_ENV === "development") {
       console.error("[API Error]", {
@@ -29,7 +48,7 @@ apiClient.interceptors.response.use(
       });
     }
 
-    return Promise.reject(new Error(message));
+    return Promise.reject(Object.assign(new Error(message), { field }));
   },
 );
 

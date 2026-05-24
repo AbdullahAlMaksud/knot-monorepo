@@ -10,14 +10,13 @@ import FeaturedProductHero from "@/components/shop/FeaturedProductHero";
 import Team2 from "@/components/home/Team2";
 import Info from "@/components/home/Info";
 import LoadingLogo from "@/components/LoadingLogo";
-import {
-  featuredProductMist,
-  featuredProductVitaminC,
-  type FeaturedProduct,
-} from "@/data/products";
 import { getPublishedProducts } from "@/services/products/api";
-import { getR2ImageUrl } from "@/lib/utils";
 import type { ApiProduct } from "@/services/products/type";
+import {
+  getDefaultProductVariant,
+  getProductImages,
+  getProductVariants,
+} from "@/services/products/utils";
 
 export default async function Home() {
   const heroMedia = [
@@ -35,36 +34,27 @@ export default async function Home() {
 
   const buildHeroProduct = (
     apiProduct: ApiProduct | undefined,
-    fallback: FeaturedProduct,
   ) => {
-    if (!apiProduct) return fallback;
-    const defaultVariant =
-      apiProduct.variants.find((v) => v.isDefault) ?? apiProduct.variants[0];
+    if (!apiProduct) return undefined;
+    const defaultVariant = getDefaultProductVariant(apiProduct);
     return {
       _id: apiProduct._id,
       variantId: defaultVariant?._id,
+      variants: getProductVariants(apiProduct),
       slug: apiProduct.slug,
       brand: "Just Be YOU",
       name: apiProduct.name,
-      price: defaultVariant?.price ?? fallback.price,
+      price: defaultVariant?.price ?? 0,
       currency: "BDT",
-      images: [
-        getR2ImageUrl(apiProduct.displayImageKey),
-        ...apiProduct.relatedImagesKeys.map(getR2ImageUrl),
-      ],
-      description: apiProduct.description || fallback.description,
-      rating: apiProduct.rating || fallback.rating || 5,
+      images: getProductImages(apiProduct),
+      description: apiProduct.description,
+      rating: apiProduct.rating ?? 0,
     };
   };
 
-  const heroMist = buildHeroProduct(
-    products.find((p) => p.slug === "vitamin-c-10-face-serum"),
-    featuredProductMist,
-  );
-  const heroNiacinamide = buildHeroProduct(
-    products.find((p) => p.slug === "niacinamide-10-face-serum"),
-    featuredProductVitaminC,
-  );
+  const featuredProducts = products.filter((product) => product.isFeatured);
+  const heroMist = buildHeroProduct(featuredProducts[0] ?? products[0]);
+  const heroNiacinamide = buildHeroProduct(featuredProducts[1] ?? products[1]);
 
   return (
     <>
@@ -100,9 +90,9 @@ export default async function Home() {
         <OurStorySection />
         <OurJourneySection />
         <ConcernsSection />
-        <FeaturedProductHero product={heroMist} />
+        {heroMist && <FeaturedProductHero product={heroMist} />}
         <Team2 />
-        <FeaturedProductHero product={heroNiacinamide} />
+        {heroNiacinamide && <FeaturedProductHero product={heroNiacinamide} />}
         <BeforeAfterSection />
         <TestimonialsSection />
       </Layout>
