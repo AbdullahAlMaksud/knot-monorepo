@@ -3,6 +3,7 @@ export type { Order, CheckoutFormData } from "@/lib/orders/types";
 export type OrderPayloadType = {
   customerId?: string;
   items: {
+    productId: string;
     variantId: string;
     quantity: number;
   }[];

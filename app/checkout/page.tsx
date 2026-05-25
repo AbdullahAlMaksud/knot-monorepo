@@ -12,8 +12,11 @@ import { CheckoutFormData, DISCOUNT_AMOUNT } from "@/lib/orders/types";
 import { useAuthSession } from "@/lib/auth-client";
 import { useCreateOrder } from "@/services/orders/mutation";
 import type { OrderPayloadType } from "@/services/orders/type";
-import { getProductById } from "@/services/products/api";
-import { getDefaultProductVariant } from "@/services/products/utils";
+import { useGetPublishedProducts } from "@/services/products/query";
+import {
+  getDefaultProductVariant,
+  getProductVariants,
+} from "@/services/products/utils";
 import {
   clearStoredBuyNowItem,
   getStoredBuyNowItem,
@@ -51,6 +54,10 @@ function CheckoutPageContent() {
   const { id: userId } = session?.user || {};
   const searchParams = useSearchParams();
   const { items: cartItems } = useCart();
+  const {
+    data: publishedProducts = [],
+    isLoading: areProductsLoading,
+  } = useGetPublishedProducts();
   const [buyNowItem] = useState(() => getStoredBuyNowItem());
   const isBuyNowCheckout =
     searchParams.get("mode") === "buy-now" && !!buyNowItem;
@@ -113,25 +120,23 @@ function CheckoutPageContent() {
     },
   });
 
-  const resolveCheckoutItems = async () => {
-    return Promise.all(
-      checkoutItems.map(async (item) => {
-        if (item.variantId) {
-          return {
-            variantId: item.variantId,
-            quantity: item.quantity,
-          };
-        }
+  const resolveCheckoutItems = () => {
+    return checkoutItems.map((item) => {
+      const product = publishedProducts.find(
+        (publishedProduct) => publishedProduct._id === String(item.id),
+      );
+      const defaultVariant = getDefaultProductVariant(product);
+      const selectedVariant =
+        getProductVariants(product).find(
+          (variant) => variant._id === item.variantId,
+        ) ?? defaultVariant;
 
-        const product = await getProductById(String(item.id));
-        const defaultVariant = getDefaultProductVariant(product);
-
-        return {
-          variantId: defaultVariant?._id ?? "",
-          quantity: item.quantity,
-        };
-      }),
-    );
+      return {
+        productId: product?._id ?? "",
+        variantId: selectedVariant?._id ?? "",
+        quantity: item.quantity,
+      };
+    });
   };
 
   const onSubmit = async (data: CheckoutFormData) => {
@@ -140,18 +145,22 @@ function CheckoutPageContent() {
       return;
     }
 
-    let items: OrderPayloadType["items"] = [];
-    try {
-      items = await resolveCheckoutItems();
-    } catch {
-      setSubmitError("Unable to verify cart item variants. Please try again.");
+    if (areProductsLoading) {
+      setSubmitError("Product details are still loading. Please try again.");
       return;
     }
 
-    const hasInvalidItem = items.some((item) => !item.variantId);
+    let items: OrderPayloadType["items"] = [];
+    items = resolveCheckoutItems();
+
+    const hasInvalidItem = items.some(
+      (item) => !item.productId || !item.variantId,
+    );
 
     if (hasInvalidItem) {
-      setSubmitError("One or more cart items are missing a valid variant.");
+      setSubmitError(
+        "One or more cart items are missing a valid product or variant.",
+      );
       return;
     }
 
@@ -208,7 +217,7 @@ function CheckoutPageContent() {
                 shippingFee={shippingFee}
                 deliveryLabel={DELIVERY_OPTIONS[deliveryArea].label}
                 estimatedDelivery={estimatedDelivery}
-                canConfirmOrder={isValid}
+                canConfirmOrder={isValid && !areProductsLoading}
                 onConfirmOrder={handleSubmit(onSubmit)}
                 submitting={isCreatingOrder}
                 submitError={submitError}

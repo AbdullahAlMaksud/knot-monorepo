@@ -122,9 +122,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
                 <Star
                   key={star}
                   className={`size-3 ${
-                    star <= rating
-                      ? "fill-black text-black"
-                      : "text-gray-300"
+                    star <= rating ? "fill-black text-black" : "text-gray-300"
                   }`}
                 />
               ))}

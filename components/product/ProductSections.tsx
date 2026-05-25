@@ -27,7 +27,9 @@ export default function ProductSections({
     .flatMap((section) => section.items ?? [])
     .filter((item) => item.text);
   const textSections = sections.filter((section) => section.type !== "BULLETS");
-  const bulletSections = sections.filter((section) => section.type === "BULLETS");
+  const bulletSections = sections.filter(
+    (section) => section.type === "BULLETS",
+  );
   const primaryText = textSections[0];
   const primaryBullets = bulletSections[0];
   const firstImage =
@@ -128,7 +130,9 @@ export default function ProductSections({
             </h2>
             <div className="space-y-6">
               {(primaryBullets?.items ?? []).map((item, index) => {
-                const Icon = [PackageCheck, Sparkles, Leaf, Droplets][index % 4];
+                const Icon = [PackageCheck, Sparkles, Leaf, Droplets][
+                  index % 4
+                ];
                 return (
                   <div key={`dark-${item.text}`} className="flex gap-4">
                     <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10">

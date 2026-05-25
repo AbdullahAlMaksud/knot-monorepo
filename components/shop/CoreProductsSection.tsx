@@ -95,9 +95,7 @@ export default function CoreProductsSection({
                         <div
                           key={index}
                           className={`absolute inset-0 transition-opacity duration-500 ${
-                            index === currentIndex
-                              ? "opacity-100"
-                              : "opacity-0"
+                            index === currentIndex ? "opacity-100" : "opacity-0"
                           }`}
                         >
                           <Image
@@ -183,12 +181,12 @@ export default function CoreProductsSection({
                       {product.description}
                     </p>
                   )}
+
                   <CurrencyAmount
                     amount={price}
                     prefix="From"
                     className="text-gray-600 mb-2 font-medium"
                   />
-
                   <div className="flex items-center gap-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star

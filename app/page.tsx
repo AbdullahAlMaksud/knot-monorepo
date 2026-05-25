@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import Layout from "@/components/Layout";
 import HeroCarousel from "@/components/shared/HeroCarousel";
 import OurStorySection from "@/components/home/OurStorySection";
@@ -10,51 +13,50 @@ import FeaturedProductHero from "@/components/shop/FeaturedProductHero";
 import Team2 from "@/components/home/Team2";
 import Info from "@/components/home/Info";
 import LoadingLogo from "@/components/LoadingLogo";
-import { getPublishedProducts } from "@/services/products/api";
 import type { ApiProduct } from "@/services/products/type";
+import { useGetPublishedProducts } from "@/services/products/query";
 import {
   getDefaultProductVariant,
   getProductImages,
   getProductVariants,
 } from "@/services/products/utils";
 
-export default async function Home() {
+const buildHeroProduct = (apiProduct: ApiProduct | undefined) => {
+  if (!apiProduct) return undefined;
+  const defaultVariant = getDefaultProductVariant(apiProduct);
+  return {
+    _id: apiProduct._id,
+    variantId: defaultVariant?._id,
+    variants: getProductVariants(apiProduct),
+    slug: apiProduct.slug,
+    brand: "Just Be YOU",
+    name: apiProduct.name,
+    price: defaultVariant?.price ?? 0,
+    currency: "BDT",
+    images: getProductImages(apiProduct),
+    description: apiProduct.description,
+    rating: apiProduct.rating ?? 0,
+  };
+};
+
+export default function Home() {
   const heroMedia = [
     { type: "image" as const, src: "/images/home/hero-bg.jpg" },
     { type: "image" as const, src: "/images/about/about-bg.jpg" },
   ];
-
-  let products: ApiProduct[] = [];
-  try {
-    const result = await getPublishedProducts();
-    products = result.data;
-  } catch {
-    // fall through with empty list
-  }
-
-  const buildHeroProduct = (
-    apiProduct: ApiProduct | undefined,
-  ) => {
-    if (!apiProduct) return undefined;
-    const defaultVariant = getDefaultProductVariant(apiProduct);
-    return {
-      _id: apiProduct._id,
-      variantId: defaultVariant?._id,
-      variants: getProductVariants(apiProduct),
-      slug: apiProduct.slug,
-      brand: "Just Be YOU",
-      name: apiProduct.name,
-      price: defaultVariant?.price ?? 0,
-      currency: "BDT",
-      images: getProductImages(apiProduct),
-      description: apiProduct.description,
-      rating: apiProduct.rating ?? 0,
-    };
-  };
-
-  const featuredProducts = products.filter((product) => product.isFeatured);
-  const heroMist = buildHeroProduct(featuredProducts[0] ?? products[0]);
-  const heroNiacinamide = buildHeroProduct(featuredProducts[1] ?? products[1]);
+  const { data: products = [] } = useGetPublishedProducts();
+  const featuredProducts = useMemo(
+    () => products.filter((product) => product.isFeatured),
+    [products],
+  );
+  const heroMist = useMemo(
+    () => buildHeroProduct(featuredProducts[0] ?? products[0]),
+    [featuredProducts, products],
+  );
+  const heroNiacinamide = useMemo(
+    () => buildHeroProduct(featuredProducts[1] ?? products[1]),
+    [featuredProducts, products],
+  );
 
   return (
     <>
