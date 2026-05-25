@@ -11,7 +11,42 @@ import { useParams } from "next/navigation";
 import { Order } from "@/lib/orders/types";
 import { useGetOrderById } from "@/services/orders/query";
 import ErrorState from "@/components/ui/error";
-import Loading from "@/components/ui/loading";
+import Skeleton from "@/components/ui/skeleton";
+
+function OrderDetailSkeleton() {
+  return (
+    <Layout>
+      <div className="py-12 sm:py-16 lg:py-24">
+        <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-6 lg:px-8">
+          <div className="space-y-3 rounded-lg border border-gray-200 p-6">
+            <Skeleton className="h-8 w-56" />
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-6 w-28 rounded-full" />
+          </div>
+          <div className="flex justify-between">
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-24 rounded-full" />
+              <Skeleton className="h-10 w-24 rounded-full" />
+            </div>
+            <Skeleton className="h-10 w-36 rounded-full" />
+          </div>
+          <div className="space-y-4 rounded-lg border border-gray-200 p-6">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+                <Skeleton className="h-5 w-20" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+}
 
 export default function OrderTrackingPage() {
   const params = useParams();
@@ -28,7 +63,7 @@ export default function OrderTrackingPage() {
   } = useGetOrderById(orderId as string);
   const orderItems: Order["items"] = orderDetails?.items ?? [];
 
-  if (isLoading) return <Loading fullPage={true} text="Fetching orders..." />;
+  if (isLoading) return <OrderDetailSkeleton />;
   if (isError)
     return (
       <ErrorState fullPage={true} message={error.message} onRetry={refetch} />

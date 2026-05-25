@@ -13,6 +13,31 @@ import {
   useGetBlogBySlug,
   useGetPublishedBlogs,
 } from "@/services/blogs/query";
+import ErrorState from "@/components/ui/error";
+import Skeleton from "@/components/ui/skeleton";
+
+function BlogPostSkeleton() {
+  return (
+    <Layout>
+      <div className="mx-auto max-w-[1080px] px-4">
+        <Skeleton className="mt-40 h-100 rounded-lg sm:h-[500px]" />
+        <div className="mt-4 flex justify-end">
+          <Skeleton className="h-4 w-44" />
+        </div>
+        <article className="py-16 sm:py-24">
+          <div className="space-y-5">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-11/12" />
+            <Skeleton className="h-5 w-10/12" />
+            <Skeleton className="h-80 w-full rounded-lg" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-3/4" />
+          </div>
+        </article>
+      </div>
+    </Layout>
+  );
+}
 
 const formatDate = (dateString: string) =>
   new Date(dateString).toLocaleDateString("en-US", {
@@ -70,24 +95,13 @@ export default function BlogPostPage() {
   }, [sortedContents]);
 
   if (isBlogLoading) {
-    return (
-      <Layout>
-        <div className="mx-auto max-w-[1080px] px-4 py-40 text-center text-gray-600">
-          Loading article...
-        </div>
-      </Layout>
-    );
+    return <BlogPostSkeleton />;
   }
 
   if (isBlogError || !blog || !isPublishedBlog(blog)) {
     return (
       <Layout>
-        <div className="mx-auto max-w-[1080px] px-4 py-40 text-center">
-          <h1 className="text-3xl font-semibold">Article not found</h1>
-          <p className="mt-3 text-gray-600">
-            The article you are looking for is unavailable.
-          </p>
-        </div>
+        <ErrorState message="The article you are looking for is unavailable." />
       </Layout>
     );
   }

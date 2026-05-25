@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import Image from "next/image";
 import {
@@ -28,12 +28,12 @@ type FormData = {
 };
 
 export default function ContactFormSection() {
+  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
-    reset,
     setValue,
   } = useForm<FormData>({
     defaultValues: {
@@ -65,23 +65,8 @@ export default function ContactFormSection() {
     }
   }, [currentPhone, selectedCountry.maxNationalNumberLength, setValue]);
 
-  const onSubmit = (data: FormData) => {
-    const country = getCountryPhoneOption(data.countryIso2);
-
-    console.log({
-      ...data,
-      countryName: country.name,
-      dialCode: country.dialCode,
-      fullPhone: `${country.dialCode}${data.phone}`,
-    });
-    alert("Thank you for your message! We will get back to you soon.");
-    reset({
-      name: "",
-      email: "",
-      countryIso2: "BD",
-      phone: "",
-      message: "",
-    });
+  const onSubmit = () => {
+    setIsComingSoonOpen(true);
   };
 
   return (
@@ -316,6 +301,36 @@ export default function ContactFormSection() {
           </div>
         </div>
       </div>
+      {isComingSoonOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="contact-coming-soon-title"
+          onClick={() => setIsComingSoonOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2
+              id="contact-coming-soon-title"
+              className="text-2xl font-semibold"
+            >
+              This feature will be available soon!
+            </h2>
+            <div className="mt-6 flex justify-end">
+              <Button
+                type="button"
+                onClick={() => setIsComingSoonOpen(false)}
+                className="rounded-full px-6"
+              >
+                Got it
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

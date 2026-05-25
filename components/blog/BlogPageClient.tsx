@@ -11,7 +11,13 @@ import { useGetPublishedBlogs } from "@/services/blogs/query";
 
 export default function BlogPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: fetchedBlogs = [], isLoading } = useGetPublishedBlogs();
+  const {
+    data: fetchedBlogs = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetPublishedBlogs();
 
   const blogs = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -48,6 +54,9 @@ export default function BlogPageClient() {
       <BlogPostsSection
         blogs={blogs}
         isLoading={isLoading}
+        isError={isError}
+        errorMessage={error?.message}
+        onRetry={refetch}
         searchQuery={searchQuery}
       />
 

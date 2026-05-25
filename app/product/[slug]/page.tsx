@@ -10,6 +10,38 @@ import {
   useGetProductById,
   useGetPublishedProducts,
 } from "@/services/products/query";
+import Info from "@/components/home/Info";
+import ErrorState from "@/components/ui/error";
+import Skeleton from "@/components/ui/skeleton";
+
+function ProductDetailSkeleton() {
+  return (
+    <Layout>
+      <div className="pt-32">
+        <section className="bg-white pt-10 pb-12">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[1.08fr_1fr] lg:px-8">
+            <div className="grid grid-cols-[72px_1fr] gap-3 sm:grid-cols-[88px_1fr]">
+              <div className="flex flex-col gap-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="h-20 w-full sm:h-24" />
+                ))}
+              </div>
+              <Skeleton className="min-h-[360px] rounded-sm sm:min-h-[470px]" />
+            </div>
+            <div className="flex flex-col justify-center space-y-5 lg:pl-4">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-11 w-3/4" />
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-20 w-full max-w-md" />
+              <Skeleton className="h-12 w-56 rounded-full" />
+              <Skeleton className="h-12 w-full max-w-sm rounded-full" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+}
 
 export default function ProductDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -26,24 +58,13 @@ export default function ProductDetailPage() {
   );
 
   if (isProductLoading) {
-    return (
-      <Layout>
-        <div className="px-4 py-40 text-center text-gray-600">
-          Loading product...
-        </div>
-      </Layout>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (isProductError || !apiProduct) {
     return (
       <Layout>
-        <div className="px-4 py-40 text-center">
-          <h1 className="text-3xl font-semibold">Product not found</h1>
-          <p className="mt-3 text-gray-600">
-            The product you are looking for is unavailable.
-          </p>
-        </div>
+        <ErrorState message="The product you are looking for is unavailable." />
       </Layout>
     );
   }
@@ -52,7 +73,7 @@ export default function ProductDetailPage() {
     <Layout>
       <div className="pt-32">
         <ProductDetailHero product={apiProduct} />
-
+        <Info />
         <ProductSections product={apiProduct} sections={apiProduct.sections} />
         {coreApiProducts.length > 0 && (
           <CoreProductsSection

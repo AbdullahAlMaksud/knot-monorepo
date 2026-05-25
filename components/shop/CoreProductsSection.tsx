@@ -140,7 +140,6 @@ export default function CoreProductsSection({
                         </Button>
                       </>
                     )}
-
                     {/* Dots Indicator */}
                     {hasMultipleImages && (
                       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
