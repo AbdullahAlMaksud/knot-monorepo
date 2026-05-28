@@ -7,7 +7,7 @@ BYOU Storefront is the public e-commerce website for BYOU skincare products. It 
 The current production storefront URL referenced by the project is:
 
 ```text
-https://byou.vercel.app/
+https://landing-byou.vercel.app/
 ```
 
 ## Overview
@@ -27,18 +27,18 @@ Current modules include:
 
 ## Tech Stack
 
-| Area | Tooling |
-| --- | --- |
-| Framework | Next.js 16 App Router |
-| UI | React 19, Tailwind CSS v4, Radix UI/Base UI primitives |
-| Language | TypeScript |
-| Data fetching | TanStack React Query, Axios |
-| Auth | Better Auth client |
+| Area               | Tooling                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| Framework          | Next.js 16 App Router                                      |
+| UI                 | React 19, Tailwind CSS v4, Radix UI/Base UI primitives     |
+| Language           | TypeScript                                                 |
+| Data fetching      | TanStack React Query, Axios                                |
+| Auth               | Better Auth client                                         |
 | Forms and UI state | React Hook Form, React state, reusable local UI components |
-| Notifications | Sonner |
-| Icons | Lucide React |
-| Images | Next.js Image, Cloudflare R2 public assets |
-| Package manager | Yarn Classic |
+| Notifications      | Sonner                                                     |
+| Icons              | Lucide React                                               |
+| Images             | Next.js Image, Cloudflare R2 public assets                 |
+| Package manager    | Yarn Classic                                               |
 
 ## Requirements
 
@@ -59,11 +59,11 @@ NEXT_PUBLIC_R2_PUBLIC_BASE_URL=https://your-public-assets-domain.com
 
 Common variables used by the app:
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | Yes | Backend API origin. If the value does not include `/api/v1`, the app appends it where needed. Defaults to `https://byou-api.nexulyze.com` when omitted. |
-| `NEXT_PUBLIC_FRONTEND_URL` | Yes | Frontend origin used by the Better Auth client when browser origin is unavailable. |
-| `NEXT_PUBLIC_R2_PUBLIC_BASE_URL` | No | Public product image base URL for R2 image keys returned by the backend. |
+| Variable                         | Required | Purpose                                                                                                                                                 |
+| -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`            | Yes      | Backend API origin. If the value does not include `/api/v1`, the app appends it where needed. Defaults to `https://byou-api.nexulyze.com` when omitted. |
+| `NEXT_PUBLIC_FRONTEND_URL`       | Yes      | Frontend origin used by the Better Auth client when browser origin is unavailable.                                                                      |
+| `NEXT_PUBLIC_R2_PUBLIC_BASE_URL` | No       | Public product image base URL for R2 image keys returned by the backend.                                                                                |
 
 For production Google OAuth and Better Auth setup, keep the backend auth configuration and Google redirect URI aligned with the deployed frontend domain.
 
@@ -73,8 +73,8 @@ The app uses a same-origin API proxy for browser requests.
 
 ```ts
 // next.config.ts
-source: "/api/v1/:path*"
-destination: `${backendApiUrl}/api/v1/:path*`
+source: "/api/v1/:path*";
+destination: `${backendApiUrl}/api/v1/:path*`;
 ```
 
 Browser-side services call relative `/api/v1` routes. Server-side calls use the configured backend origin directly. This keeps browser requests same-origin while still supporting server rendering and API access.
@@ -135,12 +135,12 @@ http://localhost:3000
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `yarn dev` | Start the Next.js development server. |
-| `yarn build` | Create a production build. |
+| Command      | Description                                 |
+| ------------ | ------------------------------------------- |
+| `yarn dev`   | Start the Next.js development server.       |
+| `yarn build` | Create a production build.                  |
 | `yarn start` | Start the production server after building. |
-| `yarn lint` | Run ESLint across the codebase. |
+| `yarn lint`  | Run ESLint across the codebase.             |
 
 ## Project Structure
 
@@ -158,26 +158,26 @@ services/            API clients, queries, mutations, query keys, helpers, and t
 
 Important storefront routes:
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Home page |
-| `/shop` | Product listing and featured product surfaces |
-| `/product/[slug]` | Product detail page |
-| `/checkout` | Checkout flow |
-| `/checkout/success` | Successful order page |
-| `/checkout/failed` | Failed checkout page |
-| `/account` | Customer profile, shipping address, password, and orders |
-| `/orders/[orderId]` | Order detail page |
-| `/auth/signin` | Customer sign-in |
-| `/auth/signup` | Customer registration |
-| `/auth/forgot-password` | Password reset request |
-| `/blog` | Blog listing |
-| `/blog/[slug]` | Blog detail page |
-| `/concern` | Concern listing |
-| `/concern/[slug]` | Concern detail page |
-| `/about` | About BYOU |
-| `/lab` | Lab and formulation content |
-| `/contact` | Contact form, contact methods, FAQ, and testimonials |
+| Route                   | Purpose                                                  |
+| ----------------------- | -------------------------------------------------------- |
+| `/`                     | Home page                                                |
+| `/shop`                 | Product listing and featured product surfaces            |
+| `/product/[slug]`       | Product detail page                                      |
+| `/checkout`             | Checkout flow                                            |
+| `/checkout/success`     | Successful order page                                    |
+| `/checkout/failed`      | Failed checkout page                                     |
+| `/account`              | Customer profile, shipping address, password, and orders |
+| `/orders/[orderId]`     | Order detail page                                        |
+| `/auth/signin`          | Customer sign-in                                         |
+| `/auth/signup`          | Customer registration                                    |
+| `/auth/forgot-password` | Password reset request                                   |
+| `/blog`                 | Blog listing                                             |
+| `/blog/[slug]`          | Blog detail page                                         |
+| `/concern`              | Concern listing                                          |
+| `/concern/[slug]`       | Concern detail page                                      |
+| `/about`                | About BYOU                                               |
+| `/lab`                  | Lab and formulation content                              |
+| `/contact`              | Contact form, contact methods, FAQ, and testimonials     |
 
 ## Development Notes
 
