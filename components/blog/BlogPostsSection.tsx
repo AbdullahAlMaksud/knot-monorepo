@@ -6,10 +6,15 @@ import type { Blog } from "@/services/blogs/type";
 import { ChevronDown } from "lucide-react";
 
 import BlogPostCard from "@/components/blog/BlogPostCard";
+import ErrorState from "@/components/ui/error";
+import Skeleton from "@/components/ui/skeleton";
 
 interface BlogPostsSectionProps {
   blogs: Blog[];
   isLoading: boolean;
+  isError?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
   searchQuery: string;
 }
 
@@ -120,6 +125,9 @@ function SidebarSection({
 export default function BlogPostsSection({
   blogs,
   isLoading,
+  isError = false,
+  errorMessage,
+  onRetry,
   searchQuery,
 }: BlogPostsSectionProps) {
   const featuredBlog = blogs.find((blog) => blog.isFeatured) ?? blogs[0];
@@ -136,9 +144,32 @@ export default function BlogPostsSection({
     <section className="bg-transparent py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         {isLoading ? (
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-16 text-center text-white/70">
-            Loading articles...
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,23rem)] xl:gap-12">
+            <div>
+              <Skeleton className="mb-8 h-[420px] rounded-lg" />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="space-y-3">
+                    <Skeleton className="h-52 rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <aside className="hidden space-y-4 lg:block">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-64 rounded-lg" />
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-32 rounded-lg" />
+            </aside>
           </div>
+        ) : isError ? (
+          <ErrorState
+            message={errorMessage}
+            onRetry={onRetry}
+            className="rounded-[2rem] border border-gray-100 bg-white"
+          />
         ) : blogs.length === 0 ? (
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] px-6 py-16 text-center text-white/70">
             No articles found

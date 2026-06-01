@@ -41,14 +41,15 @@ export default function ShippingAddressForm({
     const getShippingAddressByUserId = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/shipping-address/by-user-id/${userId}`,
+          `/api/v1/shipping-address/by-user-id/${userId}`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include",
             cache: "no-store",
-          }
+          },
         );
 
         const result = await res.json();

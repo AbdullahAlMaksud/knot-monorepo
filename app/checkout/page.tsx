@@ -9,9 +9,14 @@ import PaymentMethodSection from "@/components/checkout/PaymentMethodSection";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCart } from "@/lib/cart/CartContext";
 import { CheckoutFormData, DISCOUNT_AMOUNT } from "@/lib/orders/types";
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/auth-client";
 import { useCreateOrder } from "@/services/orders/mutation";
 import type { OrderPayloadType } from "@/services/orders/type";
+import { useGetPublishedProducts } from "@/services/products/query";
+import {
+  getDefaultProductVariant,
+  getProductVariants,
+} from "@/services/products/utils";
 import {
   clearStoredBuyNowItem,
   getStoredBuyNowItem,
@@ -45,10 +50,14 @@ export default function CheckoutPage() {
 }
 
 function CheckoutPageContent() {
-  const { data: session } = authClient.useSession();
+  const { data: session } = useAuthSession();
   const { id: userId } = session?.user || {};
   const searchParams = useSearchParams();
   const { items: cartItems } = useCart();
+  const {
+    data: publishedProducts = [],
+    isLoading: areProductsLoading,
+  } = useGetPublishedProducts();
   const [buyNowItem] = useState(() => getStoredBuyNowItem());
   const isBuyNowCheckout =
     searchParams.get("mode") === "buy-now" && !!buyNowItem;
@@ -111,34 +120,69 @@ function CheckoutPageContent() {
     },
   });
 
-  const onSubmit = (data: CheckoutFormData) => {
+  const resolveCheckoutItems = () => {
+    return checkoutItems.map((item) => {
+      const product = publishedProducts.find(
+        (publishedProduct) => publishedProduct._id === String(item.id),
+      );
+      const defaultVariant = getDefaultProductVariant(product);
+      const selectedVariant =
+        getProductVariants(product).find(
+          (variant) => variant._id === item.variantId,
+        ) ?? defaultVariant;
+
+      return {
+        productId: product?._id ?? "",
+        variantId: selectedVariant?._id ?? "",
+        quantity: item.quantity,
+      };
+    });
+  };
+
+  const onSubmit = async (data: CheckoutFormData) => {
     if (checkoutItems.length === 0) {
       setSubmitError("Your cart is empty.");
+      return;
+    }
+
+    if (areProductsLoading) {
+      setSubmitError("Product details are still loading. Please try again.");
+      return;
+    }
+
+    let items: OrderPayloadType["items"] = [];
+    items = resolveCheckoutItems();
+
+    const hasInvalidItem = items.some(
+      (item) => !item.productId || !item.variantId,
+    );
+
+    if (hasInvalidItem) {
+      setSubmitError(
+        "One or more cart items are missing a valid product or variant.",
+      );
       return;
     }
 
     setSubmitError(null);
 
     const payload: OrderPayloadType = {
-      customerId: userId,
-      items: checkoutItems.map((i) => ({
-        variantId: i.variantId ?? String(i.id),
-        quantity: i.quantity,
-      })),
+      ...(userId ? { customerId: userId } : {}),
+      items,
       shipment: {
-        name: data.name,
-        email: data.email,
+        name: data.name.trim(),
+        email: data.email.trim(),
         phone: formatBangladeshPhone(data.phone),
-        apartment: data.apartment || undefined,
-        city: data.city,
-        district: data.state.toUpperCase(),
-        postalCode: data.postalCode,
+        apartment: data.apartment?.trim() || undefined,
+        city: data.city.trim(),
+        district: data.state.trim().toUpperCase(),
+        postalCode: data.postalCode.trim(),
         country: DEFAULT_COUNTRY,
       },
       payment: {
         method: "CASH",
       },
-      note: data.extraNotes || undefined,
+      note: data.extraNotes?.trim() || undefined,
     };
     createOrder(payload);
   };
@@ -173,7 +217,7 @@ function CheckoutPageContent() {
                 shippingFee={shippingFee}
                 deliveryLabel={DELIVERY_OPTIONS[deliveryArea].label}
                 estimatedDelivery={estimatedDelivery}
-                canConfirmOrder={isValid}
+                canConfirmOrder={isValid && !areProductsLoading}
                 onConfirmOrder={handleSubmit(onSubmit)}
                 submitting={isCreatingOrder}
                 submitError={submitError}

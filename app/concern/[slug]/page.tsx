@@ -1,3 +1,6 @@
+"use client";
+
+import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import ConcernHero from "@/components/concern/ConcernHero";
 import Ingredients from "@/components/concern/Ingredients";
@@ -6,32 +9,26 @@ import Understanding from "@/components/concern/Understanding";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
-import { concerns, getConcernBySlug } from "@/data/concerns";
-import { getPublishedProducts } from "@/services/products/api";
-import { notFound } from "next/navigation";
+import { getConcernBySlug } from "@/data/concerns";
+import { useGetPublishedProducts } from "@/services/products/query";
 
-export function generateStaticParams() {
-  return concerns.map((concern) => ({ slug: concern.slug }));
-}
-
-export default async function ConcernDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+export default function ConcernDetailPage() {
+  const params = useParams<{ slug: string }>();
+  const slug = typeof params.slug === "string" ? params.slug : "";
   const concern = getConcernBySlug(slug);
+  const { data: products = [] } = useGetPublishedProducts();
 
   if (!concern) {
-    notFound();
-  }
-
-  let products: import("@/services/products/type").ApiProduct[] = [];
-  try {
-    const result = await getPublishedProducts();
-    products = result.data;
-  } catch {
-    // fall through with empty list
+    return (
+      <Layout>
+        <div className="px-4 py-40 text-center">
+          <h1 className="text-3xl font-semibold">Concern not found</h1>
+          <p className="mt-3 text-gray-600">
+            The concern you are looking for is unavailable.
+          </p>
+        </div>
+      </Layout>
+    );
   }
 
   return (

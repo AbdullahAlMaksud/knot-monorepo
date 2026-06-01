@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/auth-client";
 import {
   BANGLADESH_DISTRICTS,
   DEFAULT_COUNTRY,
@@ -83,7 +83,7 @@ const ShippingForm = ({
   errors,
   setValue,
 }: ShippingFormProps) => {
-  const { data: session } = authClient.useSession();
+  const { data: session } = useAuthSession();
   const { id: userId, name, email } = session?.user || {};
   const selectedDistrict = useWatch({
     control,
@@ -102,8 +102,8 @@ const ShippingForm = ({
     const fetchAddress = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/shipping-address/by-user-id/${userId}`,
-          { cache: "no-store" },
+          `/api/v1/shipping-address/by-user-id/${userId}`,
+          { cache: "no-store", credentials: "include" },
         );
 
         const result = await res.json();

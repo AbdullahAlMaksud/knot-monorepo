@@ -1,5 +1,5 @@
 import apiClient from "@/lib/axios";
-import type { Blog } from "./type";
+import type { Blog, BlogDetailResponse } from "./type";
 
 interface BlogsListResponse {
   data: Blog[];
@@ -20,4 +20,12 @@ export const getPublishedBlogs = async (
     `/blogs?${params.toString()}`,
   );
   return response.data.data ?? [];
+};
+
+export const getBlogBySlug = async (slug: string): Promise<Blog> => {
+  const response = await apiClient.get<BlogDetailResponse>(
+    `/blogs/slug/${encodeURIComponent(slug)}`,
+  );
+
+  return response.data.data;
 };

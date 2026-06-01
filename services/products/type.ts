@@ -1,10 +1,27 @@
 export interface ProductVariant {
   _id: string;
+  sku?: string;
   size: string;
-  inStock: boolean;
+  inStock?: boolean;
+  quantity?: number;
   price: number;
   isDefault: boolean;
   isDiscounted: boolean;
+}
+
+export interface ProductSectionItem {
+  text: string;
+  icon?: string;
+}
+
+export interface ProductSection {
+  _id: string;
+  type: "TEXT" | "BULLETS" | string;
+  title: string;
+  content?: string;
+  imageKey?: string;
+  imageAlignment?: "LEFT" | "RIGHT" | string;
+  items?: ProductSectionItem[];
 }
 
 export interface ApiProduct {
@@ -12,9 +29,11 @@ export interface ApiProduct {
   name: string;
   slug: string;
   description: string;
-  variants: ProductVariant[];
-  displayImageKey: string;
-  relatedImagesKeys: string[];
+  variants?: ProductVariant[];
+  sizeVariants?: ProductVariant[];
+  sections?: ProductSection[];
+  displayImageKey?: string;
+  relatedImagesKeys?: string[];
   rating: number;
   isPublished: boolean;
   isFeatured: boolean;
@@ -33,5 +52,11 @@ export interface ProductsMeta {
 export interface ProductsListResponse {
   data: ApiProduct[];
   meta: ProductsMeta;
+  message: string;
+}
+
+export interface ProductDetailResponse {
+  data: ApiProduct;
+  meta: null;
   message: string;
 }

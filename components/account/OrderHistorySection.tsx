@@ -1,14 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAuthSession } from "@/lib/auth-client";
 import { useGetOrdersByCustomerId } from "@/services/orders/query";
-import Loading from "../ui/loading";
 import ErrorState from "../ui/error";
 import CurrencyAmount from "@/components/ui/currency-amount";
+import Skeleton from "@/components/ui/skeleton";
+
+function OrderHistorySkeleton() {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <Skeleton className="mb-6 h-7 w-44" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="space-y-4 rounded-lg border border-gray-200 p-6"
+          >
+            <div className="flex justify-between gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-28" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </div>
+            <div className="space-y-2 border-t border-gray-100 py-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+            <Skeleton className="h-11 w-full rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function OrderHistorySection() {
-  const { userId } = useAuthUser();
+  const { data: session, isPending: isSessionPending } = useAuthSession();
+  const customerId = session?.user?.id ?? "";
 
   const {
     data: userOrdersData,
@@ -16,9 +49,26 @@ export default function OrderHistorySection() {
     isError,
     error,
     refetch,
-  } = useGetOrdersByCustomerId(userId as string);
+  } = useGetOrdersByCustomerId(customerId);
 
-  if (userOrdersData?.length === 0) {
+  if (isSessionPending || isLoading) {
+    return <OrderHistorySkeleton />;
+  }
+  if (isError)
+    return (
+      <ErrorState fullPage={true} message={error?.message} onRetry={refetch} />
+    );
+
+  if (!customerId) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-6">Order History</h2>
+        <p className="text-gray-600">Please sign in to view your orders.</p>
+      </div>
+    );
+  }
+
+  if (!userOrdersData || userOrdersData.length === 0) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-6">Order History</h2>
@@ -26,12 +76,6 @@ export default function OrderHistorySection() {
       </div>
     );
   }
-
-  if (isLoading) return <Loading fullPage={true} text="Fetching orders..." />;
-  if (isError)
-    return (
-      <ErrorState fullPage={true} message={error?.message} onRetry={refetch} />
-    );
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">

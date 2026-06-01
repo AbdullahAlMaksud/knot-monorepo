@@ -7,20 +7,23 @@ import BlogPostsSection from "@/components/blog/BlogPostsSection";
 import RealStoriesSliderSection from "@/components/blog/RealStoriesSliderSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import HeroCarousel from "@/components/shared/HeroCarousel";
-import type { Blog } from "@/services/blogs/type";
+import { useGetPublishedBlogs } from "@/services/blogs/query";
 
-export default function BlogPageClient({
-  initialBlogs,
-}: {
-  initialBlogs: Blog[];
-}) {
+export default function BlogPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
+  const {
+    data: fetchedBlogs = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetPublishedBlogs();
 
   const blogs = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return initialBlogs;
-    return initialBlogs.filter((b) => b.title.toLowerCase().includes(q));
-  }, [initialBlogs, searchQuery]);
+    if (!q) return fetchedBlogs;
+    return fetchedBlogs.filter((b) => b.title.toLowerCase().includes(q));
+  }, [fetchedBlogs, searchQuery]);
 
   const heroMedia = [{ type: "image" as const, src: "/images/blog/cover.jpg" }];
 
@@ -50,7 +53,10 @@ export default function BlogPageClient({
 
       <BlogPostsSection
         blogs={blogs}
-        isLoading={false}
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage={error?.message}
+        onRetry={refetch}
         searchQuery={searchQuery}
       />
 

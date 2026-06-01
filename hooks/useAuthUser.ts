@@ -1,9 +1,9 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/auth-client";
 
 export function useAuthUser() {
-  const { data: session } = authClient.useSession();
+  const { data: session } = useAuthSession();
 
   return {
     user: session?.user,

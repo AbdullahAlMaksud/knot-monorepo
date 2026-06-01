@@ -10,15 +10,16 @@ import {
   Minus,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import CurrencyAmount from "@/components/ui/currency-amount";
 import { useCart } from "@/lib/cart/CartContext";
 import { setStoredBuyNowItem } from "@/lib/checkout/buy-now";
+import type { ProductVariant } from "@/services/products/type";
 
 interface FeaturedProductHeroProps {
-  product?: {
+  product: {
     _id?: string;
     variantId?: string;
     slug?: string;
@@ -29,6 +30,7 @@ interface FeaturedProductHeroProps {
     images?: string[];
     description?: string;
     rating?: number;
+    variants?: ProductVariant[];
   };
   variant?: "dark" | "light";
 }
@@ -40,24 +42,25 @@ export default function FeaturedProductHero({
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariantId, setSelectedVariantId] = useState(product.variantId);
   const { addItem } = useCart();
+  const variants = useMemo(() => product.variants ?? [], [product.variants]);
+  const effectiveSelectedVariantId =
+    selectedVariantId ?? product.variantId ?? variants[0]?._id;
+  const selectedVariant =
+    variants.find((item) => item._id === effectiveSelectedVariantId) ??
+    variants[0];
 
   const featuredProduct = {
-    brand: product?.brand || "BYOU BEAUTY",
-    name: product?.name || "Glow Contour Lifting Peptide Mist",
-    price: product?.price || 63.0,
-    currency: product?.currency || "MYR",
-    images: product?.images || [
-      "/images/products/product1.jpg",
-      "/images/products/product2.jpg",
-      "/images/products/product3.jpg",
-      "/images/products/product4.jpg",
-    ],
-    description:
-      product?.description ||
-      "A revolutionary peptide mist that lifts, contours, and enhances your natural glow with advanced skincare technology.",
-    rating: product?.rating || 5,
+    brand: product.brand || "BYOU BEAUTY",
+    name: product.name || "",
+    price: selectedVariant?.price ?? product.price ?? 0,
+    currency: product.currency || "BDT",
+    images: product.images ?? [],
+    description: product.description,
+    rating: Math.max(0, Math.min(5, Math.round(product.rating ?? 0))),
   };
+  const currentImage = featuredProduct.images[selectedImage];
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -66,39 +69,53 @@ export default function FeaturedProductHero({
   };
 
   const handleIncrease = () => {
+    if (
+      typeof selectedVariant?.quantity === "number" &&
+      quantity >= selectedVariant.quantity
+    ) {
+      return;
+    }
     setQuantity(quantity + 1);
   };
 
   const handlePreviousImage = () => {
+    if (featuredProduct.images.length === 0) return;
+
     setSelectedImage((prev) =>
       prev === 0 ? featuredProduct.images.length - 1 : prev - 1,
     );
   };
 
   const handleNextImage = () => {
+    if (featuredProduct.images.length === 0) return;
+
     setSelectedImage((prev) =>
       prev === featuredProduct.images.length - 1 ? 0 : prev + 1,
     );
   };
 
   const handleAddToCart = () => {
+    if (!selectedVariant) return;
+
     addItem({
-      id: product?._id || product?.name || featuredProduct.name,
-      variantId: product?.variantId,
+      id: product._id || featuredProduct.name,
+      variantId: selectedVariant._id,
       name: featuredProduct.name,
       price: featuredProduct.price,
-      image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
+      image: currentImage ?? featuredProduct.images[0] ?? "",
       quantity,
     });
   };
 
   const handleBuyNow = () => {
+    if (!selectedVariant) return;
+
     setStoredBuyNowItem({
-      id: product?._id || product?.name || featuredProduct.name,
-      variantId: product?.variantId,
+      id: product._id || featuredProduct.name,
+      variantId: selectedVariant._id,
       name: featuredProduct.name,
       price: featuredProduct.price,
-      image: featuredProduct.images[0] ?? "/images/products/product1.jpg",
+      image: currentImage ?? featuredProduct.images[0] ?? "",
       quantity,
     });
 
@@ -127,6 +144,11 @@ export default function FeaturedProductHero({
   const starEmpty = isDark ? "text-gray-500" : "text-gray-400";
   const ratingText = isDark ? "text-gray-300" : "text-gray-600";
   const descriptionText = isDark ? "text-gray-300" : "text-gray-700";
+  const selectedVariantInStock =
+    typeof selectedVariant?.quantity === "number"
+      ? selectedVariant.quantity > 0
+      : true;
+  const canAddToCart = Boolean(selectedVariant?._id);
 
   return (
     <section className="py-8 sm:py-12 bg-white">
@@ -163,14 +185,16 @@ export default function FeaturedProductHero({
               {/* Main Product Image */}
               <div className="relative flex-1">
                 <div className="relative h-full w-full rounded-3xl overflow-hidden bg-linear-to-br from-amber-100 to-stone-200">
-                  <Image
-                    src={featuredProduct.images[selectedImage]}
-                    alt={featuredProduct.name}
-                    fill
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="object-cover"
-                    priority
-                  />
+                  {currentImage ? (
+                    <Image
+                      src={currentImage}
+                      alt={featuredProduct.name}
+                      fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      className="object-cover"
+                      priority
+                    />
+                  ) : null}
 
                   {/* Navigation Arrows - Mobile Only */}
                   {isDark && (
@@ -264,6 +288,50 @@ export default function FeaturedProductHero({
                 Price: <CurrencyAmount amount={featuredProduct.price} />
               </p>
 
+              {variants.length > 0 && (
+                <div className="mb-8">
+                  <p className={`text-sm font-medium mb-3 ${descriptionText}`}>
+                    Size
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {variants.map((item) => {
+                      const isSelected = item._id === selectedVariant?._id;
+                      const isAvailable =
+                        typeof item.quantity === "number"
+                          ? item.quantity > 0
+                          : true;
+
+                      return (
+                        <Button
+                          key={item._id}
+                          type="button"
+                          variant="outline"
+                          disabled={!isAvailable}
+                          onClick={() => {
+                            setSelectedVariantId(item._id);
+                            setQuantity(1);
+                          }}
+                          className={`min-w-24 rounded-full border-2 ${
+                            isSelected
+                              ? `${borderColor} ${buttonPrimary}`
+                              : `${borderColor} bg-transparent ${hoverBg}`
+                          }`}
+                        >
+                          {item.size}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  {selectedVariant && (
+                    <p className={`mt-3 text-xs ${descriptionText}`}>
+                      {selectedVariantInStock
+                        ? `${selectedVariant.quantity ?? "In"} stock`
+                        : "Out of stock"}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Quantity Controls */}
               <div className="flex items-center gap-6 mb-8">
                 <Button
@@ -286,6 +354,7 @@ export default function FeaturedProductHero({
                   variant="outline"
                   size="icon"
                   onClick={handleIncrease}
+                  disabled={!selectedVariantInStock}
                   className={`w-14 h-14 rounded-full border-2 ${borderColor} ${hoverBg}`}
                   aria-label="Increase quantity"
                 >
@@ -298,6 +367,7 @@ export default function FeaturedProductHero({
                 <Button
                   type="button"
                   onClick={handleAddToCart}
+                  disabled={!canAddToCart || !selectedVariantInStock}
                   className={`w-full ${buttonPrimary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
                 >
                   Add to cart
@@ -307,6 +377,7 @@ export default function FeaturedProductHero({
                   variant="outline"
                   type="button"
                   onClick={handleBuyNow}
+                  disabled={!canAddToCart || !selectedVariantInStock}
                   className={`w-full ${buttonSecondary} px-8 py-6 rounded-full font-medium transition flex items-center justify-center gap-2 text-lg`}
                 >
                   Buy Now

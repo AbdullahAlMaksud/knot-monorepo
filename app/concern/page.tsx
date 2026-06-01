@@ -1,18 +1,14 @@
+"use client";
+
 import Layout from "@/components/Layout";
 import ConcernsSection from "@/components/home/ConcernsSection";
 import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
-import { getPublishedProducts } from "@/services/products/api";
+import { useGetPublishedProducts } from "@/services/products/query";
 
-export default async function page() {
-  let products: import("@/services/products/type").ApiProduct[] = [];
-  try {
-    const result = await getPublishedProducts();
-    products = result.data;
-  } catch {
-    // fall through with empty list
-  }
+export default function Page() {
+  const { data: products = [] } = useGetPublishedProducts();
 
   return (
     <Layout>

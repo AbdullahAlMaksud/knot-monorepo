@@ -1,43 +1,42 @@
+"use client";
+
 import { Calendar } from "lucide-react";
 import Link from "next/link";
 import Layout from "@/components/Layout";
-import { notFound } from "next/navigation";
 import Image from "next/image";
-import { headers } from "next/headers";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
 import ShareButtons from "@/components/shared/ShareButtons";
 import type { Blog } from "@/services/blogs/type";
 import { sanitizeContent } from "@/lib/sanitize";
+import {
+  useGetBlogBySlug,
+  useGetPublishedBlogs,
+} from "@/services/blogs/query";
+import ErrorState from "@/components/ui/error";
+import Skeleton from "@/components/ui/skeleton";
 
-async function getBlogBySlug(slug: string): Promise<Blog | null> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/blogs/slug/${slug}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data ?? null;
-  } catch {
-    return null;
-  }
-}
-
-async function getRelatedBlogs(
-  category: string,
-  excludeSlug: string,
-): Promise<Blog[]> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/blogs?status=Published&category=${encodeURIComponent(category)}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return [];
-    const json = await res.json();
-    const blogs: Blog[] = json.data ?? [];
-    return blogs.filter((b) => b.slug !== excludeSlug).slice(0, 4);
-  } catch {
-    return [];
-  }
+function BlogPostSkeleton() {
+  return (
+    <Layout>
+      <div className="mx-auto max-w-[1080px] px-4">
+        <Skeleton className="mt-40 h-100 rounded-lg sm:h-[500px]" />
+        <div className="mt-4 flex justify-end">
+          <Skeleton className="h-4 w-44" />
+        </div>
+        <article className="py-16 sm:py-24">
+          <div className="space-y-5">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-11/12" />
+            <Skeleton className="h-5 w-10/12" />
+            <Skeleton className="h-80 w-full rounded-lg" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-3/4" />
+          </div>
+        </article>
+      </div>
+    </Layout>
+  );
 }
 
 const formatDate = (dateString: string) =>
@@ -48,44 +47,68 @@ const formatDate = (dateString: string) =>
   });
 
 const getFirstImage = (blog: Blog) =>
-  blog.contents.find((c) => c.type === "image")?.content;
+  blog.contents.find((content) => content.type === "image")?.content;
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const headersList = await headers();
-  const host = headersList.get("host") ?? "";
-  const protocol = host.startsWith("localhost") ? "http" : "https";
-  const canonicalUrl = `${protocol}://${host}/blog/${slug}`;
-  const blog = await getBlogBySlug(slug);
+const isPublishedBlog = (blog: Blog) =>
+  blog.status.trim().toUpperCase() === "PUBLISHED";
 
-  if (!blog || blog.status !== "Published") {
-    notFound();
+const stripHtml = (html: string) =>
+  html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+
+export default function BlogPostPage() {
+  const params = useParams<{ slug: string }>();
+  const slug = typeof params.slug === "string" ? params.slug : "";
+  const canonicalUrl =
+    typeof window === "undefined" ? `/blog/${slug}` : window.location.href;
+  const {
+    data: blog,
+    isLoading: isBlogLoading,
+    isError: isBlogError,
+  } = useGetBlogBySlug(slug);
+  const { data: categoryBlogs = [] } = useGetPublishedBlogs(
+    blog?.category,
+    undefined,
+    undefined,
+    Boolean(blog?.category),
+  );
+
+  const relatedBlogs = useMemo(
+    () => categoryBlogs.filter((item) => item.slug !== slug).slice(0, 4),
+    [categoryBlogs, slug],
+  );
+  const sortedContents = useMemo(
+    () => [...(blog?.contents ?? [])].sort((a, b) => a.order - b.order),
+    [blog?.contents],
+  );
+  const heroImage = blog ? getFirstImage(blog) : undefined;
+  const description = useMemo(() => {
+    const firstTextContent =
+      sortedContents.find((content) => content.type === "text")?.content || "";
+    const plainText = stripHtml(firstTextContent);
+
+    return plainText.length > 150
+      ? `${plainText.slice(0, 147)}...`
+      : plainText;
+  }, [sortedContents]);
+
+  if (isBlogLoading) {
+    return <BlogPostSkeleton />;
   }
 
-  const relatedBlogs = await getRelatedBlogs(blog.category, slug);
-  const heroImage = getFirstImage(blog);
-  const sortedContents = [...blog.contents].sort((a, b) => a.order - b.order);
-
-  const stripHtml = (html: string) =>
-    html
-      .replace(/<[^>]*>/g, "")
-      .replace(/&nbsp;/g, " ")
-      .trim();
-
-  const firstTextContent =
-    sortedContents.find((c) => c.type === "text")?.content || "";
-  const plainText = stripHtml(firstTextContent);
-  const description =
-    plainText.length > 150 ? plainText.slice(0, 147) + "..." : plainText;
+  if (isBlogError || !blog || !isPublishedBlog(blog)) {
+    return (
+      <Layout>
+        <ErrorState message="The article you are looking for is unavailable." />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="max-w-[1080px] mx-auto ">
-        {/* Hero */}
         <section className="relative h-100 mt-40 sm:h-[500px] rounded-lg overflow-hidden mb-2">
           {heroImage ? (
             <Image
@@ -112,10 +135,8 @@ export default async function BlogPostPage({
           <span>{formatDate(blog.createdAt)}</span>
         </div>
 
-        {/* Article Content */}
         <article className="py-16 sm:py-24">
           <div className="">
-            {/* Body — render contents in order */}
             <div className="space-y-6">
               {sortedContents.map((item) => {
                 if (item.type === "text") {
@@ -148,18 +169,16 @@ export default async function BlogPostPage({
             <div className="mt-12 pb-5 flex items-center justify-between border-b border-gray-200">
               <div className="flex items-center gap-4 text-sm text-gray-600">
                 {blog.tags.length > 0 && (
-                  <>
-                    <div className="flex gap-1 flex-wrap">
-                      {blog.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </>
+                  <div className="flex gap-1 flex-wrap">
+                    {blog.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -172,7 +191,6 @@ export default async function BlogPostPage({
           </div>
         </article>
 
-        {/* Related Posts */}
         {relatedBlogs.length > 0 && (
           <section className="py-16 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,7 +205,7 @@ export default async function BlogPostPage({
                     <div className="relative h-40 rounded-lg overflow-hidden mb-3">
                       {getFirstImage(related) ? (
                         <Image
-                          src={getFirstImage(related as Blog) as string}
+                          src={getFirstImage(related) as string}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                           alt={related.title}

@@ -10,7 +10,7 @@ import UserInfoForm from "@/components/account/UserInfoForm";
 import ShippingAddressForm from "@/components/account/ShippingAddressForm";
 import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useAuthSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useUpdateShippingAddress } from "@/services/shipping-address/mutation";
 import type { ShippingAddress } from "@/services/shipping-address/type";
@@ -30,7 +30,7 @@ type PasswordFormData = {
 
 export default function MyAccountPage() {
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending } = useAuthSession();
   const [activeTab, setActiveTab] = useState<"profile" | "orders">("profile");
 
   const {

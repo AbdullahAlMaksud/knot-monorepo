@@ -1,91 +1,87 @@
+"use client";
+
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import Layout from "@/components/Layout";
-import FeaturedProductHero from "@/components/shop/FeaturedProductHero";
-import WhyChooseSection from "@/components/product/WhyChooseSection";
-import BeforeAfterSection from "@/components/shared/BeforeAfterSection";
-import FromUsToYouSection from "@/components/product/FromUsToYouSection";
-import TestimonialsSection from "@/components/shared/TestimonialsSection";
-import Info from "@/components/home/Info";
 import CoreProductsSection from "@/components/shop/CoreProductsSection";
+import ProductSections from "@/components/product/ProductSections";
+import ProductDetailHero from "@/components/product/ProductDetailHero";
 import {
-  getProductDetailBySlug,
-  getProductInfoFeaturesBySlug,
-} from "@/data/products";
-import { getPublishedProducts } from "@/services/products/api";
-import { getR2ImageUrl } from "@/lib/utils";
-import { notFound } from "next/navigation";
+  useGetProductById,
+  useGetPublishedProducts,
+} from "@/services/products/query";
+import Info from "@/components/home/Info";
+import ErrorState from "@/components/ui/error";
+import Skeleton from "@/components/ui/skeleton";
 
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+function ProductDetailSkeleton() {
+  return (
+    <Layout>
+      <div className="pt-32">
+        <section className="bg-white pt-10 pb-12">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[1.08fr_1fr] lg:px-8">
+            <div className="grid grid-cols-[72px_1fr] gap-3 sm:grid-cols-[88px_1fr]">
+              <div className="flex flex-col gap-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton key={index} className="h-20 w-full sm:h-24" />
+                ))}
+              </div>
+              <Skeleton className="min-h-[360px] rounded-sm sm:min-h-[470px]" />
+            </div>
+            <div className="flex flex-col justify-center space-y-5 lg:pl-4">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-11 w-3/4" />
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-20 w-full max-w-md" />
+              <Skeleton className="h-12 w-56 rounded-full" />
+              <Skeleton className="h-12 w-full max-w-sm rounded-full" />
+            </div>
+          </div>
+        </section>
+      </div>
+    </Layout>
+  );
+}
 
-  const detail = getProductDetailBySlug(slug);
-  const infoFeatures = getProductInfoFeaturesBySlug(slug);
+export default function ProductDetailPage() {
+  const params = useParams<{ slug: string }>();
+  const productId = typeof params.slug === "string" ? params.slug : "";
+  const {
+    data: apiProduct,
+    isLoading: isProductLoading,
+    isError: isProductError,
+  } = useGetProductById(productId);
+  const { data: publishedProducts = [] } = useGetPublishedProducts();
+  const coreApiProducts = useMemo(
+    () => publishedProducts.filter((product) => product._id !== productId),
+    [productId, publishedProducts],
+  );
 
-  if (!detail) {
-    notFound();
+  if (isProductLoading) {
+    return <ProductDetailSkeleton />;
   }
 
-  let apiProduct = undefined;
-  try {
-    const result = await getPublishedProducts();
-    apiProduct = result.data.find((p) => p.slug === slug);
-  } catch {
-    // fall through — show page with static fallback
-  }
-
-  const defaultVariant =
-    apiProduct?.variants.find((v) => v.isDefault) ?? apiProduct?.variants[0];
-
-  const heroProduct = apiProduct
-    ? {
-        brand: "Just Be YOU",
-        name: apiProduct.name,
-        price: defaultVariant?.price ?? 0,
-        images: [
-          getR2ImageUrl(apiProduct.displayImageKey),
-          ...apiProduct.relatedImagesKeys.map(getR2ImageUrl),
-        ],
-        description: apiProduct.description,
-        rating: apiProduct.rating || 5,
-        slug: apiProduct.slug,
-        _id: apiProduct._id,
-        variantId: defaultVariant?._id,
-      }
-    : undefined;
-
-  // Pass all published products (excluding current) to the "Core Products" section
-  let coreApiProducts = undefined;
-  try {
-    if (!apiProduct) {
-      const result = await getPublishedProducts();
-      coreApiProducts = result.data;
-    } else {
-      const result = await getPublishedProducts();
-      coreApiProducts = result.data.filter((p) => p.slug !== slug);
-    }
-  } catch {
-    // fall through
+  if (isProductError || !apiProduct) {
+    return (
+      <Layout>
+        <ErrorState message="The product you are looking for is unavailable." />
+      </Layout>
+    );
   }
 
   return (
     <Layout>
       <div className="pt-32">
-        <FeaturedProductHero variant="light" product={heroProduct} />
-        <Info features={infoFeatures} />
-        <WhyChooseSection detail={detail} />
-        <BeforeAfterSection />
-        <FromUsToYouSection />
-        {coreApiProducts && coreApiProducts.length > 0 && (
+        <ProductDetailHero product={apiProduct} />
+        <Info />
+        <ProductSections product={apiProduct} sections={apiProduct.sections} />
+        {coreApiProducts.length > 0 && (
           <CoreProductsSection
             subtitle="MADE JUST FOR YOU"
             title="Our Core Products"
             products={coreApiProducts}
           />
         )}
-        <TestimonialsSection />
       </div>
     </Layout>
   );

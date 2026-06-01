@@ -1,3 +1,5 @@
+"use client";
+
 import Layout from "@/components/Layout";
 import HeroCarousel from "@/components/shared/HeroCarousel";
 import Info from "@/components/home/Info";
@@ -9,18 +11,11 @@ import TestimonialsSection from "@/components/shared/TestimonialsSection";
 import Innovation from "@/components/lab/Innovation";
 import Journey from "@/components/lab/Journey";
 import Team2 from "@/components/home/Team2";
-import { getPublishedProducts } from "@/services/products/api";
+import { useGetPublishedProducts } from "@/services/products/query";
 
-export default async function LabPage() {
+export default function LabPage() {
   const heroMedia = [{ type: "image" as const, src: "/images/lab/lab-bg.jpg" }];
-
-  let products: import("@/services/products/type").ApiProduct[] = [];
-  try {
-    const result = await getPublishedProducts();
-    products = result.data;
-  } catch {
-    // fall through with empty list
-  }
+  const { data: products = [] } = useGetPublishedProducts();
 
   return (
     <Layout>

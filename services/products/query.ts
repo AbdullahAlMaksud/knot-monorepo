@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getPublishedProducts, getProductBySlug } from "./api";
+import { getProductById, getPublishedProducts, getProductBySlug } from "./api";
 import { productsQueryKeys } from "./querykey";
 
 export const useGetPublishedProducts = () =>
@@ -16,4 +16,11 @@ export const useGetProductBySlug = (slug: string) =>
     queryKey: productsQueryKeys.detail(slug),
     queryFn: () => getProductBySlug(slug),
     enabled: !!slug,
+  });
+
+export const useGetProductById = (id: string) =>
+  useQuery({
+    queryKey: productsQueryKeys.detail(id),
+    queryFn: () => getProductById(id),
+    enabled: !!id,
   });

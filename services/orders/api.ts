@@ -7,6 +7,11 @@ interface OrderResponse {
   message: string;
 }
 
+interface CreateOrderResponse {
+  data?: Order;
+  message?: string;
+}
+
 interface OrdersListResponse {
   data: Order[];
   message: string;
@@ -32,11 +37,13 @@ export const getOrderById = async (id: string): Promise<Order> => {
 export const createOrder = async (
   orderData: OrderPayloadType,
 ): Promise<{ message: string }> => {
-  const response = await apiClient.post<{ message: string }>(
+  const response = await apiClient.post<CreateOrderResponse>(
     "/orders",
     orderData,
   );
-  return response.data;
+  return {
+    message: response.data.message ?? "Order placed successfully!",
+  };
 };
 
 export const updateOrderStatus = async (
