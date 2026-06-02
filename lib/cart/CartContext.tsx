@@ -13,14 +13,24 @@ import { getStoredCart, setStoredCart, type CartItem } from "./types";
 type CartContextValue = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
-  updateQuantity: (id: number | string, quantity: number) => void;
-  removeItem: (id: number | string) => void;
+  updateQuantity: (
+    id: number | string,
+    quantity: number,
+    variantId?: string,
+  ) => void;
+  removeItem: (id: number | string, variantId?: string) => void;
   clearCart: () => void;
   total: number;
   itemCount: number;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
+
+const isSameCartItem = (
+  item: Pick<CartItem, "id" | "variantId">,
+  id: number | string,
+  variantId?: string,
+) => String(item.id) === String(id) && item.variantId === variantId;
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -42,10 +52,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
       const qty = item.quantity ?? 1;
       setItems((prev) => {
-        const existing = prev.find((i) => String(i.id) === String(item.id));
+        const existing = prev.find((i) =>
+          isSameCartItem(i, item.id, item.variantId),
+        );
         if (existing) {
           return prev.map((i) =>
-            String(i.id) === String(item.id)
+            isSameCartItem(i, item.id, item.variantId)
               ? { ...i, quantity: i.quantity + qty }
               : i,
           );
@@ -57,17 +69,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateQuantity = useCallback(
-    (id: number | string, quantity: number) => {
+    (id: number | string, quantity: number, variantId?: string) => {
       if (quantity < 1) return;
       setItems((prev) =>
-        prev.map((i) => (String(i.id) === String(id) ? { ...i, quantity } : i)),
+        prev.map((i) =>
+          isSameCartItem(i, id, variantId) ? { ...i, quantity } : i,
+        ),
       );
     },
     [],
   );
 
-  const removeItem = useCallback((id: number | string) => {
-    setItems((prev) => prev.filter((i) => String(i.id) !== String(id)));
+  const removeItem = useCallback((id: number | string, variantId?: string) => {
+    setItems((prev) =>
+      prev.filter((i) => !isSameCartItem(i, id, variantId)),
+    );
   }, []);
 
   const clearCart = useCallback(() => {

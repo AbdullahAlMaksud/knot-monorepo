@@ -7,7 +7,15 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
 type ShippingFormData = {
   apartment?: string;
@@ -37,6 +45,9 @@ export default function ShippingAddressForm({
   isSubmitting,
   userId,
 }: ShippingAddressFormProps) {
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+
   useEffect(() => {
     const getShippingAddressByUserId = async () => {
       try {
@@ -62,9 +73,15 @@ export default function ShippingAddressForm({
         // populate only if exists
         if (data.apartment) setValue("apartment", data.apartment);
         if (data.city) setValue("city", data.city);
-        if (data.state) setValue("state", data.state);
+        if (data.state) {
+          setValue("state", data.state);
+          setSelectedState(data.state);
+        }
         if (data.postalCode) setValue("postalCode", data.postalCode);
-        if (data.country) setValue("country", data.country);
+        if (data.country) {
+          setValue("country", data.country);
+          setSelectedCountry(data.country);
+        }
       } catch (error) {
         console.error("Shipping fetch error:", error);
       }
@@ -106,14 +123,24 @@ export default function ShippingAddressForm({
             <label className="block text-sm font-medium mb-2">
               State/Province
             </label>
-            <select
-              {...register("state")}
-              className="w-full px-4 py-2 border rounded-lg bg-white"
+            <input type="hidden" {...register("state")} />
+            <Select
+              value={selectedState}
+              onValueChange={(value) => {
+                setSelectedState(value);
+                setValue("state", value, { shouldDirty: true });
+              }}
             >
-              <option value="">Select</option>
-              <option value="dhaka">Dhaka</option>
-              <option value="ny">New York</option>
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="dhaka">Dhaka</SelectItem>
+                  <SelectItem value="ny">New York</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -130,14 +157,24 @@ export default function ShippingAddressForm({
 
         <div>
           <label className="block text-sm font-medium mb-2">Country</label>
-          <select
-            {...register("country")}
-            className="w-full px-4 py-2 border rounded-lg bg-white"
+          <input type="hidden" {...register("country")} />
+          <Select
+            value={selectedCountry}
+            onValueChange={(value) => {
+              setSelectedCountry(value);
+              setValue("country", value, { shouldDirty: true });
+            }}
           >
-            <option value="">Country</option>
-            <option value="bangladesh">Bangladesh</option>
-            <option value="usa">United States</option>
-          </select>
+            <SelectTrigger>
+              <SelectValue placeholder="Country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="bangladesh">Bangladesh</SelectItem>
+                <SelectItem value="usa">United States</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <Button type="submit" disabled={isSubmitting} className="rounded-full">

@@ -10,6 +10,7 @@ import type { ApiProduct } from "@/services/products/type";
 import {
   getDefaultProductVariant,
   getProductImages,
+  getVariantPricing,
 } from "@/services/products/utils";
 
 interface CoreProductsSectionProps {
@@ -73,7 +74,8 @@ export default function CoreProductsSection({
             const currentIndex = getCurrentIndex(product._id);
             const hasMultipleImages = images.length > 1;
             const defaultVariant = getDefaultProductVariant(product);
-            const price = defaultVariant?.price ?? 0;
+            const pricing = getVariantPricing(defaultVariant);
+            const price = pricing.discountedPrice;
             const defaultVariantInStock =
               typeof defaultVariant?.quantity === "number"
                 ? defaultVariant.quantity > 0
@@ -181,11 +183,20 @@ export default function CoreProductsSection({
                     </p>
                   )}
 
-                  <CurrencyAmount
-                    amount={price}
-                    prefix="From"
-                    className="text-gray-600 mb-2 font-medium"
-                  />
+                  <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-gray-600 font-medium">
+                    <CurrencyAmount
+                      amount={pricing.discountedPrice}
+                      currency={pricing.currency}
+                      prefix="From"
+                    />
+                    {pricing.hasDiscount && (
+                      <CurrencyAmount
+                        amount={pricing.originalPrice}
+                        currency={pricing.currency}
+                        className="text-sm text-gray-400 line-through"
+                      />
+                    )}
+                  </div>
                   <div className="flex items-center gap-1 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star

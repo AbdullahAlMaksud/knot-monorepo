@@ -1,21 +1,22 @@
 import type { ReactNode } from "react";
-import TakaIcon from "@/components/icons/TakaIcon";
 import { cn, formatCurrencyValue } from "@/lib/utils";
 
 type CurrencyAmountProps = {
   amount: number;
+  currency?: ReactNode;
   className?: string;
-  iconClassName?: string;
   valueClassName?: string;
+  currencyClassName?: string;
   prefix?: ReactNode;
   suffix?: ReactNode;
 };
 
 const CurrencyAmount = ({
   amount,
+  currency = "BDT",
   className,
-  iconClassName,
   valueClassName,
+  currencyClassName,
   prefix,
   suffix,
 }: CurrencyAmountProps) => {
@@ -27,10 +28,10 @@ const CurrencyAmount = ({
     >
       {prefix ? <span>{prefix}</span> : null}
       {isNegative ? <span aria-hidden="true">-</span> : null}
-      <TakaIcon className={cn("text-current", iconClassName)} />
       <span className={valueClassName}>
         {formatCurrencyValue(Math.abs(amount))}
       </span>
+      {currency ? <span className={currencyClassName}>{currency}</span> : null}
       {suffix ? <span>{suffix}</span> : null}
     </span>
   );
