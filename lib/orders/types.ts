@@ -95,6 +95,7 @@ export type Order = {
   };
   payment: {
     method: string;
+    status?: string;
     transactionId?: string;
   };
   items: {
@@ -109,7 +110,7 @@ export type Order = {
   discountAmount: number;
   shippingFee: number;
   finalAmount: number;
-  status: "Paid" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  status: string;
   createdAt: string;
   updatedAt: string;
 };

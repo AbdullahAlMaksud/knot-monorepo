@@ -5,11 +5,12 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Layout from "@/components/Layout";
-import AccountTabs from "@/components/account/AccountTabs";
+import AccountTabs, { type AccountTab } from "@/components/account/AccountTabs";
 import UserInfoForm from "@/components/account/UserInfoForm";
 import ShippingAddressForm from "@/components/account/ShippingAddressForm";
 import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
+import CountryPreferenceSection from "@/components/account/CountryPreferenceSection";
 import { authClient, useAuthSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useUpdateShippingAddress } from "@/services/shipping-address/mutation";
@@ -31,7 +32,7 @@ type PasswordFormData = {
 export default function MyAccountPage() {
   const router = useRouter();
   const { data: session, isPending } = useAuthSession();
-  const [activeTab, setActiveTab] = useState<"profile" | "orders">("profile");
+  const [activeTab, setActiveTab] = useState<AccountTab>("profile");
 
   const {
     register: registerProfile,
@@ -153,6 +154,8 @@ export default function MyAccountPage() {
           )}
 
           {activeTab === "orders" && <OrderHistorySection />}
+
+          {activeTab === "preference" && <CountryPreferenceSection />}
         </div>
       </div>
     </Layout>

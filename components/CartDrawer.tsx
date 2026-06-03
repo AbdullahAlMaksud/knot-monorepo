@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import CurrencyAmount from "@/components/ui/currency-amount";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items: cartItems, updateQuantity, removeItem, total } = useCart();
+  useBodyScrollLock(isOpen);
 
   if (!isOpen) return null;
 
@@ -21,6 +23,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <>
       {/* Backdrop */}
       <div
+        data-lenis-prevent
         className={`fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
@@ -29,9 +32,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
       {/* Drawer */}
       <div
+        data-lenis-prevent
         className={`fixed right-0 top-0 h-full w-full sm:w-[360px] bg-white z-50 shadow-xl flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        onWheel={(event) => event.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-black text-white p-5 flex items-center justify-between">
@@ -55,7 +60,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           ) : (
             cartItems.map((item) => (
               <div
-                key={item.id}
+                key={`${item.id}-${item.variantId ?? "default"}`}
                 className="flex gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors"
               >
                 {/* Product Image */}
@@ -84,7 +89,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id, item.variantId)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 size={20} />
@@ -97,7 +102,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       type="button"
                       variant="outline"
                       size="icon"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.id,
+                          item.quantity - 1,
+                          item.variantId,
+                        )
+                      }
                       className="w-7 h-7 rounded-full"
                     >
                       <Minus size={14} />
@@ -109,7 +120,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       type="button"
                       variant="outline"
                       size="icon"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(
+                          item.id,
+                          item.quantity + 1,
+                          item.variantId,
+                        )
+                      }
                       className="w-7 h-7 rounded-full"
                     >
                       <Plus size={14} />

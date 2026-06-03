@@ -17,6 +17,7 @@ import {
   countryPhoneOptions,
   getCountryPhoneOption,
 } from "@/lib/country-phone-options";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "../ui/button";
 
 type FormData = {
@@ -29,6 +30,7 @@ type FormData = {
 
 export default function ContactFormSection() {
   const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
+  useBodyScrollLock(isComingSoonOpen);
   const {
     control,
     register,
@@ -303,11 +305,13 @@ export default function ContactFormSection() {
       </div>
       {isComingSoonOpen && (
         <div
+          data-lenis-prevent
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="contact-coming-soon-title"
           onClick={() => setIsComingSoonOpen(false)}
+          onWheel={(event) => event.stopPropagation()}
         >
           <div
             className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"

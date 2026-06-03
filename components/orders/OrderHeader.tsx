@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 function statusClass(status: string): string {
-  switch (status) {
+  switch (status.toLowerCase()) {
     case "delivered":
       return "bg-green-100 text-green-800";
     case "shipped":

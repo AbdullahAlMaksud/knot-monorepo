@@ -18,6 +18,8 @@ export default function SmoothScrollProvider({
       wheelMultiplier: 1,
       touchMultiplier: 2,
       infinite: false,
+      prevent: (node) =>
+        node instanceof Element && Boolean(node.closest("[data-lenis-prevent]")),
     });
 
     function raf(time: number) {

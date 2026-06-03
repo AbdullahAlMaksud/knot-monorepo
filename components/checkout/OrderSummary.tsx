@@ -5,6 +5,7 @@ import CurrencyAmount from "@/components/ui/currency-amount";
 
 type CartItem = {
   id: number | string;
+  variantId?: string;
   name: string;
   quantity: number;
   price: number;
@@ -46,7 +47,10 @@ export default function OrderSummary({
 
       <div className="space-y-4 mb-6">
         {cartItems.map((item) => (
-          <div key={item.id} className="flex gap-4">
+          <div
+            key={`${item.id}-${item.variantId ?? "default"}`}
+            className="flex gap-4"
+          >
             <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden shrink-0 relative">
               <Image
                 src={item.image}

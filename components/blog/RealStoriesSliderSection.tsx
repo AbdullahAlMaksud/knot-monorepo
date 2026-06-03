@@ -7,6 +7,7 @@ import { Play, X } from "lucide-react";
 
 import DraggableSlider from "@/components/shared/DraggableSlider";
 import { Button } from "@/components/ui/button";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { cn } from "@/lib/utils";
 
 export interface RealStoriesSliderItem {
@@ -131,11 +132,10 @@ function StoryVideoDialog({
   item: RealStoriesSliderItem | null;
   onClose: () => void;
 }) {
+  useBodyScrollLock(Boolean(item));
+
   useEffect(() => {
     if (!item) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -146,7 +146,6 @@ function StoryVideoDialog({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [item, onClose]);
@@ -158,10 +157,15 @@ function StoryVideoDialog({
   return (
     <>
       <div
+        data-lenis-prevent
         className="fixed inset-0 z-[60] bg-black/82 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="fixed inset-0 z-[61] flex items-center justify-center p-4 sm:p-6 lg:p-10">
+      <div
+        data-lenis-prevent
+        className="fixed inset-0 z-[61] flex items-center justify-center overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-10"
+        onWheel={(event) => event.stopPropagation()}
+      >
         <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] bg-black shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
           <button
             type="button"

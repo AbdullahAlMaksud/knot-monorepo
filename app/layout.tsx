@@ -5,6 +5,7 @@ import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import { CartProvider } from "@/lib/cart/CartContext";
 import { Toaster } from "sonner";
 import { TTQueryClientProvider } from "@/providers/TTQueryClientProvider";
+import { UserCountryProvider } from "@/hooks/useUserCountry";
 
 // Playfair Display for headings
 const playfairDisplay = Playfair_Display({
@@ -45,7 +46,9 @@ export default function RootLayout({
         />
         <TTQueryClientProvider>
           <CartProvider>
-            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            <UserCountryProvider>
+              <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            </UserCountryProvider>
           </CartProvider>
         </TTQueryClientProvider>
       </body>

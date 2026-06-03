@@ -17,6 +17,7 @@ import CurrencyAmount from "@/components/ui/currency-amount";
 import { useCart } from "@/lib/cart/CartContext";
 import { setStoredBuyNowItem } from "@/lib/checkout/buy-now";
 import type { ProductVariant } from "@/services/products/type";
+import { getVariantPricing } from "@/services/products/utils";
 
 interface FeaturedProductHeroProps {
   product: {
@@ -50,12 +51,18 @@ export default function FeaturedProductHero({
   const selectedVariant =
     variants.find((item) => item._id === effectiveSelectedVariantId) ??
     variants[0];
+  const selectedVariantPricing = getVariantPricing(
+    selectedVariant,
+    product.price ?? 0,
+  );
 
   const featuredProduct = {
     brand: product.brand || "BYOU BEAUTY",
     name: product.name || "",
-    price: selectedVariant?.price ?? product.price ?? 0,
-    currency: product.currency || "BDT",
+    price: selectedVariantPricing.discountedPrice,
+    originalPrice: selectedVariantPricing.originalPrice,
+    hasDiscount: selectedVariantPricing.hasDiscount,
+    currency: selectedVariant?.currency ?? product.currency ?? "BDT",
     images: product.images ?? [],
     description: product.description,
     rating: Math.max(0, Math.min(5, Math.round(product.rating ?? 0))),
@@ -284,8 +291,23 @@ export default function FeaturedProductHero({
                 </p>
               )}
 
-              <p className="text-xl font-bold mb-8">
-                Price: <CurrencyAmount amount={featuredProduct.price} />
+              <p className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-xl font-bold">
+                <span>Price:</span>
+                <CurrencyAmount
+                  amount={featuredProduct.price}
+                  currency={featuredProduct.currency}
+                />
+                {featuredProduct.hasDiscount && (
+                  <CurrencyAmount
+                    amount={featuredProduct.originalPrice}
+                    currency={featuredProduct.currency}
+                    className={
+                      isDark
+                        ? "text-white/50 line-through"
+                        : "text-gray-400 line-through"
+                    }
+                  />
+                )}
               </p>
 
               {variants.length > 0 && (

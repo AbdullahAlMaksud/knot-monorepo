@@ -1,11 +1,13 @@
 "use client";
 
-import { User, Package } from "lucide-react";
+import { Package, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export type AccountTab = "profile" | "orders" | "preference";
+
 type AccountTabsProps = {
-  activeTab: "profile" | "orders";
-  setActiveTab: (tab: "profile" | "orders") => void;
+  activeTab: AccountTab;
+  setActiveTab: (tab: AccountTab) => void;
 };
 
 export default function AccountTabs({
@@ -29,6 +31,14 @@ export default function AccountTabs({
       >
         <Package size={20} className="mr-2" />
         Order History
+      </Button>
+      <Button
+        onClick={() => setActiveTab("preference")}
+        variant={activeTab === "preference" ? "default" : "outline"}
+        className="rounded-full"
+      >
+        <Settings size={20} className="mr-2" />
+        Prefarence
       </Button>
     </div>
   );

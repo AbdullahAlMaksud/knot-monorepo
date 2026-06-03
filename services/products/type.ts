@@ -1,3 +1,15 @@
+export type ProductDiscountType = "FLAT" | "PERCENTAGE" | string;
+
+export type ProductVariantDiscount = {
+  type?: ProductDiscountType;
+  value?: number | string;
+  amount?: number | string;
+  maxValue?: number | string;
+  maxAmount?: number | string;
+  maxDiscountValue?: number | string;
+  maxDiscountAmount?: number | string;
+};
+
 export interface ProductVariant {
   _id: string;
   sku?: string;
@@ -7,6 +19,14 @@ export interface ProductVariant {
   price: number;
   isDefault: boolean;
   isDiscounted: boolean;
+  discountType?: ProductDiscountType | ProductVariantDiscount;
+  discountValue?: number | string;
+  discountAmount?: number | string;
+  discountMaxValue?: number | string;
+  maxDiscountValue?: number | string;
+  maxDiscountAmount?: number | string;
+  currency?: string;
+  discount?: ProductVariantDiscount;
 }
 
 export interface ProductSectionItem {

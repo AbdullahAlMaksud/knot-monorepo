@@ -12,6 +12,7 @@ import {
   getDefaultProductVariant,
   getProductImages,
   getProductVariants,
+  getVariantPricing,
 } from "@/services/products/utils";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +35,8 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
     variants.find((variant) => variant._id === selectedVariantId) ??
     defaultVariant;
   const currentImage = images[selectedImage] ?? images[0] ?? "";
-  const price = selectedVariant?.price ?? defaultVariant?.price ?? 0;
+  const pricing = getVariantPricing(selectedVariant, defaultVariant?.price ?? 0);
+  const price = pricing.discountedPrice;
   const maxQuantity = selectedVariant?.quantity;
   const inStock = typeof maxQuantity === "number" ? maxQuantity > 0 : true;
   const canAddToCart = Boolean(selectedVariant?._id) && inStock;
@@ -129,8 +131,19 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
             </div>
           </div>
 
-          <div className="mb-5 text-sm font-semibold">
-            Price: <CurrencyAmount amount={price} />
+          <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold">
+            <span>Price:</span>
+            <CurrencyAmount
+              amount={pricing.discountedPrice}
+              currency={pricing.currency}
+            />
+            {pricing.hasDiscount && (
+              <CurrencyAmount
+                amount={pricing.originalPrice}
+                currency={pricing.currency}
+                className="text-gray-400 line-through"
+              />
+            )}
           </div>
 
           {variants.length > 0 && (

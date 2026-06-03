@@ -1,5 +1,6 @@
 import { getR2ImageUrl } from "@/lib/utils";
 import type { ApiProduct, ProductVariant } from "./type";
+export { getVariantPricing, useVariantPricing } from "./pricing";
 
 export const getProductVariants = (
   product?: ApiProduct,
