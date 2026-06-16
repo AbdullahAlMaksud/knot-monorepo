@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sudoku",
   description: "Minimal focus Sudoku — glassmorphism UI",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = {

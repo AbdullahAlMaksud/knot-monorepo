@@ -6,6 +6,7 @@ import { GlassButton } from "@/components/ui/GlassButton";
 import { useGameStore } from "@/shared/stores/gameStore";
 import { loadGame } from "@/shared/lib/storage";
 import { DifficultySelector } from "./DifficultySelector";
+import { SudokuLogo } from "@/components/ui";
 
 export function HomeScreen() {
   const { restoreGame } = useGameStore();
@@ -20,13 +21,14 @@ export function HomeScreen() {
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col items-center gap-5 w-full max-w-[320px] px-4">
 
-        {/* Title */}
+        {/* Title & Logo */}
         <motion.div
           initial={{ opacity: 0, y: -18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-          className="text-center"
+          className="flex flex-col items-center text-center"
         >
+          <SudokuLogo size={80} className="text-[var(--accent)] mb-4" />
           <p className="text-[10px] font-semibold tracking-[0.3em] text-white/20 uppercase mb-2">
             Focus
           </p>
