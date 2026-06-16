@@ -1,5 +1,3 @@
-"use client";
-
 import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGameStore } from "@/shared/stores/gameStore";
@@ -7,6 +5,8 @@ import { useSettingsStore } from "@/shared/stores/settingsStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { getConflicts } from "@/shared/lib/sudoku";
 import { cn } from "@/shared/lib/utils";
+import { useTranslation } from "react-i18next";
+import { translateNumber } from "@/shared/lib/i18n";
 
 export function SudokuGrid() {
   const { board, given, selected, solution, notes, selectCell } = useGameStore();
@@ -14,6 +14,7 @@ export function SudokuGrid() {
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const shakeRef = useRef<number | null>(null);
+  const { i18n } = useTranslation();
 
   if (!board || !given) return null;
 
@@ -110,7 +111,7 @@ export function SudokuGrid() {
                         color: textColor,
                       }}
                     >
-                      {v}
+                      {translateNumber(v, i18n.language)}
                     </motion.span>
                   </AnimatePresence>
                 )}
@@ -128,7 +129,7 @@ export function SudokuGrid() {
                           fontWeight: 500,
                         }}
                       >
-                        {n}
+                        {translateNumber(n, i18n.language)}
                       </span>
                     ))}
                   </div>

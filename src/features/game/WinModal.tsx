@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Trophy, Clock, XCircle, RotateCcw, Home, ChevronRight } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -7,6 +5,8 @@ import { useGameStore } from "@/shared/stores/gameStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { formatTime, loadStats } from "@/shared/lib/storage";
 import type { Difficulty } from "@/shared/lib/sudoku";
+import { useTranslation } from "react-i18next";
+import { translateNumber } from "@/shared/lib/i18n";
 
 const DIFF_ORDER: Difficulty[] = ["easy", "medium", "hard", "expert"];
 
@@ -22,6 +22,7 @@ export function WinModal({ onClose }: WinModalProps) {
   const currentStats = difficulty ? stats[difficulty] : null;
   const isPersonalBest = !!(currentStats?.bestTime && currentStats.bestTime === elapsed);
   const nextDiff = difficulty ? DIFF_ORDER[DIFF_ORDER.indexOf(difficulty) + 1] : null;
+  const { t, i18n } = useTranslation();
 
   return (
     <motion.div
@@ -65,7 +66,7 @@ export function WinModal({ onClose }: WinModalProps) {
                 className="absolute -top-2 -right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none"
                 style={{ background: theme.accent, color: theme.accentFg }}
               >
-                PB!
+                {t("game.win.pb")}
               </motion.div>
             )}
           </div>
@@ -73,18 +74,18 @@ export function WinModal({ onClose }: WinModalProps) {
           {/* Title */}
           <div>
             <h2 className="text-[17px] font-semibold text-white/90 leading-tight">
-              Puzzle Complete
+              {t("game.win.title")}
             </h2>
             <p className="text-[11px] text-white/35 capitalize mt-0.5">
-              {difficulty} difficulty
+              {t("game.win.difficulty_desc", { diff: difficulty ? t(`difficulty.${difficulty}`) : "" })}
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2.5 w-full">
             {[
-              { label: "Time", value: formatTime(elapsed), icon: <Clock size={11} />, color: theme.accent },
-              { label: "Mistakes", value: String(mistakes), icon: <XCircle size={11} />, color: mistakes > 0 ? "#ef4444" : "rgba(255,255,255,0.5)" },
+              { label: t("game.win.time"), value: translateNumber(formatTime(elapsed), i18n.language), icon: <Clock size={11} />, color: theme.accent },
+              { label: t("game.win.mistakes"), value: translateNumber(mistakes, i18n.language), icon: <XCircle size={11} />, color: mistakes > 0 ? "#ef4444" : "rgba(255,255,255,0.5)" },
             ].map(({ label, value, icon, color }) => (
               <div
                 key={label}
@@ -110,7 +111,7 @@ export function WinModal({ onClose }: WinModalProps) {
               style={{ background: theme.accent, color: theme.accentFg }}
             >
               <RotateCcw size={13} />
-              Play Again
+              {t("game.win.play_again")}
             </button>
 
             {nextDiff && (
@@ -123,7 +124,7 @@ export function WinModal({ onClose }: WinModalProps) {
                   color: "rgba(255,255,255,0.65)",
                 }}
               >
-                Try {nextDiff.charAt(0).toUpperCase() + nextDiff.slice(1)}
+                {t("game.win.try_next", { diff: t(`difficulty.${nextDiff}`) })}
                 <ChevronRight size={13} />
               </button>
             )}
@@ -138,7 +139,7 @@ export function WinModal({ onClose }: WinModalProps) {
               }}
             >
               <Home size={12} />
-              Home
+              {t("game.win.home")}
             </button>
           </div>
         </GlassCard>

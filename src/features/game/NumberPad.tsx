@@ -1,15 +1,16 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Eraser, PenLine } from "lucide-react";
 import { useGameStore } from "@/shared/stores/gameStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { cn } from "@/shared/lib/utils";
+import { useTranslation } from "react-i18next";
+import { translateNumber } from "@/shared/lib/i18n";
 
 export function NumberPad() {
   const { inputNumber, eraseCell, noteMode, toggleNoteMode, board } = useGameStore();
   const { getTheme } = useThemeStore();
   const theme = getTheme();
+  const { t, i18n } = useTranslation();
 
   // Count how many of each number are placed
   const counts = Array(10).fill(0);
@@ -41,17 +42,19 @@ export function NumberPad() {
               )}
             >
               <span
-                className="text-sm font-semibold leading-none"
-                style={{ color: done ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.84)" }}
+                className={cn(
+                  "text-sm font-semibold leading-none",
+                  done ? "text-white/22" : "text-white/88"
+                )}
               >
-                {n}
+                {translateNumber(n, i18n.language)}
               </span>
               {!done && remaining < 9 && remaining > 0 && (
                 <span
                   className="text-[7px] leading-none mt-0.5"
                   style={{ color: `${theme.accent}77` }}
                 >
-                  {remaining}
+                  {translateNumber(remaining, i18n.language)}
                 </span>
               )}
               {/* Hover glow */}
@@ -76,7 +79,7 @@ export function NumberPad() {
           className="flex-1 h-9 rounded-xl border border-white/10 bg-white/[0.035] hover:bg-white/[0.08] hover:border-white/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 text-white/45 hover:text-white/75 outline-none"
         >
           <Eraser size={13} />
-          <span className="text-[11px] font-medium">Erase</span>
+          <span className="text-[11px] font-medium">{t("game.erase")}</span>
         </motion.button>
 
         <motion.button
@@ -94,7 +97,7 @@ export function NumberPad() {
         >
           <PenLine size={13} />
           <span className="text-[11px] font-medium">
-            Notes{noteMode ? " ●" : ""}
+            {t("game.notes")}{noteMode ? " ●" : ""}
           </span>
         </motion.button>
       </div>

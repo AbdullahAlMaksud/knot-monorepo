@@ -12,6 +12,10 @@ import { useGameStore } from "@/shared/stores/gameStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { useKeyboard } from "@/shared/hooks/useKeyboard";
 import { useTimer } from "@/shared/hooks/useTimer";
+import { useSettingsStore } from "@/shared/stores/settingsStore";
+import { cn } from "@/shared/lib/utils";
+import "@/shared/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 type Page = "home" | "score" | "settings";
 
@@ -21,8 +25,17 @@ export function AppShell() {
   const gameView = useGameStore((s) => s.view);
   const { getTheme } = useThemeStore();
   const theme = getTheme();
+  const { language } = useSettingsStore();
+  const { i18n } = useTranslation();
 
   useTimer();
+
+  // Sync i18next language on load / change
+  useEffect(() => {
+    if (language && i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language, i18n]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -64,7 +77,13 @@ export function AppShell() {
 
   return (
     <ThemeProvider>
-      <div className="fixed inset-0 overflow-hidden" style={{ background: "var(--bg-app, #080808)", transition: "background-color 0.3s ease" }}>
+      <div
+        className={cn(
+          "fixed inset-0 overflow-hidden",
+          language === "bn" && "lang-bn"
+        )}
+        style={{ background: "var(--bg-app, #080808)", transition: "background-color 0.3s ease" }}
+      >
 
         {/* Animated background gradient that reacts to theme */}
         <motion.div
@@ -95,8 +114,6 @@ export function AppShell() {
         <Sidebar
           activePage={activePage}
           onNavigate={handleNavigate}
-          onToggleFullscreen={toggleFullscreen}
-          isFullscreen={isFullscreen}
         />
 
         {/* Main content area */}
@@ -113,7 +130,12 @@ export function AppShell() {
               {showHome     && <HomeScreen />}
               {showGame     && <GameScreen />}
               {showScore    && <ScoreScreen />}
-              {showSettings && <SettingsScreen />}
+              {showSettings && (
+                <SettingsScreen
+                  isFullscreen={isFullscreen}
+                  onToggleFullscreen={toggleFullscreen}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>

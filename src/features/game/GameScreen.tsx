@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Home, RotateCcw } from "lucide-react";
@@ -12,6 +10,8 @@ import { useThemeStore } from "@/shared/stores/themeStore";
 import { useSettingsStore } from "@/shared/stores/settingsStore";
 import { useSound } from "@/shared/hooks/useSound";
 import { formatTime } from "@/shared/lib/storage";
+import { useTranslation } from "react-i18next";
+import { translateNumber } from "@/shared/lib/i18n";
 
 interface TopBarButtonProps {
   onClick: () => void;
@@ -43,7 +43,10 @@ function TopBarButton({ onClick, icon, tooltip }: TopBarButtonProps) {
             transition={{ duration: 0.12 }}
             className="absolute top-[42px] pointer-events-none z-50"
           >
-            <div className="whitespace-nowrap backdrop-blur-xl bg-black/75 border border-white/10 text-white/75 text-[11px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl">
+            <div
+              className="whitespace-nowrap backdrop-blur-xl bg-black/75 border text-[11px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl"
+              style={{ color: "rgba(255, 255, 255, 0.75)", borderColor: "rgba(255, 255, 255, 0.1)" }}
+            >
               {tooltip}
             </div>
           </motion.div>
@@ -59,6 +62,7 @@ export function GameScreen() {
   const { showMistakes } = useSettingsStore();
   const theme = getTheme();
   const { play } = useSound();
+  const { t, i18n } = useTranslation();
 
   // Register sound callback into the store (avoids hooks-in-store issue)
   useEffect(() => {
@@ -79,19 +83,19 @@ export function GameScreen() {
         transition={{ duration: 0.3 }}
         className="flex items-center justify-between w-full max-w-[400px]"
       >
-        <TopBarButton onClick={resetGame} icon={<Home size={15} />} tooltip="Home" />
+        <TopBarButton onClick={resetGame} icon={<Home size={15} />} tooltip={t("game.home_tooltip")} />
 
         <span
           className="text-[11px] font-semibold tracking-[0.18em] uppercase"
           style={{ color: theme.accent }}
         >
-          {difficulty}
+          {difficulty ? t(`difficulty.${difficulty}`) : ""}
         </span>
 
         <TopBarButton
           onClick={() => difficulty && startGame(difficulty)}
           icon={<RotateCcw size={15} />}
-          tooltip="New Game"
+          tooltip={t("game.new_game_tooltip")}
         />
       </motion.div>
 
@@ -104,20 +108,20 @@ export function GameScreen() {
       >
         {[
           {
-            value: formatTime(elapsed),
-            label: "time",
+            value: translateNumber(formatTime(elapsed), i18n.language),
+            label: t("game.time"),
             color: theme.accent,
           },
           {
-            value: showMistakes ? String(mistakes) : "—",
-            label: "errors",
+            value: showMistakes ? translateNumber(mistakes, i18n.language) : "—",
+            label: t("game.errors"),
             color: mistakes > 0 && showMistakes ? "#ef4444" : "rgba(255,255,255,0.5)",
           },
           {
-            value: `${filled}`,
-            label: "filled",
+            value: translateNumber(filled, i18n.language),
+            label: t("game.filled"),
             color: "rgba(255,255,255,0.55)",
-            suffix: `/${total}`,
+            suffix: `/${translateNumber(total, i18n.language)}`,
           },
         ].map(({ value, label, color, suffix }, i) => (
           <div key={label} className="flex items-center gap-5">
@@ -164,8 +168,8 @@ export function GameScreen() {
       </motion.div>
 
       {/* Keyboard hint */}
-      <p className="text-[9px] text-white/12 tracking-[0.15em] select-none uppercase">
-        arrows · 1-9 · N note · D theme · F fullscreen · P pin
+      <p className="text-[9px] text-white/45 tracking-[0.15em] select-none uppercase">
+        {t("game.keyboard_hint")}
       </p>
 
       {/* Win Modal */}

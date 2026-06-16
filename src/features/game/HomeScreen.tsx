@@ -7,10 +7,12 @@ import { useGameStore } from "@/shared/stores/gameStore";
 import { loadGame } from "@/shared/lib/storage";
 import { DifficultySelector } from "./DifficultySelector";
 import { SudokuLogo } from "@/components/ui";
+import { useTranslation } from "react-i18next";
 
 export function HomeScreen() {
   const { restoreGame } = useGameStore();
   const [hasSaved, setHasSaved] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const saved = loadGame();
@@ -30,10 +32,10 @@ export function HomeScreen() {
         >
           <SudokuLogo size={80} className="text-[var(--accent)] mb-4" />
           <p className="text-[10px] font-semibold tracking-[0.3em] text-white/20 uppercase mb-2">
-            Focus
+            {t("home.focus")}
           </p>
           <h1 className="text-[52px] font-extralight tracking-[0.08em] text-white/88 leading-none">
-            sudoku
+            {t("home.sudoku")}
           </h1>
         </motion.div>
 
@@ -61,11 +63,11 @@ export function HomeScreen() {
               className="w-full text-white/40"
               onClick={() => restoreGame()}
             >
-              ↩ Resume last game
+              {t("home.resume")}
             </GlassButton>
           )}
           <p className="text-[9px] text-white/12 tracking-[0.22em] uppercase">
-            Focus · Rest · Repeat
+            {t("home.footer")}
           </p>
         </motion.div>
       </div>

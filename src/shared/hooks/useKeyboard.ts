@@ -11,7 +11,7 @@ export function useKeyboard(
 ) {
   const { selected, view, inputNumber, eraseCell, selectCell, toggleNoteMode } = useGameStore();
   const { cycleTheme } = useThemeStore();
-  const { setSidebarPinned, sidebarPinned } = useSettingsStore();
+  const { setSidebarPinned, sidebarPinned, language, setLanguage } = useSettingsStore();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -21,6 +21,11 @@ export function useKeyboard(
       if (e.key === "d" || e.key === "D") { e.preventDefault(); cycleTheme(); return; }
       if (e.key === "f" || e.key === "F") { e.preventDefault(); onToggleFullscreen(); return; }
       if (e.key === "p" || e.key === "P") { e.preventDefault(); setSidebarPinned(!sidebarPinned); return; }
+      if (e.key === "l" || e.key === "L") {
+        e.preventDefault();
+        setLanguage(language === "bn" ? "en" : "bn");
+        return;
+      }
 
       // Game-only shortcuts
       if (view !== "game") return;
@@ -50,5 +55,5 @@ export function useKeyboard(
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [selected, view, cycleTheme, inputNumber, eraseCell, selectCell, toggleNoteMode, onToggleFullscreen, onToggleSidebar, setSidebarPinned, sidebarPinned]);
+  }, [selected, view, cycleTheme, inputNumber, eraseCell, selectCell, toggleNoteMode, onToggleFullscreen, onToggleSidebar, setSidebarPinned, sidebarPinned, language, setLanguage]);
 }

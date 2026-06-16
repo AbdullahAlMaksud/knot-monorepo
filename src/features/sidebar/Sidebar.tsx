@@ -2,27 +2,28 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, BarChart2, Settings, Palette, Maximize2, Minimize2, Pin, PinOff } from "lucide-react";
+import { BarChart2, Settings, Pin, PinOff } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useSettingsStore } from "@/shared/stores/settingsStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { useGameStore } from "@/shared/stores/gameStore";
+import { useTranslation } from "react-i18next";
+import { SudokuLogo } from "@/components/ui";
 
 interface SidebarProps {
   activePage: "home" | "game" | "score" | "settings";
   onNavigate: (page: "home" | "score" | "settings") => void;
-  onToggleFullscreen: () => void;
-  isFullscreen: boolean;
 }
 
-export function Sidebar({ activePage, onNavigate, onToggleFullscreen, isFullscreen }: SidebarProps) {
+export function Sidebar({ activePage, onNavigate }: SidebarProps) {
   const [open, setOpen] = useState(false);
   const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { sidebarPinned, setSidebarPinned } = useSettingsStore();
-  const { cycleTheme, getTheme } = useThemeStore();
+  const { getTheme } = useThemeStore();
   const theme = getTheme();
   const gameView = useGameStore((s) => s.view);
+  const { t } = useTranslation();
 
   const showSidebar = useCallback(() => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
@@ -52,9 +53,9 @@ export function Sidebar({ activePage, onNavigate, onToggleFullscreen, isFullscre
   }, [sidebarPinned, hideSidebar]);
 
   const navItems = [
-    { id: "home"     as const, icon: Home,      label: "Home",     kbd: "" },
-    { id: "score"    as const, icon: BarChart2,  label: "Scores",   kbd: "" },
-    { id: "settings" as const, icon: Settings,   label: "Settings", kbd: "" },
+    { id: "home"     as const, icon: SudokuLogo, label: t("navigation.sudoku"),   kbd: "" },
+    { id: "score"    as const, icon: BarChart2,  label: t("navigation.scores"),   kbd: "" },
+    { id: "settings" as const, icon: Settings,   label: t("navigation.settings"), kbd: "" },
   ];
 
   return (
@@ -67,71 +68,48 @@ export function Sidebar({ activePage, onNavigate, onToggleFullscreen, isFullscre
         />
       )}
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ x: -68, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -68, opacity: 0 }}
-            transition={{ type: "spring", damping: 26, stiffness: 320, mass: 0.8 }}
-            className="fixed left-3 top-1/2 -translate-y-1/2 z-50"
-            onMouseEnter={cancelHide}
-            onMouseLeave={hideSidebar}
+      <motion.div
+        animate={{
+          x: open ? 0 : -46,
+          opacity: open ? 1 : 0.35,
+        }}
+        transition={{ type: "spring", damping: 26, stiffness: 320, mass: 0.8 }}
+        className="fixed left-3 top-1/2 -translate-y-1/2 z-50 cursor-pointer"
+        onMouseEnter={showSidebar}
+        onMouseLeave={hideSidebar}
+      >
+        <GlassCard intensity="high" className="flex flex-col py-3 px-2 gap-0.5 w-[50px]">
+
+          {/* Nav items */}
+          {navItems.map(({ id, icon: Icon, label }) => {
+            const isActive = activePage === id || (id === "home" && gameView === "game");
+            return (
+              <SidebarBtn
+                key={id}
+                label={label}
+                active={isActive}
+                accent={theme.accent}
+                onClick={() => { onNavigate(id); if (!sidebarPinned) setOpen(false); }}
+              >
+                <Icon size={16} />
+              </SidebarBtn>
+            );
+          })}
+
+          {/* Divider */}
+          <div className="mx-2 my-1 h-px bg-white/10" />
+
+          {/* Pin */}
+          <SidebarBtn
+            label={sidebarPinned ? t("navigation.unpinSidebar") : t("navigation.pinSidebar")}
+            active={sidebarPinned}
+            accent={theme.accent}
+            onClick={() => setSidebarPinned(!sidebarPinned)}
           >
-            <GlassCard intensity="high" className="flex flex-col py-3 px-2 gap-0.5 w-[50px]">
-
-              {/* Nav items */}
-              {navItems.map(({ id, icon: Icon, label }) => {
-                const isActive = activePage === id || (id === "home" && gameView === "game");
-                return (
-                  <SidebarBtn
-                    key={id}
-                    label={label}
-                    active={isActive}
-                    accent={theme.accent}
-                    onClick={() => { onNavigate(id); if (!sidebarPinned) setOpen(false); }}
-                  >
-                    <Icon size={16} />
-                  </SidebarBtn>
-                );
-              })}
-
-              {/* Divider */}
-              <div className="mx-2 my-1 h-px bg-white/10" />
-
-              {/* Theme cycle */}
-              <SidebarBtn
-                label="Theme (D)"
-                accent={theme.accent}
-                onClick={cycleTheme}
-                badge={<div className="w-2 h-2 rounded-full border border-black/20" style={{ background: theme.accent }} />}
-              >
-                <Palette size={16} />
-              </SidebarBtn>
-
-              {/* Fullscreen */}
-              <SidebarBtn
-                label={isFullscreen ? "Exit Fullscreen (F)" : "Fullscreen (F)"}
-                active={isFullscreen}
-                accent={theme.accent}
-                onClick={onToggleFullscreen}
-              >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </SidebarBtn>
-
-              {/* Pin */}
-              <SidebarBtn
-                label={sidebarPinned ? "Unpin Sidebar (P)" : "Pin Sidebar (P)"}
-                active={sidebarPinned}
-                accent={theme.accent}
-                onClick={() => setSidebarPinned(!sidebarPinned)}
-              >
-                {sidebarPinned ? <PinOff size={16} /> : <Pin size={16} />}
-              </SidebarBtn>
-            </GlassCard>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {sidebarPinned ? <PinOff size={16} /> : <Pin size={16} />}
+          </SidebarBtn>
+        </GlassCard>
+      </motion.div>
     </>
   );
 }
@@ -156,7 +134,7 @@ function SidebarBtn({ children, label, active, accent, onClick, badge }: Sidebar
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={cn(
-          "w-[34px] h-[34px] rounded-xl flex items-center justify-center",
+          "w-[34px] h-[34px] rounded-xl flex items-center justify-center cursor-pointer",
           "transition-all duration-150 relative outline-none",
           active
             ? "bg-[color-mix(in_srgb,var(--accent-color)_18%,transparent)] text-[var(--accent-color)]"
@@ -183,7 +161,10 @@ function SidebarBtn({ children, label, active, accent, onClick, badge }: Sidebar
             transition={{ duration: 0.12 }}
             className="absolute left-[42px] pointer-events-none z-50"
           >
-            <div className="whitespace-nowrap backdrop-blur-xl bg-black/75 border border-white/10 text-white/75 text-[11px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl">
+            <div
+              className="whitespace-nowrap backdrop-blur-xl bg-black/75 border text-[11px] font-medium px-2.5 py-1.5 rounded-lg shadow-xl"
+              style={{ color: "rgba(255, 255, 255, 0.75)", borderColor: "rgba(255, 255, 255, 0.1)" }}
+            >
               {label}
             </div>
           </motion.div>

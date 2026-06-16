@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Trophy, Clock, CheckCircle2, Percent } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -7,20 +5,23 @@ import { useThemeStore } from "@/shared/stores/themeStore";
 import { loadStats } from "@/shared/lib/storage";
 import { formatTime } from "@/shared/lib/storage";
 import type { Difficulty } from "@/shared/lib/sudoku";
+import { useTranslation } from "react-i18next";
+import { translateNumber } from "@/shared/lib/i18n";
 
 const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "expert"];
 
-const DIFF_META: Record<Difficulty, { label: string; color: string }> = {
-  easy:   { label: "Easy",   color: "#10b981" },
-  medium: { label: "Medium", color: "#f59e0b" },
-  hard:   { label: "Hard",   color: "#f97316" },
-  expert: { label: "Expert", color: "#ef4444" },
+const DIFF_META: Record<Difficulty, { color: string }> = {
+  easy:   { color: "#10b981" },
+  medium: { color: "#f59e0b" },
+  hard:   { color: "#f97316" },
+  expert: { color: "#ef4444" },
 };
 
 export function ScoreScreen() {
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const stats = loadStats();
+  const { t, i18n } = useTranslation();
 
   const totalGames = DIFFICULTIES.reduce((a, d) => a + (stats[d]?.gamesPlayed ?? 0), 0);
   const totalWins  = DIFFICULTIES.reduce((a, d) => a + (stats[d]?.gamesWon   ?? 0), 0);
@@ -34,8 +35,8 @@ export function ScoreScreen() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <p className="text-xs tracking-[0.25em] text-white/25 uppercase mb-1">Performance</p>
-        <h2 className="text-3xl font-thin text-white/90">Scoreboard</h2>
+        <p className="text-xs tracking-[0.25em] text-white/25 uppercase mb-1">{t("scores.performance")}</p>
+        <h2 className="text-3xl font-thin text-white/90">{t("scores.scoreboard")}</h2>
       </motion.div>
 
       {/* Global summary */}
@@ -46,11 +47,11 @@ export function ScoreScreen() {
         className="w-full max-w-sm"
       >
         <GlassCard intensity="medium" className="p-4">
-          <p className="text-xs text-white/30 uppercase tracking-widest mb-3 font-medium">Overall</p>
+          <p className="text-xs text-white/30 uppercase tracking-widest mb-3 font-medium">{t("scores.overall")}</p>
           <div className="grid grid-cols-3 gap-3 text-center">
-            <StatPill label="Played" value={totalGames} icon={<CheckCircle2 size={12} />} color={theme.accent} />
-            <StatPill label="Won"    value={totalWins}  icon={<Trophy size={12} />}       color={theme.accent} />
-            <StatPill label="Time"   value={formatTime(totalTime)} icon={<Clock size={12} />} color={theme.accent} />
+            <StatPill label={t("scores.played")} value={translateNumber(totalGames, i18n.language)} icon={<CheckCircle2 size={12} />} color={theme.accent} />
+            <StatPill label={t("scores.won")}    value={translateNumber(totalWins, i18n.language)}  icon={<Trophy size={12} />}       color={theme.accent} />
+            <StatPill label={t("scores.time")}   value={translateNumber(formatTime(totalTime), i18n.language)} icon={<Clock size={12} />} color={theme.accent} />
           </div>
         </GlassCard>
       </motion.div>
@@ -75,23 +76,23 @@ export function ScoreScreen() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
-                    <span className="text-sm font-semibold text-white/80">{meta.label}</span>
+                    <span className="text-sm font-semibold text-white/80">{t(`difficulty.${d}`)}</span>
                   </div>
                   {s.bestTime > 0 && (
                     <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs"
                       style={{ background: `${meta.color}22`, color: meta.color, border: `1px solid ${meta.color}44` }}>
                       <Trophy size={10} />
-                      <span>{formatTime(s.bestTime)}</span>
+                      <span>{translateNumber(formatTime(s.bestTime), i18n.language)}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Stats grid */}
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <MiniStat label="Played" value={s.gamesPlayed} />
-                  <MiniStat label="Won"    value={s.gamesWon} />
-                  <MiniStat label="Win %" value={`${winRate}%`} />
-                  <MiniStat label="Avg"   value={avgTime > 0 ? formatTime(avgTime) : "—"} />
+                  <MiniStat label={t("scores.played")} value={translateNumber(s.gamesPlayed, i18n.language)} />
+                  <MiniStat label={t("scores.won")}    value={translateNumber(s.gamesWon, i18n.language)} />
+                  <MiniStat label={t("scores.win_rate")} value={`${translateNumber(winRate, i18n.language)}%`} />
+                  <MiniStat label={t("scores.avg_time")}   value={avgTime > 0 ? translateNumber(formatTime(avgTime), i18n.language) : "—"} />
                 </div>
 
                 {/* Win rate bar */}
@@ -108,7 +109,7 @@ export function ScoreScreen() {
                 )}
 
                 {s.gamesPlayed === 0 && (
-                  <p className="text-xs text-white/20 text-center mt-1">No games played yet</p>
+                  <p className="text-xs text-white/20 text-center mt-1">{t("scores.no_games")}</p>
                 )}
               </GlassCard>
             </motion.div>
@@ -123,7 +124,7 @@ export function ScoreScreen() {
           transition={{ delay: 0.4 }}
           className="text-sm text-white/25 text-center mt-4"
         >
-          Play your first game to see stats here
+          {t("scores.play_first")}
         </motion.p>
       )}
     </div>
