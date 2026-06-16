@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/* ── CSS Custom Properties ─────────────────────────────────────────── */
+:root {
+  --accent:      #f59e0b;
+  --accent-fg:   #0a0a0a;
+  --accent-ring: rgba(245, 158, 11, 0.55);
+  --accent-glow: rgba(245, 158, 11, 0.12);
+
+  --bg-app:      #080808;
+  --text-app:    rgba(255, 255, 255, 0.9);
+}
+
+.light-theme {
+  --bg-app:      #f4f4f7;
+  --text-app:    rgba(15, 23, 42, 0.9);
+  --color-white: #0f172a;
+
+  /* Redefine custom alpha-channel helpers for light theme */
+  .bg-white\/\[0\.025\] { background-color: rgba(15, 23, 42, 0.025) !important; }
+  .bg-white\/\[0\.035\] { background-color: rgba(15, 23, 42, 0.035) !important; }
+  .bg-white\/\[0\.04\]  { background-color: rgba(15, 23, 42, 0.04)  !important; }
+  .bg-white\/3  { background-color: rgba(15, 23, 42, 0.03) !important; }
+  .bg-white\/4  { background-color: rgba(15, 23, 42, 0.04) !important; }
+  .bg-white\/5  { background-color: rgba(15, 23, 42, 0.05) !important; }
+  .bg-white\/8  { background-color: rgba(15, 23, 42, 0.08) !important; }
+  
+  .border-white\/\[0\.07\] { border-color: rgba(15, 23, 42, 0.07) !important; }
+  .border-white\/8  { border-color: rgba(15, 23, 42, 0.08) !important; }
+  
+  .text-white\/88 { color: rgba(15, 23, 42, 0.88) !important; }
+  .text-white\/22 { color: rgba(15, 23, 42, 0.22) !important; }
+  .text-white\/12 { color: rgba(15, 23, 42, 0.12) !important; }
+  
+  /* Redefine Sudoku cell thick borders for light theme */
+  .\!border-r-white\/22 { border-right-color: rgba(15, 23, 42, 0.22) !important; }
+  .\!border-b-white\/22 { border-bottom-color: rgba(15, 23, 42, 0.22) !important; }
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-app);
+    color: var(--text-app);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* ── Tailwind alpha-channel helpers (CSS4 not yet in tw4 by default) ─ */
+.bg-white\/\[0\.025\] { background-color: rgba(255,255,255,0.025) !important; }
+.bg-white\/\[0\.035\] { background-color: rgba(255,255,255,0.035) !important; }
+.bg-white\/\[0\.04\]  { background-color: rgba(255,255,255,0.04)  !important; }
+.bg-white\/3  { background-color: rgba(255,255,255,0.03); }
+.bg-white\/4  { background-color: rgba(255,255,255,0.04); }
+.bg-white\/5  { background-color: rgba(255,255,255,0.05); }
+.bg-white\/8  { background-color: rgba(255,255,255,0.08); }
+.border-white\/\[0\.07\] { border-color: rgba(255,255,255,0.07) !important; }
+.border-white\/8  { border-color: rgba(255,255,255,0.08); }
+.text-white\/88 { color: rgba(255,255,255,0.88); }
+.text-white\/22 { color: rgba(255,255,255,0.22); }
+.text-white\/12 { color: rgba(255,255,255,0.12); }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar            { width: 4px; }
+::-webkit-scrollbar-track      { background: transparent; }
+::-webkit-scrollbar-thumb      { background: var(--btn-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover{ background: var(--glass-border); }
+
+/* ── Custom Glassmorphism Classes ─────────────────────────────────── */
+.btn-glass-ghost {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.15s ease;
+}
+.btn-glass-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.btn-glass-outline {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.15s ease;
+}
+.btn-glass-outline:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.light-theme {
+  .btn-glass-ghost {
+    background-color: rgba(15, 23, 42, 0.04);
+    border-color: rgba(15, 23, 42, 0.08);
+    color: rgba(15, 23, 42, 0.65);
+  }
+  .btn-glass-ghost:hover {
+    background-color: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.16);
+    color: rgba(15, 23, 42, 0.9);
+  }
+  .btn-glass-outline {
+    background-color: transparent;
+    border-color: rgba(15, 23, 42, 0.16);
+    color: rgba(15, 23, 42, 0.55);
+  }
+  .btn-glass-outline:hover {
+    border-color: rgba(15, 23, 42, 0.32);
+    color: rgba(15, 23, 42, 0.85);
+  }
+}
+
+/* ── Cell grid borders (Tailwind can't generate dynamic nth-child) ─── */
+/* Box-separator border overrides applied via JS className in SudokuGrid */
+
+/* ── Focus ring suppression for game buttons ───────────────────────── */
+button:focus-visible { outline: none; }
+
+/* ── Framer Motion will-change hint ───────────────────────────────── */
+[data-framer-appear-id] { will-change: transform, opacity; }
