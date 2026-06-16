@@ -5,20 +5,15 @@ import { getBlogBySlug, getPublishedBlogs } from "./api";
 import { blogsQueryKeys } from "./querykey";
 
 export const useGetPublishedBlogs = (
-  category?: string,
+  page = 1,
   search?: string,
-  tag?: string,
+  limit = 9,
   enabled = true,
 ) =>
   useQuery({
-    queryKey: blogsQueryKeys.published(
-      category ?? "all",
-      search ?? "",
-      tag ?? "",
-    ),
-    queryFn: () => getPublishedBlogs(category, search, tag),
+    queryKey: blogsQueryKeys.published(page, search ?? "", limit),
+    queryFn: () => getPublishedBlogs(page, limit, search),
     enabled,
-    select: (data) => data,
   });
 
 export const useGetBlogBySlug = (slug: string) =>

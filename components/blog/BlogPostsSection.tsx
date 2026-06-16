@@ -2,17 +2,21 @@
 
 import { useState } from "react";
 
-import type { Blog } from "@/services/blogs/type";
-import { ChevronDown } from "lucide-react";
+import type { Blog, BlogMeta } from "@/services/blogs/type";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import BlogPostCard from "@/components/blog/BlogPostCard";
 import ErrorState from "@/components/ui/error";
 import Skeleton from "@/components/ui/skeleton";
+import { cn, getR2ImageUrl } from "@/lib/utils";
 
 interface BlogPostsSectionProps {
   blogs: Blog[];
   isLoading: boolean;
   isError?: boolean;
+  meta?: BlogMeta;
+  page?: number;
+  onPageChange?: (page: number) => void;
   errorMessage?: string;
   onRetry?: () => void;
   searchQuery: string;
@@ -39,13 +43,17 @@ const sidebarCategories = [
   { label: "Wellness", keywords: ["wellness", "self care", "self-care"] },
 ];
 
-function getFirstImage(blog: Blog) {
-  return blog.contents.find((content) => content.type === "image")?.content;
+function getFirstImage(blog: Blog): string | undefined {
+  const item = blog.contents.find((c) => c.type === "IMAGE");
+  if (!item) return undefined;
+  if (item.content && item.content.startsWith("http")) return item.content;
+  if (item.contentKey) return getR2ImageUrl(item.contentKey);
+  return undefined;
 }
 
 function getFirstText(blog: Blog, maxLength: number) {
   const item = blog.contents.find(
-    (content) => content.type === "text" && content.content,
+    (content) => content.type === "TEXT" && content.content,
   );
 
   if (!item) return "";
@@ -129,6 +137,9 @@ export default function BlogPostsSection({
   errorMessage,
   onRetry,
   searchQuery,
+  meta,
+  page = 1,
+  onPageChange,
 }: BlogPostsSectionProps) {
   const featuredBlog = blogs.find((blog) => blog.isFeatured) ?? blogs[0];
   const gridBlogs = blogs.filter((blog) => blog._id !== featuredBlog?._id);
@@ -176,63 +187,97 @@ export default function BlogPostsSection({
             {searchQuery ? ` for "${searchQuery}"` : ""}.
           </div>
         ) : (
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,23rem)] xl:gap-12">
-            <div>
-              {featuredBlog ? (
-                <BlogPostCard
-                  blog={featuredBlog}
-                  imageSrc={getFirstImage(featuredBlog)}
-                  excerpt={getFirstText(featuredBlog, 180)}
-                  variant="featured"
-                  priority
-                  className="mb-8 lg:mb-10"
-                />
-              ) : null}
+          <>
+            <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,23rem)] xl:gap-12">
+              <div>
+                {featuredBlog ? (
+                  <BlogPostCard
+                    blog={featuredBlog}
+                    imageSrc={getFirstImage(featuredBlog)}
+                    excerpt={getFirstText(featuredBlog, 180)}
+                    variant="featured"
+                    priority
+                    className="mb-8 lg:mb-10"
+                  />
+                ) : null}
 
-              {gridBlogs.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {gridBlogs.map((blog) => (
-                    <BlogPostCard
-                      key={blog._id}
-                      blog={blog}
-                      imageSrc={getFirstImage(blog)}
-                      excerpt={getFirstText(blog, 72)}
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            <aside className="lg:sticky lg:top-24 lg:self-start">
-              <div className="overflow-hidden rounded-none bg-transparent px-5 py-5 shadow-none sm:px-6 sm:py-6">
-                <SidebarSection title="Categories">
-                  <div className="mt-2 divide-y divide-black/6">
-                    {categoryRows.map((category) => (
-                      <div
-                        key={category.label}
-                        className="flex items-center justify-between gap-4 py-3 text-[1.04rem] tracking-[0.01em] text-black/88"
-                      >
-                        <span>{category.label}</span>
-                        <span className="min-w-8 text-right font-medium tracking-[0.12em] text-black/72">
-                          {String(category.count).padStart(2, "0")}
-                        </span>
-                      </div>
+                {gridBlogs.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {gridBlogs.map((blog) => (
+                      <BlogPostCard
+                        key={blog._id}
+                        blog={blog}
+                        imageSrc={getFirstImage(blog)}
+                        excerpt={getFirstText(blog, 72)}
+                      />
                     ))}
                   </div>
-                </SidebarSection>
+                ) : null}
+              </div>
 
-                <div className="mt-6">
-                  <SidebarSection title="Popular Tags">
-                    <div className="mt-4 flex flex-wrap gap-2.5">
-                      {sidebarPills.map((pill) => (
-                        <SidebarPill key={pill}>{pill}</SidebarPill>
+              <aside className="lg:sticky lg:top-24 lg:self-start">
+                <div className="overflow-hidden rounded-none bg-transparent px-5 py-5 shadow-none sm:px-6 sm:py-6">
+                  <SidebarSection title="Categories">
+                    <div className="mt-2 divide-y divide-black/6">
+                      {categoryRows.map((category) => (
+                        <div
+                          key={category.label}
+                          className="flex items-center justify-between gap-4 py-3 text-[1.04rem] tracking-[0.01em] text-black/88"
+                        >
+                          <span>{category.label}</span>
+                          <span className="min-w-8 text-right font-medium tracking-[0.12em] text-black/72">
+                            {String(category.count).padStart(2, "0")}
+                          </span>
+                        </div>
                       ))}
                     </div>
                   </SidebarSection>
+
+                  <div className="mt-6">
+                    <SidebarSection title="Popular Tags">
+                      <div className="mt-4 flex flex-wrap gap-2.5">
+                        {sidebarPills.map((pill) => (
+                          <SidebarPill key={pill}>{pill}</SidebarPill>
+                        ))}
+                      </div>
+                    </SidebarSection>
+                  </div>
                 </div>
+              </aside>
+            </div>
+
+            {meta && meta.totalPage > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2">
+                {Array.from({ length: meta.totalPage }, (_, i) => i + 1).map(
+                  (p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => onPageChange?.(p)}
+                      className={cn(
+                        "h-10 min-w-10 rounded-full px-3 text-sm font-medium transition-colors",
+                        p === page
+                          ? "bg-black text-white"
+                          : "border border-black/15 bg-white text-black hover:bg-black/5",
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+                {page < meta.totalPage && (
+                  <button
+                    type="button"
+                    onClick={() => onPageChange?.(page + 1)}
+                    className="flex h-10 items-center gap-1.5 rounded-full border border-black/15 bg-white px-4 text-sm font-medium text-black transition-colors hover:bg-black/5"
+                  >
+                    Next
+                    <ChevronRight className="size-4" strokeWidth={1.5} />
+                  </button>
+                )}
               </div>
-            </aside>
-          </div>
+            )}
+          </>
         )}
       </div>
     </section>

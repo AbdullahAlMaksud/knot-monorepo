@@ -5,14 +5,12 @@ import Link from "next/link";
 import Layout from "@/components/Layout";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import ShareButtons from "@/components/shared/ShareButtons";
 import type { Blog } from "@/services/blogs/type";
 import { sanitizeContent } from "@/lib/sanitize";
-import {
-  useGetBlogBySlug,
-  useGetPublishedBlogs,
-} from "@/services/blogs/query";
+import { cn, getR2ImageUrl } from "@/lib/utils";
+import { useGetBlogBySlug, useGetPublishedBlogs } from "@/services/blogs/query";
 import ErrorState from "@/components/ui/error";
 import Skeleton from "@/components/ui/skeleton";
 
@@ -46,8 +44,13 @@ const formatDate = (dateString: string) =>
     year: "numeric",
   });
 
-const getFirstImage = (blog: Blog) =>
-  blog.contents.find((content) => content.type === "image")?.content;
+const getFirstImage = (blog: Blog): string | undefined => {
+  const item = blog.contents.find((c) => c.type === "IMAGE");
+  if (!item) return undefined;
+  if (item.content && item.content.startsWith("http")) return item.content;
+  if (item.contentKey) return getR2ImageUrl(item.contentKey);
+  return undefined;
+};
 
 const isPublishedBlog = (blog: Blog) =>
   blog.status.trim().toUpperCase() === "PUBLISHED";
@@ -68,16 +71,30 @@ export default function BlogPostPage() {
     isLoading: isBlogLoading,
     isError: isBlogError,
   } = useGetBlogBySlug(slug);
-  const { data: categoryBlogs = [] } = useGetPublishedBlogs(
-    blog?.category,
+  const { data: allBlogsData } = useGetPublishedBlogs(
+    1,
     undefined,
-    undefined,
+    20,
     Boolean(blog?.category),
   );
 
-  const relatedBlogs = useMemo(
-    () => categoryBlogs.filter((item) => item.slug !== slug).slice(0, 4),
-    [categoryBlogs, slug],
+  const allRelatedBlogs = useMemo(
+    () =>
+      (allBlogsData?.data ?? [])
+        .filter(
+          (item) => item.slug !== slug && item.category === blog?.category,
+        )
+        .slice(0, 12),
+    [allBlogsData, slug, blog?.category],
+  );
+  const [relatedPage, setRelatedPage] = useState(1);
+  const RELATED_PER_PAGE = 4;
+  const relatedTotalPages = Math.ceil(
+    allRelatedBlogs.length / RELATED_PER_PAGE,
+  );
+  const relatedBlogs = allRelatedBlogs.slice(
+    (relatedPage - 1) * RELATED_PER_PAGE,
+    relatedPage * RELATED_PER_PAGE,
   );
   const sortedContents = useMemo(
     () => [...(blog?.contents ?? [])].sort((a, b) => a.order - b.order),
@@ -86,12 +103,10 @@ export default function BlogPostPage() {
   const heroImage = blog ? getFirstImage(blog) : undefined;
   const description = useMemo(() => {
     const firstTextContent =
-      sortedContents.find((content) => content.type === "text")?.content || "";
+      sortedContents.find((content) => content.type === "TEXT")?.content || "";
     const plainText = stripHtml(firstTextContent);
 
-    return plainText.length > 150
-      ? `${plainText.slice(0, 147)}...`
-      : plainText;
+    return plainText.length > 150 ? `${plainText.slice(0, 147)}...` : plainText;
   }, [sortedContents]);
 
   if (isBlogLoading) {
@@ -139,7 +154,7 @@ export default function BlogPostPage() {
           <div className="">
             <div className="space-y-6">
               {sortedContents.map((item) => {
-                if (item.type === "text") {
+                if (item.type === "TEXT") {
                   return (
                     <div
                       key={item.order}
@@ -150,11 +165,17 @@ export default function BlogPostPage() {
                     />
                   );
                 }
-                if (item.type === "image" && item.content) {
+                if (item.type === "IMAGE") {
+                  const src = item.content?.startsWith("http")
+                    ? item.content
+                    : item.contentKey
+                      ? getR2ImageUrl(item.contentKey)
+                      : null;
+                  if (!src) return null;
                   return (
                     <Image
                       key={item.order}
-                      src={item.content}
+                      src={src}
                       width={1920}
                       height={500}
                       alt={`Blog image ${item.order}`}
@@ -191,41 +212,76 @@ export default function BlogPostPage() {
           </div>
         </article>
 
-        {relatedBlogs.length > 0 && (
+        {allRelatedBlogs.length > 0 && (
           <section className="py-16 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <h2 className="text-2xl font-light mb-8">Related Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedBlogs.map((related) => (
-                  <Link
-                    key={related._id}
-                    href={`/blog/${related.slug}`}
-                    className="group"
-                  >
-                    <div className="relative h-40 rounded-lg overflow-hidden mb-3">
-                      {getFirstImage(related) ? (
-                        <Image
-                          src={getFirstImage(related) as string}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          alt={related.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-linear-to-br from-gray-300 to-gray-400 group-hover:scale-105 transition-transform duration-300" />
-                      )}
-                      <div className="absolute top-2 left-2">
-                        <span className="bg-white px-2 py-0.5 rounded-full text-xs font-semibold">
-                          {related.category}
-                        </span>
+                {relatedBlogs.map((related) => {
+                  const relatedImg = getFirstImage(related);
+                  return (
+                    <Link
+                      key={related._id}
+                      href={`/blog/${related.slug}`}
+                      className="group"
+                    >
+                      <div className="relative h-40 rounded-lg overflow-hidden mb-3">
+                        {relatedImg ? (
+                          <Image
+                            src={relatedImg}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            alt={related.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-linear-to-br from-gray-300 to-gray-400 group-hover:scale-105 transition-transform duration-300" />
+                        )}
+                        <div className="absolute top-2 left-2">
+                          <span className="bg-white px-2 py-0.5 rounded-full text-xs font-semibold">
+                            {related.category}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <h3 className="text-sm font-medium line-clamp-2 group-hover:text-gray-600 transition">
-                      {related.title}
-                    </h3>
-                  </Link>
-                ))}
+                      <h3 className="text-sm font-medium line-clamp-2 group-hover:text-gray-600 transition">
+                        {related.title}
+                      </h3>
+                    </Link>
+                  );
+                })}
               </div>
+
+              {relatedTotalPages > 1 && (
+                <div className="mt-10 flex items-center justify-center gap-2">
+                  {Array.from(
+                    { length: relatedTotalPages },
+                    (_, i) => i + 1,
+                  ).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setRelatedPage(p)}
+                      className={cn(
+                        "h-10 min-w-10 rounded-full px-3 text-sm font-medium transition-colors",
+                        p === relatedPage
+                          ? "bg-black text-white"
+                          : "border border-black/15 bg-white text-black hover:bg-black/5",
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  {relatedPage < relatedTotalPages && (
+                    <button
+                      type="button"
+                      onClick={() => setRelatedPage((p) => p + 1)}
+                      className="flex h-10 items-center gap-1.5 rounded-full border border-black/15 bg-white px-4 text-sm font-medium text-black transition-colors hover:bg-black/5"
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </section>
         )}

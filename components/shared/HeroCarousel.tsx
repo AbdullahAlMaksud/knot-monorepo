@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGetWebsiteBannersByRoute } from "@/services/settings/banner/query";
+import { getBannerMediaItems } from "@/services/settings/banner/utils";
 
 export interface MediaItem {
   type: "image" | "video";
@@ -38,12 +41,22 @@ export default function HeroCarousel({
   autoPlayInterval = 5000,
   searchBar,
 }: HeroCarouselProps) {
+  const pathname = usePathname();
+  const { data: routeBanners = [] } = useGetWebsiteBannersByRoute(pathname);
+  const routeBannerMediaItems = useMemo(
+    () => getBannerMediaItems(routeBanners),
+    [routeBanners],
+  );
+  const resolvedMediaItems =
+    routeBannerMediaItems.length > 0 ? routeBannerMediaItems : mediaItems;
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const activeIndex =
+    currentIndex < resolvedMediaItems.length ? currentIndex : 0;
 
   // Auto-play functionality
   useEffect(() => {
-    if (!autoPlay || mediaItems.length <= 1) return;
+    if (!autoPlay || resolvedMediaItems.length <= 1) return;
 
     // Clear any existing interval
     if (intervalRef.current) {
@@ -52,7 +65,7 @@ export default function HeroCarousel({
 
     // Set up new interval
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % mediaItems.length);
+      setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
     }, autoPlayInterval);
 
     return () => {
@@ -60,30 +73,31 @@ export default function HeroCarousel({
         clearInterval(intervalRef.current);
       }
     };
-  }, [autoPlay, mediaItems.length, autoPlayInterval]);
+  }, [autoPlay, resolvedMediaItems.length, autoPlayInterval]);
 
   // Reset interval when user manually changes slide
   const resetAutoPlay = () => {
-    if (!autoPlay || mediaItems.length <= 1) return;
+    if (!autoPlay || resolvedMediaItems.length <= 1) return;
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % mediaItems.length);
+      setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
     }, autoPlayInterval);
   };
 
   const goToPrevious = () => {
     setCurrentIndex(
-      (prev) => (prev - 1 + mediaItems.length) % mediaItems.length,
+      (prev) =>
+        (prev - 1 + resolvedMediaItems.length) % resolvedMediaItems.length,
     );
     resetAutoPlay();
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % mediaItems.length);
+    setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
     resetAutoPlay();
   };
 
@@ -92,17 +106,17 @@ export default function HeroCarousel({
     resetAutoPlay();
   };
 
-  if (mediaItems.length === 0) return null;
+  if (resolvedMediaItems.length === 0) return null;
 
   return (
     <section className="relative h-svh overflow-hidden">
       {/* Media Carousel */}
       <div className="absolute inset-0">
-        {mediaItems.map((item, index) => (
+        {resolvedMediaItems.map((item, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
+              index === activeIndex ? "opacity-100" : "opacity-0"
             }`}
           >
             {item.type === "video" ? (
@@ -127,7 +141,7 @@ export default function HeroCarousel({
       </div>
 
       {/* Navigation Arrows */}
-      {mediaItems.length > 1 && (
+      {resolvedMediaItems.length > 1 && (
         <>
           <Button
             type="button"
@@ -192,16 +206,16 @@ export default function HeroCarousel({
       </div>
 
       {/* Dots Indicator */}
-      {mediaItems.length > 1 && (
+      {resolvedMediaItems.length > 1 && (
         <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2 sm:bottom-8">
-          {mediaItems.map((_, index) => (
+          {resolvedMediaItems.map((_, index) => (
             <Button
               key={index}
               type="button"
               variant="ghost"
               onClick={() => goToSlide(index)}
               className={`min-w-0 rounded-full p-0 transition-all ${
-                index === currentIndex
+                index === activeIndex
                   ? "h-2 w-8 bg-white"
                   : "h-2 w-2 bg-white/50 hover:bg-white/75"
               }`}

@@ -1,25 +1,30 @@
 import apiClient from "@/lib/axios";
-import type { Blog, BlogDetailResponse } from "./type";
+import type {
+  Blog,
+  BlogDetailResponse,
+  BlogMeta,
+  PaginatedBlogsResponse,
+} from "./type";
 
-interface BlogsListResponse {
-  data: Blog[];
-  message: string;
-}
+const BLOGS_PER_PAGE = 9;
 
 export const getPublishedBlogs = async (
-  category?: string,
+  page = 1,
+  limit = BLOGS_PER_PAGE,
   search?: string,
-  tag?: string,
-): Promise<Blog[]> => {
+): Promise<{ data: Blog[]; meta: BlogMeta }> => {
   const params = new URLSearchParams();
-  if (category && category !== "All") params.set("category", category);
-  if (search && search.trim()) params.set("title", search.trim());
-  if (tag && tag.trim()) params.set("tag", tag.trim());
+  params.set("page", String(page));
+  params.set("limit", String(limit));
+  if (search && search.trim()) params.set("searchTerm", search.trim());
 
-  const response = await apiClient.get<BlogsListResponse>(
-    `/blogs?${params.toString()}`,
+  const response = await apiClient.get<PaginatedBlogsResponse>(
+    `/blogs/published?${params.toString()}`,
   );
-  return response.data.data ?? [];
+  return {
+    data: response.data.data ?? [],
+    meta: response.data.meta,
+  };
 };
 
 export const getBlogBySlug = async (slug: string): Promise<Blog> => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Layout from "@/components/Layout";
 import BlogPostsSection from "@/components/blog/BlogPostsSection";
@@ -11,19 +11,19 @@ import { useGetPublishedBlogs } from "@/services/blogs/query";
 
 export default function BlogPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
-  const {
-    data: fetchedBlogs = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetPublishedBlogs();
+  const [page, setPage] = useState(1);
 
-  const blogs = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return fetchedBlogs;
-    return fetchedBlogs.filter((b) => b.title.toLowerCase().includes(q));
-  }, [fetchedBlogs, searchQuery]);
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
+
+  const { data, isLoading, isError, error, refetch } = useGetPublishedBlogs(
+    page,
+    searchQuery,
+  );
+
+  const blogs = data?.data ?? [];
+  const meta = data?.meta;
 
   const heroMedia = [{ type: "image" as const, src: "/images/blog/cover.jpg" }];
 
@@ -58,6 +58,9 @@ export default function BlogPageClient() {
         errorMessage={error?.message}
         onRetry={refetch}
         searchQuery={searchQuery}
+        meta={meta}
+        page={page}
+        onPageChange={setPage}
       />
 
       <RealStoriesSliderSection />

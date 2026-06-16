@@ -1,6 +1,6 @@
 export interface BlogContent {
   order: number;
-  type: "text" | "image" | "video";
+  type: "TEXT" | "IMAGE" | "VIDEO";
   content: string;
   contentKey?: string;
 }
@@ -16,6 +16,19 @@ export interface Blog {
   contents: BlogContent[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BlogMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
+
+export interface PaginatedBlogsResponse {
+  data: Blog[];
+  meta: BlogMeta;
+  message: string;
 }
 
 export interface BlogDetailResponse {

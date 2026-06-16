@@ -1,8 +1,70 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { Chrome, Facebook, Instagram } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTiktok,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
+import { FiGlobe, FiMail, FiPhone } from "react-icons/fi";
+import { useGetWebsiteSettingsInfo } from "@/services/settings/settings-info/query";
+import type {
+  WebsiteLocation,
+  WebsiteSocialLink,
+} from "@/services/settings/settings-info/type";
+
+const fallbackLocations: WebsiteLocation[] = [
+  {
+    id: "head-quarter",
+    title: "Head Quarter",
+    addressLine:
+      "AriMo Glow UK Ltd, 124 City Road, Ec1v 2nx, London, United Kingdom",
+  },
+  {
+    id: "local",
+    title: "Local",
+    addressLine:
+      "AriMo Glow Bangladesh Operation, Ventura Iconia, Level 3, Block H, Banani 11, Dhaka-1213",
+  },
+];
+
+const socialIconMap: Record<string, ReactNode> = {
+  facebook: <FaFacebookF size={16} />,
+  instagram: <FaInstagram size={16} />,
+  linkedin: <FaLinkedinIn size={16} />,
+  twitter: <FaXTwitter size={16} />,
+  x: <FaXTwitter size={16} />,
+  youtube: <FaYoutube size={16} />,
+  tiktok: <FaTiktok size={16} />,
+  email: <FiMail size={16} />,
+  website: <FiGlobe size={16} />,
+};
+
+const getSocialIcon = (name: string): ReactNode => {
+  return socialIconMap[name.trim().toLowerCase()] ?? <FiGlobe size={16} />;
+};
+
+const getValidSocials = (
+  socials: WebsiteSocialLink[] | undefined,
+): WebsiteSocialLink[] => {
+  return (socials ?? []).filter(
+    (social) => social.name.trim() && social.link.trim(),
+  );
+};
 
 export default function Footer() {
+  const { data: settingsInfo } = useGetWebsiteSettingsInfo();
+  const locations =
+    settingsInfo?.locations && settingsInfo.locations.length > 0
+      ? settingsInfo.locations
+      : fallbackLocations;
+  const socials = getValidSocials(settingsInfo?.socials);
+
   return (
     <footer className="bg-black text-white relative overflow-hidden min-h-[600px]">
       {/* Giant BYOU Background Logo */}
@@ -24,16 +86,37 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6">Location</h3>
             <div className="space-y-4 text-sm text-gray-300">
-              <div>
-                <p className="font-semibold text-white mb-1">Head Quarter</p>
-                <p>AriMo Glow UK Ltd</p>
-                <p>124 City Road, Ec1v 2nx, London, United Kingdom</p>
-              </div>
-              <div>
-                <p className="font-semibold text-white mb-1">Local</p>
-                <p>AriMo Glow Bangladesh Operation</p>
-                <p>Ventura Iconia, Level 3, Block H, Banani 11, Dhaka-1213</p>
-              </div>
+              {locations.map((location) => (
+                <div key={location.id}>
+                  <p className="font-semibold text-white mb-1">
+                    {location.title}
+                  </p>
+                  <p>{location.addressLine}</p>
+                  {location.phone && <p>{location.phone}</p>}
+                </div>
+              ))}
+              {(settingsInfo?.email || settingsInfo?.phone) && (
+                <div className="space-y-2 pt-2">
+                  {settingsInfo.email && (
+                    <a
+                      href={`mailto:${settingsInfo.email}`}
+                      className="flex items-center gap-2 hover:text-white transition"
+                    >
+                      <FiMail size={14} />
+                      {settingsInfo.email}
+                    </a>
+                  )}
+                  {settingsInfo.phone && (
+                    <a
+                      href={`tel:${settingsInfo.phone}`}
+                      className="flex items-center gap-2 hover:text-white transition"
+                    >
+                      <FiPhone size={14} />
+                      {settingsInfo.phone}
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -49,26 +132,24 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-gray-300 mb-6 max-w-xs">Just Be You</p>
-            <div className="flex justify-center space-x-4">
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-black transition"
-              >
-                <Chrome size={16} />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-black transition"
-              >
-                <Facebook size={16} />
-              </a>
-              <a
-                href="#"
-                className="w-8 h-8 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-black transition"
-              >
-                <Instagram size={16} />
-              </a>
-            </div>
+            {socials.length > 0 && (
+              <div className="flex justify-center space-x-4">
+                {socials.map((social) => {
+                  return (
+                    <a
+                      key={social.id}
+                      href={social.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.name}
+                      className="w-8 h-8 rounded-full border border-white flex items-center justify-center hover:bg-white hover:text-black transition"
+                    >
+                      {getSocialIcon(social.name)}
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* About Links */}
