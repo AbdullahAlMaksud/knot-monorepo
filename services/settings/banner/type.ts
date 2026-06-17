@@ -1,8 +1,13 @@
 export interface WebsiteBanner {
   _id: string;
-  imageKey: string;
+  title?: string;
+  description?: string;
+  buttonText?: string;
   link?: string;
   pageName?: string;
+  order?: number;
+  mediaKey?: string;
+  imageKey?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -7,7 +7,9 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import ShareButtons from "@/components/shared/ShareButtons";
-import type { Blog } from "@/services/blogs/type";
+import BlogProductCard from "@/components/blog/BlogProductCard";
+import type { Blog, BlogContent } from "@/services/blogs/type";
+import type { ApiProduct } from "@/services/products/type";
 import { sanitizeContent } from "@/lib/sanitize";
 import { cn, getR2ImageUrl } from "@/lib/utils";
 import { useGetBlogBySlug, useGetPublishedBlogs } from "@/services/blogs/query";
@@ -47,9 +49,35 @@ const formatDate = (dateString: string) =>
 const getFirstImage = (blog: Blog): string | undefined => {
   const item = blog.contents.find((c) => c.type === "IMAGE");
   if (!item) return undefined;
-  if (item.content && item.content.startsWith("http")) return item.content;
+  const content = typeof item.content === "string" ? item.content : "";
+  if (content && content.startsWith("http")) return content;
   if (item.contentKey) return getR2ImageUrl(item.contentKey);
   return undefined;
+};
+
+type ContentGroup =
+  | { type: "PRODUCT_GROUP"; items: BlogContent[] }
+  | { type: "SINGLE"; item: BlogContent };
+
+const groupBlogContents = (contents: BlogContent[]): ContentGroup[] => {
+  const groups: ContentGroup[] = [];
+  let i = 0;
+  while (i < contents.length) {
+    const item = contents[i];
+    if (item.type === "PRODUCT") {
+      const productItems: BlogContent[] = [];
+      while (i < contents.length && contents[i].type === "PRODUCT") {
+        productItems.push(contents[i]);
+        i++;
+        if (productItems.length === 3) break;
+      }
+      groups.push({ type: "PRODUCT_GROUP", items: productItems });
+    } else {
+      groups.push({ type: "SINGLE", item });
+      i++;
+    }
+  }
+  return groups;
 };
 
 const isPublishedBlog = (blog: Blog) =>
@@ -102,8 +130,9 @@ export default function BlogPostPage() {
   );
   const heroImage = blog ? getFirstImage(blog) : undefined;
   const description = useMemo(() => {
-    const firstTextContent =
-      sortedContents.find((content) => content.type === "TEXT")?.content || "";
+    const rawContent =
+      sortedContents.find((content) => content.type === "TEXT")?.content ?? "";
+    const firstTextContent = typeof rawContent === "string" ? rawContent : "";
     const plainText = stripHtml(firstTextContent);
 
     return plainText.length > 150 ? `${plainText.slice(0, 147)}...` : plainText;
@@ -153,21 +182,51 @@ export default function BlogPostPage() {
         <article className="py-16 sm:py-24">
           <div className="">
             <div className="space-y-6">
-              {sortedContents.map((item) => {
+              {groupBlogContents(sortedContents).map((group, groupIndex) => {
+                if (group.type === "PRODUCT_GROUP") {
+                  const products = group.items.map(
+                    (item) => item.content as ApiProduct,
+                  );
+                  const colClass =
+                    products.length === 1
+                      ? "flex justify-center"
+                      : products.length === 2
+                        ? "grid grid-cols-2 gap-6"
+                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+                  return (
+                    <div
+                      key={`product-group-${groupIndex}`}
+                      className={colClass}
+                    >
+                      {products.map((product) => (
+                        <div
+                          key={product._id}
+                          className={
+                            products.length === 1 ? "w-full max-w-xs" : ""
+                          }
+                        >
+                          <BlogProductCard product={product} />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                const item = group.item;
                 if (item.type === "TEXT") {
                   return (
                     <div
                       key={item.order}
                       className="prose prose-lg max-w-none text-gray-700 leading-relaxed [&_a]:underline [&_a]:text-black [&_strong]:font-semibold [&_em]:italic"
                       dangerouslySetInnerHTML={{
-                        __html: sanitizeContent(item.content),
+                        __html: sanitizeContent(item.content as string),
                       }}
                     />
                   );
                 }
                 if (item.type === "IMAGE") {
-                  const src = item.content?.startsWith("http")
-                    ? item.content
+                  const content = item.content as string;
+                  const src = content?.startsWith("http")
+                    ? content
                     : item.contentKey
                       ? getR2ImageUrl(item.contentKey)
                       : null;

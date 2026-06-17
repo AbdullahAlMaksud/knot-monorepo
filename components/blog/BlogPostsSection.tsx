@@ -46,7 +46,8 @@ const sidebarCategories = [
 function getFirstImage(blog: Blog): string | undefined {
   const item = blog.contents.find((c) => c.type === "IMAGE");
   if (!item) return undefined;
-  if (item.content && item.content.startsWith("http")) return item.content;
+  const content = typeof item.content === "string" ? item.content : "";
+  if (content && content.startsWith("http")) return content;
   if (item.contentKey) return getR2ImageUrl(item.contentKey);
   return undefined;
 }
@@ -57,8 +58,9 @@ function getFirstText(blog: Blog, maxLength: number) {
   );
 
   if (!item) return "";
+  const text = typeof item.content === "string" ? item.content : "";
 
-  return item.content
+  return text
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim()

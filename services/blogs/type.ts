@@ -1,7 +1,9 @@
+import type { ApiProduct } from "@/services/products/type";
+
 export interface BlogContent {
   order: number;
-  type: "TEXT" | "IMAGE" | "VIDEO";
-  content: string;
+  type: "TEXT" | "IMAGE" | "VIDEO" | "PRODUCT";
+  content: string | ApiProduct;
   contentKey?: string;
 }
 

@@ -19,7 +19,7 @@ export default function Header() {
   const profileHref = session?.user ? "/account" : "/auth/signin";
 
   // Pages that start with transparent header
-  const transparentPages = ["/", "/about", "/lab", "/blog", "/concern"];
+  const transparentPages = ["/", "/about", "/lab", "/concern"];
   const isTransparentPage =
     transparentPages.includes(pathname) || pathname.startsWith("/concern/");
 

@@ -6,7 +6,11 @@ import { usePathname } from "next/navigation";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetWebsiteBannersByRoute } from "@/services/settings/banner/query";
-import { getBannerMediaItems } from "@/services/settings/banner/utils";
+import type { WebsiteBanner } from "@/services/settings/banner/type";
+import {
+  getBannerMediaItem,
+  getBannerPageNameFromPath,
+} from "@/services/settings/banner/utils";
 
 export interface MediaItem {
   type: "image" | "video";
@@ -21,8 +25,8 @@ export interface HeroSearchBarProps {
 }
 
 export interface HeroCarouselProps {
-  mediaItems: MediaItem[];
-  title: string | React.ReactNode;
+  mediaItems?: MediaItem[];
+  title?: string | React.ReactNode;
   description?: string | React.ReactNode;
   buttonText?: string;
   buttonLink?: string;
@@ -31,8 +35,213 @@ export interface HeroCarouselProps {
   searchBar?: HeroSearchBarProps;
 }
 
+interface HeroSlide extends MediaItem {
+  title?: string | React.ReactNode;
+  description?: string | React.ReactNode;
+  buttonText?: string;
+  link?: string;
+}
+
+const FALLBACK_HERO_SLIDES: Record<string, HeroSlide[]> = {
+  home: [
+    {
+      type: "image",
+      src: "/images/home/hero-bg.jpg",
+      title: (
+        <>
+          Unveil Your Natural
+          <br />
+          Glow
+        </>
+      ),
+      description: (
+        <>
+          Byou brings you simple, pure, and effective beauty
+          <br />
+          essentials designed to highlight your true self.
+        </>
+      ),
+      buttonText: "Choose Your Glow",
+      link: "/shop",
+    },
+    {
+      type: "image",
+      src: "/images/about/about-bg.jpg",
+      title: (
+        <>
+          Unveil Your Natural
+          <br />
+          Glow
+        </>
+      ),
+      description: (
+        <>
+          Byou brings you simple, pure, and effective beauty
+          <br />
+          essentials designed to highlight your true self.
+        </>
+      ),
+      buttonText: "Choose Your Glow",
+      link: "/shop",
+    },
+  ],
+  about: [
+    {
+      type: "image",
+      src: "/images/about/about-bg.jpg",
+      title: "Our Story",
+      description: (
+        <>
+          B&apos;You is built on a simple belief: skincare should be personal,
+          and place matters. Bangladesh&apos;s heat, humidity, pollution, and
+          lifestyle demand formulations designed specifically for this
+          environment-not products adapted from elsewhere. That&apos;s why we
+          create premium, science-backed skincare developed exclusively for
+          Bangladeshi skin. Each formula is carefully researched, dermatologist
+          certified, and crafted to deliver safety, comfort, and visible results
+          in real local conditions. Because true confidence begins with healthy
+          skin.
+        </>
+      ),
+      buttonText: "Shop Now",
+      link: "/shop",
+    },
+  ],
+  lab: [
+    {
+      type: "image",
+      src: "/images/lab/lab-bg.jpg",
+      title: (
+        <>
+          Science Meets
+          <br />
+          Beauty
+        </>
+      ),
+      description: (
+        <>
+          Welcome to Byou Labs, where innovation, research, and expert insights
+          come together to create the future of skincare.
+        </>
+      ),
+      buttonText: "Choose Your Glow",
+      link: "/shop",
+    },
+  ],
+};
+
+const isExternalUrl = (value?: string): value is string =>
+  Boolean(value && /^https?:\/\//i.test(value));
+
+const isBareDomain = (value?: string): value is string =>
+  Boolean(value && /^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#].*)?$/i.test(value));
+
+const normalizeLinkHref = (value: string): string => {
+  const trimmed = value.trim();
+
+  if (isExternalUrl(trimmed)) return trimmed;
+  if (isBareDomain(trimmed)) return `https://${trimmed}`;
+
+  return trimmed;
+};
+
+function LinkWrapper({
+  href,
+  className,
+  children,
+  ...props
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+} & React.ComponentPropsWithoutRef<"a">) {
+  const normalizedHref = normalizeLinkHref(href);
+
+  if (isExternalUrl(normalizedHref)) {
+    return (
+      <a
+        href={normalizedHref}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={normalizedHref} className={className} {...props}>
+      {children}
+    </Link>
+  );
+}
+
+function SlideMedia({
+  slide,
+  isActive,
+}: {
+  slide: HeroSlide;
+  isActive: boolean;
+}) {
+  const media = (
+    <>
+      {slide.type === "video" ? (
+        <div className="relative h-full w-full">
+          <video
+            className="h-full w-full object-cover"
+            src={slide.src}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+          <div className="absolute inset-0 bg-black/35 sm:bg-black/25" />
+        </div>
+      ) : (
+        <div
+          className="h-full w-full bg-cover bg-center"
+          style={{ backgroundImage: `url(${slide.src})` }}
+        >
+          <div className="h-full w-full bg-black/35 sm:bg-black/25" />
+        </div>
+      )}
+    </>
+  );
+
+  const baseClassName = `absolute inset-0 block transition-opacity duration-1000 ${
+    isActive
+      ? "pointer-events-auto z-10 opacity-100"
+      : "pointer-events-none z-0 opacity-0"
+  }`;
+
+  if (slide.link && !slide.buttonText) {
+    return (
+      <LinkWrapper href={slide.link} className={baseClassName}>
+        {media}
+      </LinkWrapper>
+    );
+  }
+
+  return <div className={baseClassName}>{media}</div>;
+}
+
+function getBannerSlide(banner: WebsiteBanner): HeroSlide | undefined {
+  const mediaItem = getBannerMediaItem(banner);
+  if (!mediaItem) return undefined;
+
+  return {
+    ...mediaItem,
+    title: banner.title || undefined,
+    description: banner.description || undefined,
+    buttonText: banner.buttonText || undefined,
+    link: banner.link || undefined,
+  } satisfies HeroSlide;
+}
+
 export default function HeroCarousel({
-  mediaItems,
+  mediaItems = [],
   title,
   description,
   buttonText,
@@ -42,21 +251,54 @@ export default function HeroCarousel({
   searchBar,
 }: HeroCarouselProps) {
   const pathname = usePathname();
+  const pageName = getBannerPageNameFromPath(pathname);
   const { data: routeBanners = [] } = useGetWebsiteBannersByRoute(pathname);
-  const routeBannerMediaItems = useMemo(
-    () => getBannerMediaItems(routeBanners),
+  const routeBannerSlides = useMemo(
+    () =>
+      routeBanners
+        .map(getBannerSlide)
+        .filter((slide): slide is HeroSlide => Boolean(slide)),
     [routeBanners],
   );
-  const resolvedMediaItems =
-    routeBannerMediaItems.length > 0 ? routeBannerMediaItems : mediaItems;
+  const fallbackSlides = useMemo(
+    () => FALLBACK_HERO_SLIDES[pageName] ?? [],
+    [pageName],
+  );
+  const resolvedSlides = useMemo<HeroSlide[]>(() => {
+    if (routeBanners.length > 0) {
+      return routeBannerSlides;
+    }
+
+    if (mediaItems.length > 0) {
+      return mediaItems.map<HeroSlide>((item) => ({
+        ...item,
+        title,
+        description,
+        buttonText,
+        link: buttonLink,
+      }));
+    }
+
+    return fallbackSlides;
+  }, [
+    buttonLink,
+    buttonText,
+    description,
+    fallbackSlides,
+    mediaItems,
+    routeBanners.length,
+    routeBannerSlides,
+    title,
+  ]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const activeIndex =
-    currentIndex < resolvedMediaItems.length ? currentIndex : 0;
+  const activeIndex = currentIndex < resolvedSlides.length ? currentIndex : 0;
+  const activeSlide = resolvedSlides[activeIndex];
+  const hasOverlayInteraction = Boolean(searchBar || activeSlide?.buttonText);
 
   // Auto-play functionality
   useEffect(() => {
-    if (!autoPlay || resolvedMediaItems.length <= 1) return;
+    if (!autoPlay || resolvedSlides.length <= 1) return;
 
     // Clear any existing interval
     if (intervalRef.current) {
@@ -65,7 +307,7 @@ export default function HeroCarousel({
 
     // Set up new interval
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
+      setCurrentIndex((prev) => (prev + 1) % resolvedSlides.length);
     }, autoPlayInterval);
 
     return () => {
@@ -73,31 +315,30 @@ export default function HeroCarousel({
         clearInterval(intervalRef.current);
       }
     };
-  }, [autoPlay, resolvedMediaItems.length, autoPlayInterval]);
+  }, [autoPlay, resolvedSlides.length, autoPlayInterval]);
 
   // Reset interval when user manually changes slide
   const resetAutoPlay = () => {
-    if (!autoPlay || resolvedMediaItems.length <= 1) return;
+    if (!autoPlay || resolvedSlides.length <= 1) return;
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
+      setCurrentIndex((prev) => (prev + 1) % resolvedSlides.length);
     }, autoPlayInterval);
   };
 
   const goToPrevious = () => {
     setCurrentIndex(
-      (prev) =>
-        (prev - 1 + resolvedMediaItems.length) % resolvedMediaItems.length,
+      (prev) => (prev - 1 + resolvedSlides.length) % resolvedSlides.length,
     );
     resetAutoPlay();
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % resolvedMediaItems.length);
+    setCurrentIndex((prev) => (prev + 1) % resolvedSlides.length);
     resetAutoPlay();
   };
 
@@ -106,42 +347,23 @@ export default function HeroCarousel({
     resetAutoPlay();
   };
 
-  if (resolvedMediaItems.length === 0) return null;
+  if (resolvedSlides.length === 0) return null;
 
   return (
     <section className="relative h-svh overflow-hidden">
       {/* Media Carousel */}
       <div className="absolute inset-0">
-        {resolvedMediaItems.map((item, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === activeIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {item.type === "video" ? (
-              <video
-                className="w-full h-full object-cover"
-                src={item.src}
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
-            ) : (
-              <div
-                className="w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${item.src})` }}
-              >
-                <div className="w-full h-full bg-black/35 sm:bg-black/25" />
-              </div>
-            )}
-          </div>
+        {resolvedSlides.map((slide, index) => (
+          <SlideMedia
+            key={`${slide.src}-${index}`}
+            slide={slide}
+            isActive={index === activeIndex}
+          />
         ))}
       </div>
 
       {/* Navigation Arrows */}
-      {resolvedMediaItems.length > 1 && (
+      {resolvedSlides.length > 1 && (
         <>
           <Button
             type="button"
@@ -167,19 +389,25 @@ export default function HeroCarousel({
       )}
 
       {/* Content Overlay */}
-      <div className="relative z-10 flex h-full items-end px-4 pb-24 pt-28 sm:items-center sm:px-6 sm:pb-20 sm:pt-32 lg:px-8 lg:pt-36">
+      <div className="pointer-events-none relative z-10 flex h-full items-end px-4 pb-24 pt-28 sm:items-center sm:px-6 sm:pb-20 sm:pt-32 lg:px-8 lg:pt-36">
         <div className="mx-auto w-full max-w-7xl">
-          <div className="max-w-xl text-white lg:max-w-2xl">
-            <h1 className="mb-4 text-4xl leading-[0.95] font-semibold tracking-[0.08em] sm:text-5xl sm:tracking-[0.12em] lg:text-7xl lg:tracking-[0.16em]">
-              {title}
-            </h1>
-            {description && (
+          <div
+            className={`max-w-xl text-white lg:max-w-2xl ${
+              hasOverlayInteraction ? "pointer-events-auto" : ""
+            }`}
+          >
+            {activeSlide?.title ? (
+              <h1 className="mb-4 text-4xl leading-[0.95] font-semibold tracking-[0.08em] sm:text-5xl sm:tracking-[0.12em] lg:text-7xl lg:tracking-[0.16em]">
+                {activeSlide.title}
+              </h1>
+            ) : null}
+            {activeSlide?.description ? (
               <p className="mb-6 max-w-md text-sm leading-relaxed tracking-normal text-white/90 sm:text-base sm:tracking-[0.08em] lg:max-w-xl lg:text-lg">
-                {description}
+                {activeSlide.description}
               </p>
-            )}
+            ) : null}
             {searchBar ? (
-              <div className="relative mt-2 w-full max-w-[28rem]">
+              <div className="relative mt-2 w-full max-w-md">
                 <Search
                   className="absolute left-5 top-1/2 -translate-y-1/2 text-black/40"
                   size={18}
@@ -190,25 +418,33 @@ export default function HeroCarousel({
                   value={searchBar.value ?? ""}
                   onChange={(e) => searchBar.onChange?.(e.target.value)}
                   placeholder={searchBar.placeholder ?? "Search..."}
-                  className="h-[3.25rem] w-full rounded-full bg-white pl-12 pr-6 text-[0.96rem] text-black placeholder:text-black/38 focus:outline-none"
+                  className="h-13 w-full rounded-full bg-white pl-12 pr-6 text-[0.96rem] text-black placeholder:text-black/38 focus:outline-none"
                 />
               </div>
-            ) : buttonText ? (
-              <Button
-                asChild
-                className="min-w-[160px] rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-[180px]"
-              >
-                <Link href={buttonLink}>{buttonText}</Link>
-              </Button>
+            ) : activeSlide?.buttonText ? (
+              activeSlide.link ? (
+                <Button
+                  asChild
+                  className="min-w-40 rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-45"
+                >
+                  <LinkWrapper href={activeSlide.link}>
+                    {activeSlide.buttonText}
+                  </LinkWrapper>
+                </Button>
+              ) : (
+                <Button className="min-w-40 rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-45">
+                  {activeSlide.buttonText}
+                </Button>
+              )
             ) : null}
           </div>
         </div>
       </div>
 
       {/* Dots Indicator */}
-      {resolvedMediaItems.length > 1 && (
+      {resolvedSlides.length > 1 && (
         <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2 sm:bottom-8">
-          {resolvedMediaItems.map((_, index) => (
+          {resolvedSlides.map((_, index) => (
             <Button
               key={index}
               type="button"
