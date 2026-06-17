@@ -7,7 +7,7 @@ import { blogsQueryKeys } from "./querykey";
 export const useGetPublishedBlogs = (
   page = 1,
   search?: string,
-  limit = 9,
+  limit = 10,
   enabled = true,
 ) =>
   useQuery({
