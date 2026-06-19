@@ -52,6 +52,14 @@ export default function BlogProductCard({ product }: BlogProductCardProps) {
       name: product.name,
       price: pricing.discountedPrice,
       image: displayImage,
+      quantity: 1,
+      originalPrice: pricing.originalPrice,
+      discountAmount: pricing.discountAmount,
+      currency: pricing.currency,
+      discountType: pricing.discountType,
+      discountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.value) : (selectedVariant?.discountValue ? Number(selectedVariant.discountValue) : undefined),
+      maxDiscountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.maxValue || selectedVariant.discountType.maxAmount) : (selectedVariant?.discountMaxValue ? Number(selectedVariant.discountMaxValue) : undefined),
+      isDiscounted: pricing.hasDiscount,
     });
   };
 
@@ -64,6 +72,13 @@ export default function BlogProductCard({ product }: BlogProductCardProps) {
       price: pricing.discountedPrice,
       image: displayImage,
       quantity: 1,
+      originalPrice: pricing.originalPrice,
+      discountAmount: pricing.discountAmount,
+      currency: pricing.currency,
+      discountType: pricing.discountType,
+      discountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.value) : (selectedVariant?.discountValue ? Number(selectedVariant.discountValue) : undefined),
+      maxDiscountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.maxValue || selectedVariant.discountType.maxAmount) : (selectedVariant?.discountMaxValue ? Number(selectedVariant.discountMaxValue) : undefined),
+      isDiscounted: pricing.hasDiscount,
     });
     router.push("/checkout");
   };

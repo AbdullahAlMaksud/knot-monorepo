@@ -5,6 +5,13 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  originalPrice?: number;
+  discountAmount?: number;
+  currency?: string;
+  discountType?: string;
+  discountValue?: number;
+  maxDiscountValue?: number;
+  isDiscounted?: boolean;
 }
 
 const STORAGE_KEY = "byou-cart";

@@ -32,3 +32,10 @@ export const useGetProductById = (id: string) =>
     queryFn: () => getProductById(id),
     enabled: !!id,
   });
+
+export const useSearchProducts = (searchTerm: string, limit = 5, enabled = true) =>
+  useQuery({
+    queryKey: productsQueryKeys.search(searchTerm, limit),
+    queryFn: () => getPublishedProducts({ searchTerm, limit }),
+    enabled: enabled && !!searchTerm,
+  });

@@ -45,6 +45,10 @@ export default function Home() {
     () => products.filter((product) => product.isFeatured),
     [products],
   );
+  const homeFeaturedProducts = useMemo(
+    () => featuredProducts.slice(0, 4),
+    [featuredProducts],
+  );
   const heroMist = useMemo(
     () => buildHeroProduct(featuredProducts[0] ?? products[0]),
     [featuredProducts, products],
@@ -59,11 +63,11 @@ export default function Home() {
       <LoadingLogo />
       <Layout>
         <HeroCarousel />
-        {products.length > 0 && (
+        {homeFeaturedProducts.length > 0 && (
           <CoreProductsSection
             subtitle="MADE JUST FOR YOU"
             title="Our Core Products"
-            products={products}
+            products={homeFeaturedProducts}
           />
         )}
         <Info />

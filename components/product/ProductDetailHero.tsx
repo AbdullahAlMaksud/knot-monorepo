@@ -52,6 +52,13 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
       price,
       image: currentImage,
       quantity,
+      originalPrice: pricing.originalPrice,
+      discountAmount: pricing.discountAmount,
+      currency: pricing.currency,
+      discountType: pricing.discountType,
+      discountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.value) : (selectedVariant?.discountValue ? Number(selectedVariant.discountValue) : undefined),
+      maxDiscountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.maxValue || selectedVariant.discountType.maxAmount) : (selectedVariant?.discountMaxValue ? Number(selectedVariant.discountMaxValue) : undefined),
+      isDiscounted: pricing.hasDiscount,
     });
   };
 
@@ -65,6 +72,13 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
       price,
       image: currentImage,
       quantity,
+      originalPrice: pricing.originalPrice,
+      discountAmount: pricing.discountAmount,
+      currency: pricing.currency,
+      discountType: pricing.discountType,
+      discountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.value) : (selectedVariant?.discountValue ? Number(selectedVariant.discountValue) : undefined),
+      maxDiscountValue: typeof selectedVariant?.discountType === "object" ? Number(selectedVariant.discountType.maxValue || selectedVariant.discountType.maxAmount) : (selectedVariant?.discountMaxValue ? Number(selectedVariant.discountMaxValue) : undefined),
+      isDiscounted: pricing.hasDiscount,
     });
     router.push("/checkout?mode=buy-now");
   };
@@ -138,11 +152,18 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
               currency={pricing.currency}
             />
             {pricing.hasDiscount && (
-              <CurrencyAmount
-                amount={pricing.originalPrice}
-                currency={pricing.currency}
-                className="text-gray-400 line-through"
-              />
+              <>
+                <CurrencyAmount
+                  amount={pricing.originalPrice}
+                  currency={pricing.currency}
+                  className="text-gray-400 line-through"
+                />
+                <span className="inline-flex items-center bg-red-50 text-red-700 px-2 py-0.5 rounded text-xs font-bold">
+                  {pricing.discountType === "PERCENTAGE" || pricing.discountType === "PERCENT"
+                    ? `-${Math.round((pricing.discountAmount / pricing.originalPrice) * 100)}%`
+                    : `-${pricing.discountAmount} ${pricing.currency === "BDT" ? "৳" : pricing.currency}`}
+                </span>
+              </>
             )}
           </div>
 

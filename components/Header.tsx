@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import CartDrawer from "./CartDrawer";
+import SearchModal from "./SearchModal";
 import { useCart } from "@/lib/cart/CartContext";
 import { useAuthSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const { itemCount } = useCart();
   const { data: session } = useAuthSession();
@@ -158,7 +160,12 @@ export default function Header() {
                 isSolid ? "text-black" : "text-white"
               }`}
             >
-              <Button variant="ghost" size="icon" className="hover:opacity-70">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:opacity-70"
+                onClick={() => setSearchOpen(true)}
+              >
                 <Search size={20} />
               </Button>
               {session?.user ? (
@@ -274,6 +281,9 @@ export default function Header() {
 
       {/* Cart Drawer */}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

@@ -6,7 +6,12 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
 import { Button } from "@/components/ui/button";
 import CurrencyAmount from "@/components/ui/currency-amount";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -15,32 +20,18 @@ interface CartDrawerProps {
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items: cartItems, updateQuantity, removeItem, total } = useCart();
-  useBodyScrollLock(isOpen);
-
-  if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        side="right"
+        className="w-full sm:w-[360px] p-0 flex flex-col h-full bg-white border-l border-stone-200"
+        showCloseButton={false}
         data-lenis-prevent
-        className={`fixed inset-0 bg-black/50 z-50 transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div
-        data-lenis-prevent
-        className={`fixed right-0 top-0 h-full w-full sm:w-[360px] bg-white z-50 shadow-xl flex flex-col transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-        onWheel={(event) => event.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-black text-white p-5 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Cart</h2>
+        <SheetHeader className="bg-black text-white p-5 flex flex-row items-center justify-between space-y-0 shrink-0">
+          <SheetTitle className="text-xl font-semibold text-white">Cart</SheetTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -49,7 +40,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           >
             <X size={24} />
           </Button>
-        </div>
+        </SheetHeader>
 
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -66,11 +57,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 {/* Product Image */}
                 <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-lg overflow-hidden relative">
                   <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover"
+                     src={item.image}
+                     alt={item.name}
+                     fill
+                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                     className="object-cover"
                   />
                 </div>
 
@@ -81,9 +72,23 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <h3 className="font-semibold text-sm mb-1">
                         {item.name}
                       </h3>
-                      <p className="text-base font-semibold">
-                        <CurrencyAmount amount={item.price} />
-                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="text-sm font-semibold">
+                          <CurrencyAmount amount={item.price} />
+                        </p>
+                        {item.isDiscounted && item.originalPrice && item.originalPrice > item.price && (
+                          <>
+                            <span className="text-xs text-gray-400 line-through">
+                              <CurrencyAmount amount={item.originalPrice} />
+                            </span>
+                            <span className="inline-flex items-center bg-red-50 text-red-700 px-1 py-0.2 rounded text-[9px] font-bold">
+                              {item.discountType === "PERCENTAGE" || item.discountType === "PERCENT"
+                                ? `-${Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}%`
+                                : `-${item.originalPrice - item.price} ${item.currency === "BDT" ? "৳" : item.currency || ""}`}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <Button
                       type="button"
@@ -139,18 +144,18 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         </div>
 
         {/* Footer */}
-        <div className="border-t p-5 space-y-3">
+        <div className="border-t p-5 space-y-3 shrink-0">
           <div className="flex items-center justify-between text-xl font-bold">
             <span>Total</span>
             <span>
               <CurrencyAmount amount={total} />
             </span>
           </div>
-          <Button className="w-full rounded-full font-semibold" asChild>
+          <Button className="w-full rounded-full font-semibold" asChild onClick={onClose}>
             <Link href="/checkout">Check Out</Link>
           </Button>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }

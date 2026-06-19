@@ -4,7 +4,10 @@ import SkinTypeIcon from "@/components/icons/SkinTypeIcon";
 import Ingredients from "@/components/icons/Ingredients";
 import Cruelty from "@/components/icons/Cruelty";
 import Eco from "@/components/icons/Eco";
-import type { InfoFeature } from "@/data/products";
+export interface InfoFeature {
+  title: string;
+  description: string;
+}
 
 const icons = [
   <DermatologistIcon key="dermatologist" />,

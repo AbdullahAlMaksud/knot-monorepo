@@ -3,4 +3,6 @@ export const productsQueryKeys = {
   paginated: (page: number, limit: number) =>
     ["products", "published", "paginated", page, limit] as const,
   detail: (slug: string) => ["products", "published", slug] as const,
+  search: (searchTerm: string, limit: number) =>
+    ["products", "published", "search", searchTerm, limit] as const,
 };

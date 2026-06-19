@@ -40,6 +40,7 @@ export default function ScratchCouponOffer() {
   }, []);
 
   const THRESHOLD = isDebug ? 15 * 1000 : 1 * 60 * 1000; // 15s for debug, 1m for production
+  const REAPPEAR_THRESHOLD = isDebug ? 30 * 1000 : 5 * 60 * 1000; // 30s for debug, 5m for production
   const COUPON_CODE = "SERUM20";
 
   // Lock body scroll when modal is open
@@ -47,6 +48,7 @@ export default function ScratchCouponOffer() {
 
   // Main timer and observer loop
   const userId = user?.id;
+
   useEffect(() => {
     if (!mounted) return;
 
@@ -61,10 +63,29 @@ export default function ScratchCouponOffer() {
       // 1. Check logged-in or empty cart -> Clear states
       if (isLoggedIn || !hasItems) {
         localStorage.removeItem("byou_cart_abandoned_start");
-        localStorage.removeItem("byou_scratch_offer_dismissed_at");
+        localStorage.removeItem("byou_scratch_offer_last_closed_at");
         localStorage.removeItem("byou_coupon_expiry_time");
         if (showModal) setShowModal(false);
         if (timeLeft > 0) setTimeLeft(0);
+        return;
+      }
+
+      // Check if coupon claimed in this session
+      const claimedInSession = sessionStorage.getItem("byou_scratch_offer_claimed_in_session") === "true";
+      if (claimedInSession) {
+        if (showModal) setShowModal(false);
+        const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
+        if (couponExpiry) {
+          const remaining = Number(couponExpiry) - now;
+          if (remaining <= 0) {
+            localStorage.removeItem("byou_coupon_expiry_time");
+            setTimeLeft(0);
+          } else {
+            setTimeLeft(Math.ceil(remaining / 1000));
+          }
+        } else {
+          if (timeLeft > 0) setTimeLeft(0);
+        }
         return;
       }
 
@@ -76,21 +97,21 @@ export default function ScratchCouponOffer() {
       }
 
       const elapsed = now - Number(abandonedStart);
-      const isDismissed = localStorage.getItem("byou_scratch_offer_dismissed_at") === "true";
       const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
+      const lastClosedAt = localStorage.getItem("byou_scratch_offer_last_closed_at");
 
-      // Trigger modal if elapsed threshold is met, not dismissed, and coupon timer not running yet
-      if (elapsed >= THRESHOLD && !isDismissed && !couponExpiry && !showModal) {
+      const isReappearEligible = !lastClosedAt || (now - Number(lastClosedAt) >= REAPPEAR_THRESHOLD);
+
+      // Trigger modal if elapsed threshold is met, not dismissed recently, and coupon timer not running yet
+      if (elapsed >= THRESHOLD && !couponExpiry && !showModal && isReappearEligible) {
         setShowModal(true);
       }
 
-      // 3. Update corner countdown timer if coupon has been generated/dismissed
+      // 3. Update corner countdown timer if coupon has been generated
       if (couponExpiry) {
         const remaining = Number(couponExpiry) - now;
         if (remaining <= 0) {
           localStorage.removeItem("byou_coupon_expiry_time");
-          localStorage.removeItem("byou_scratch_offer_dismissed_at");
-          localStorage.removeItem("byou_cart_abandoned_start");
           setTimeLeft(0);
         } else {
           setTimeLeft(Math.ceil(remaining / 1000));
@@ -99,7 +120,7 @@ export default function ScratchCouponOffer() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [mounted, userId, showModal, THRESHOLD, timeLeft]);
+  }, [mounted, userId, showModal, THRESHOLD, REAPPEAR_THRESHOLD, timeLeft]);
 
   // Canvas Initializer
   useEffect(() => {
@@ -219,24 +240,27 @@ export default function ScratchCouponOffer() {
     };
   }, [showModal]);
 
-  // Close modal -> start timer
+  // Close modal -> do not start timer, just record closed timestamp for reappear logic
   const handleClose = () => {
-    localStorage.setItem("byou_scratch_offer_dismissed_at", "true");
-    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes from now
-    localStorage.setItem("byou_coupon_expiry_time", expiry.toString());
+    localStorage.setItem("byou_scratch_offer_last_closed_at", Date.now().toString());
+    localStorage.removeItem("byou_coupon_expiry_time");
+    setTimeLeft(0);
     setShowModal(false);
   };
 
-  // Claim button click -> navigate to checkout
+  // Claim button click -> navigate to checkout, apply coupon automatically
   const handleClaim = () => {
-    // Also copy coupon code for them to make it seamless
     navigator.clipboard.writeText(COUPON_CODE);
     toast.success("Coupon code copied! Redirecting to checkout...");
 
-    // Set dismissed & start timer in background so they still have it if they navigate away
-    localStorage.setItem("byou_scratch_offer_dismissed_at", "true");
+    sessionStorage.setItem("byou_scratch_offer_claimed_in_session", "true");
+    sessionStorage.setItem("byou_claimed_coupon_code", COUPON_CODE);
+
     const expiry = Date.now() + 10 * 60 * 1000;
     localStorage.setItem("byou_coupon_expiry_time", expiry.toString());
+    setTimeLeft(10 * 60);
+
+    localStorage.removeItem("byou_scratch_offer_last_closed_at");
 
     setShowModal(false);
     router.push("/checkout");
@@ -398,7 +422,7 @@ export default function ScratchCouponOffer() {
 
             {/* Hover Tooltip (Bengali prompt text) */}
             <div className="absolute bottom-14 right-0 bg-[#FAF8F5] border border-[#EBE8E0] text-black text-[11px] font-medium py-1 px-3 rounded-md shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-              কোপনটি কপি করতে ক্লিক করুন
+              Click to copy coupon
             </div>
           </div>
         </div>
