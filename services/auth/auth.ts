@@ -6,9 +6,11 @@ export interface SendOtpResponse {
 }
 
 export interface VerifyOtpResponse {
-  success: boolean;
+  success?: boolean;
   message?: string;
   data?: any;
+  token?: string;
+  user?: any;
 }
 
 export interface SocialSignInResponse {
@@ -43,6 +45,13 @@ export const verifyEmailOtp = async (
     body.name = name;
   }
   const response = await apiClient.post("/auth/sign-in/email-otp", body);
+  return response.data;
+};
+
+export const updateUser = async (
+  name: string
+): Promise<{ status: boolean; message?: string }> => {
+  const response = await apiClient.post("/auth/update-user", { name });
   return response.data;
 };
 

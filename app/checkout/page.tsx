@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import Layout from "@/components/Layout";
 import ShippingForm from "@/components/checkout/ShippingForm";
@@ -53,9 +53,10 @@ export default function CheckoutPage() {
 }
 
 function CheckoutPageContent() {
-  const { data: session } = useAuthSession();
+  const { data: session, isPending } = useAuthSession();
   const { id: userId } = session?.user || {};
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { items: cartItems, updateCartItems } = useCart();
   const { countryCode, country } = useUserCountry();
   const { data: currencies = [] } = useGetCurrencies();
@@ -422,6 +423,12 @@ function CheckoutPageContent() {
     couponError,
   ]);
 
+  useEffect(() => {
+    if (!isPending && !session?.user) {
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent("/checkout")}`);
+    }
+  }, [session, isPending, router]);
+
   //  Backend field → frontend field mapping
   const fieldMap: Record<string, keyof CheckoutFormData> = {
     "shipment.name": "name",
@@ -550,6 +557,18 @@ function CheckoutPageContent() {
     };
     createOrder(payload);
   };
+
+  if (isPending || !session?.user) {
+    return (
+      <Layout>
+        <section className="py-16 sm:py-36">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p className="text-gray-500">Redirecting to login...</p>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

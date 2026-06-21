@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import OAuthSignInOptions from "@/components/auth/OAuthSignInOptions";
@@ -27,6 +27,7 @@ import {
   getCountryPhoneOption,
 } from "@/lib/country-phone-options";
 import { sendEmailOtp, verifyEmailOtp, socialSignIn } from "@/services/auth/auth";
+import { useAuthSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 type SignUpFormData = {
@@ -39,6 +40,9 @@ type SignUpFormData = {
 
 export default function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const { refetch: refetchSession } = useAuthSession();
   const [activeTab, setActiveTab] = useState<"email" | "phone">("email");
   const [otpSent, setOtpSent] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -133,9 +137,10 @@ export default function SignUpForm() {
       if (activeTab === "email") {
         // For sign-up, always pass the name parameter to the verify OTP API
         const res = await verifyEmailOtp(data.email, data.otp, data.name);
-        if (res.success) {
+        if (res.token || res.user || res.success) {
+          await refetchSession();
           toast.success("Account created and signed in successfully!");
-          router.push("/account");
+          router.push(callbackUrl);
           router.refresh();
         } else {
           toast.error(res.message || "Invalid verification code.");
@@ -144,8 +149,9 @@ export default function SignUpForm() {
         // Phone mock verify OTP
         await new Promise((resolve) => setTimeout(resolve, 800));
         if (data.otp === "123456") {
+          await refetchSession();
           toast.success(`Account for ${data.name} created successfully! (Demo)`);
-          router.push("/account");
+          router.push(callbackUrl);
           router.refresh();
         } else {
           toast.error("Invalid verification code. Please try 123456.");

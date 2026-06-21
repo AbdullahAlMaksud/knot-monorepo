@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import OAuthSignInOptions from "@/components/auth/OAuthSignInOptions";
@@ -26,7 +26,8 @@ import {
   countryPhoneOptions,
   getCountryPhoneOption,
 } from "@/lib/country-phone-options";
-import { sendEmailOtp, verifyEmailOtp, socialSignIn } from "@/services/auth/auth";
+import { sendEmailOtp, verifyEmailOtp, socialSignIn, updateUser } from "@/services/auth/auth";
+import { useAuthSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 type SignInFormData = {
@@ -34,12 +35,17 @@ type SignInFormData = {
   countryIso2: string;
   phone: string;
   otp: string;
+  name: string;
 };
 
 export default function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const { refetch: refetchSession } = useAuthSession();
   const [activeTab, setActiveTab] = useState<"email" | "phone">("email");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -56,6 +62,7 @@ export default function SignInForm() {
       phone: "",
       email: "",
       otp: "",
+      name: "",
     },
   });
 
@@ -125,11 +132,25 @@ export default function SignInForm() {
     setIsPending(true);
     try {
       if (activeTab === "email") {
-        const res = await verifyEmailOtp(data.email, data.otp);
-        if (res.success) {
-          toast.success("Signed in successfully!");
-          router.push("/account");
-          router.refresh();
+        const nameFromEmail = data.email.split("@")[0].replace(/[^a-zA-Z]/g, " ").trim() || "Customer";
+        const formattedName = nameFromEmail
+          .split(/\s+/)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(" ");
+        const res = await verifyEmailOtp(data.email, data.otp, formattedName);
+        if (res.token || res.user || res.success) {
+          const userObj = res.user || res.data?.user;
+          const hasName = userObj?.name && userObj.name !== "Customer" && userObj.name.trim().length > 0;
+          if (hasName) {
+            await refetchSession();
+            toast.success("Signed in successfully!");
+            router.push(callbackUrl);
+            router.refresh();
+          } else {
+            await refetchSession();
+            toast.success("Verification successful!");
+            setOtpVerified(true);
+          }
         } else {
           toast.error(res.message || "Invalid verification code.");
         }
@@ -137,8 +158,9 @@ export default function SignInForm() {
         // Phone mock verify OTP
         await new Promise((resolve) => setTimeout(resolve, 800));
         if (data.otp === "123456") {
+          await refetchSession();
           toast.success("Signed in successfully! (Demo)");
-          router.push("/account");
+          router.push(callbackUrl);
           router.refresh();
         } else {
           toast.error("Invalid verification code. Please try 123456.");
@@ -146,6 +168,26 @@ export default function SignInForm() {
       }
     } catch (err: any) {
       toast.error(err.message || "Verification failed. Please try again.");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleUpdateName = async (data: SignInFormData) => {
+    setIsPending(true);
+    try {
+      const finalName = data.name.trim();
+      const updateRes = await updateUser(finalName);
+      if (updateRes.status === true) {
+        await refetchSession();
+        toast.success("Signed in successfully!");
+        router.push(callbackUrl);
+        router.refresh();
+      } else {
+        toast.error(updateRes.message || "Failed to update profile name.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred. Please try again.");
     } finally {
       setIsPending(false);
     }
@@ -177,7 +219,7 @@ export default function SignInForm() {
       </h1>
 
       {/* Tabs Selector */}
-      {!otpSent && (
+      {!otpSent && !otpVerified && (
         <div className="flex border-b border-gray-200 mb-8">
           <button
             type="button"
@@ -208,7 +250,7 @@ export default function SignInForm() {
 
       {/* Forms Content */}
       <div className="transition-all duration-300 ease-in-out">
-        {!otpSent ? (
+        {!otpSent && !otpVerified ? (
           <form onSubmit={handleSubmit(handleSendOtp)} className="space-y-6">
             {activeTab === "email" ? (
               <div>
@@ -348,6 +390,44 @@ export default function SignInForm() {
               </Link>
             </div>
           </form>
+        ) : otpVerified ? (
+          /* Name Input Form */
+          <form onSubmit={handleSubmit(handleUpdateName)} className="space-y-6">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                {...register("name", {
+                  required: "Name is required",
+                  validate: (value) =>
+                    value.trim().length >= 2 || "Name must be at least 2 characters",
+                })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition mb-4"
+                placeholder="Your name"
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600 mb-4">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full rounded-full py-3 bg-black hover:bg-gray-800 text-white font-medium"
+              >
+                {isPending ? "Saving..." : "Save & Continue"}
+              </Button>
+            </div>
+          </form>
         ) : (
           /* OTP Verification Form */
           <form onSubmit={handleSubmit(handleVerifyOtp)} className="space-y-6">
@@ -419,7 +499,7 @@ export default function SignInForm() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => handleSendOtp({ email: currentEmail, phone: currentPhone, countryIso2: selectedCountryIso2, otp: "" })}
+                  onClick={() => handleSendOtp({ name: "", email: currentEmail, phone: currentPhone, countryIso2: selectedCountryIso2, otp: "" })}
                   className="text-xs text-black font-semibold hover:underline"
                 >
                   Resend code
@@ -441,11 +521,13 @@ export default function SignInForm() {
       </div>
 
       {/* Google Login Option */}
-      <OAuthSignInOptions
-        onGoogleSignIn={handleGoogleSignIn}
-        isGooglePending={isGooglePending}
-        enabled={true}
-      />
+      {!otpVerified && (
+        <OAuthSignInOptions
+          onGoogleSignIn={handleGoogleSignIn}
+          isGooglePending={isGooglePending}
+          enabled={true}
+        />
+      )}
     </div>
   );
 }
