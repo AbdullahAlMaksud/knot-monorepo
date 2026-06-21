@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getAllCurrencies, getAllShippingCharges, validateCoupon } from "./api";
+import { getAllCurrencies, getAllShippingCharges, validateCoupon, getActiveCoupons } from "./api";
 
 export const useGetCurrencies = () =>
   useQuery({
@@ -11,6 +11,12 @@ export const useGetShippingCharges = () =>
   useQuery({
     queryKey: ["shipping-charges"],
     queryFn: getAllShippingCharges,
+  });
+
+export const useGetActiveCoupons = () =>
+  useQuery({
+    queryKey: ["active-coupons"],
+    queryFn: getActiveCoupons,
   });
 
 export const useValidateCoupon = () =>

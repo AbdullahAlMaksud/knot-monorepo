@@ -215,18 +215,8 @@ function CheckoutPageContent() {
 
   const couponDiscountAmount = useMemo(() => {
     if (!appliedCoupon) return 0;
-
-    let discount = 0;
-    if (appliedCoupon.discountType === "FLAT") {
-      discount = appliedCoupon.discountValue;
-    } else if (appliedCoupon.discountType === "PERCENTAGE" || appliedCoupon.discountType === "PERCENT") {
-      discount = (subtotal * appliedCoupon.discountValue) / 100;
-      if (appliedCoupon.maxDiscountAmount) {
-        discount = Math.min(discount, appliedCoupon.maxDiscountAmount);
-      }
-    }
-    return Math.round(Math.min(discount, subtotal));
-  }, [appliedCoupon, subtotal]);
+    return appliedCoupon.discountAmount ?? 0;
+  }, [appliedCoupon]);
 
   const shippingFee = useMemo(() => {
     if (!activeShippingCharge) return 0;
@@ -392,6 +382,7 @@ function CheckoutPageContent() {
           code: storedCoupon,
           orderAmount: subtotal,
           userId: userId,
+          currencyId: activeCurrency?._id,
         },
         {
           onSuccess: (res) => {
@@ -421,6 +412,7 @@ function CheckoutPageContent() {
     appliedCoupon,
     validateCouponMutation,
     couponError,
+    activeCurrency,
   ]);
 
   useEffect(() => {
@@ -481,6 +473,7 @@ function CheckoutPageContent() {
         code: couponCodeInput.trim(),
         orderAmount: subtotal,
         userId: userId,
+        currencyId: activeCurrency?._id,
       },
       {
         onSuccess: (res) => {
@@ -537,7 +530,7 @@ function CheckoutPageContent() {
       ...(userId ? { customerId: userId } : {}),
       orderedItems,
       currencyId: activeCurrency?._id || "",
-      orderAmount: total,
+      orderAmount: subtotal,
       shipment: {
         name: data.name.trim(),
         email: data.email.trim(),

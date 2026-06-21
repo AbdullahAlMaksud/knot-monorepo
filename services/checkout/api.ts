@@ -37,6 +37,7 @@ export interface ValidateCouponParams {
   code: string;
   orderAmount: number;
   userId?: string;
+  currencyId?: string;
 }
 
 export interface ValidateCouponResponse {
@@ -60,4 +61,25 @@ export const validateCoupon = async (
     params
   );
   return response.data;
+};
+
+export interface Coupon {
+  _id: string;
+  code: string;
+  discountType: string;
+  percentageDiscountValue?: number;
+  couponAmountsCurrencies?: {
+    currency: string;
+    minOrderAmount?: number;
+    maxDiscountAmount: number;
+    flatDiscountValue?: number;
+  }[];
+  isActive: boolean;
+  isScratchApplicable: boolean;
+  expiresAt?: string | null;
+}
+
+export const getActiveCoupons = async (): Promise<Coupon[]> => {
+  const response = await apiClient.get<{ data: Coupon[] }>("/coupons/active");
+  return response.data.data;
 };

@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { X, Copy, Check, Gift, Clock } from "lucide-react";
+import { X, Copy, Check, Gift } from "lucide-react";
 import { useCart } from "@/lib/cart/CartContext";
 import { getStoredCart } from "@/lib/cart/types";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { toast } from "sonner";
+import { useGetActiveCoupons, useGetCurrencies } from "@/services/checkout/query";
+import { useUserCountry } from "@/hooks/useUserCountry";
 
 export default function ScratchCouponOffer() {
   const router = useRouter();
@@ -41,7 +43,76 @@ export default function ScratchCouponOffer() {
 
   const THRESHOLD = isDebug ? 15 * 1000 : 1 * 60 * 1000; // 15s for debug, 1m for production
   const REAPPEAR_THRESHOLD = isDebug ? 30 * 1000 : 5 * 60 * 1000; // 30s for debug, 5m for production
-  const COUPON_CODE = "SERUM20";
+
+  const { countryCode } = useUserCountry();
+  const { data: currencies = [] } = useGetCurrencies();
+  const { data: activeCoupons = [] } = useGetActiveCoupons();
+
+  const targetCurrencyCode = useMemo(() => {
+    const code = (countryCode || "BD").toUpperCase();
+    if (code === "BD") return "BDT";
+    if (code === "CA") return "CAD";
+    if (code === "GB") return "GBP";
+    if (code === "US") return "USD";
+    return "";
+  }, [countryCode]);
+
+  const activeCurrency = useMemo(() => {
+    if (currencies.length === 0) return null;
+    const matched = currencies.find((c) => c.code === targetCurrencyCode);
+    if (matched) return matched;
+    return (
+      currencies.find((c) => c.isDefault) ??
+      currencies.find((c) => c.code === "BDT") ??
+      currencies[0]
+    );
+  }, [currencies, targetCurrencyCode]);
+
+  const scratchCoupon = useMemo(() => {
+    if (activeCoupons.length === 0 || !activeCurrency) return null;
+    return activeCoupons.find((coupon) => {
+      if (!coupon.isScratchApplicable) return false;
+      return coupon.couponAmountsCurrencies?.some(
+        (entry) => String(entry.currency) === String(activeCurrency._id)
+      );
+    });
+  }, [activeCoupons, activeCurrency]);
+
+  const couponCode = scratchCoupon?.code || "SAVE2110";
+
+  const discountLabel = useMemo(() => {
+    if (!scratchCoupon) return "GET 20% OFF ALL PRODUCTS";
+    if (scratchCoupon.discountType === "PERCENTAGE" || scratchCoupon.discountType === "PERCENT") {
+      return `GET ${scratchCoupon.percentageDiscountValue}% OFF ALL PRODUCTS`;
+    }
+    if (activeCurrency) {
+      const entry = scratchCoupon.couponAmountsCurrencies?.find(
+        (c) => String(c.currency) === String(activeCurrency._id)
+      );
+      if (entry?.flatDiscountValue) {
+        const symbol = activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
+        return `GET ${symbol}${entry.flatDiscountValue} OFF ALL PRODUCTS`;
+      }
+    }
+    return "GET A SPECIAL DISCOUNT";
+  }, [scratchCoupon, activeCurrency]);
+
+  const claimButtonLabel = useMemo(() => {
+    if (!scratchCoupon) return "Claim 20% Off Now";
+    if (scratchCoupon.discountType === "PERCENTAGE" || scratchCoupon.discountType === "PERCENT") {
+      return `Claim ${scratchCoupon.percentageDiscountValue}% Off Now`;
+    }
+    if (activeCurrency) {
+      const entry = scratchCoupon.couponAmountsCurrencies?.find(
+        (c) => String(c.currency) === String(activeCurrency._id)
+      );
+      if (entry?.flatDiscountValue) {
+        const symbol = activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
+        return `Claim ${symbol}${entry.flatDiscountValue} Off Now`;
+      }
+    }
+    return "Claim Discount Now";
+  }, [scratchCoupon, activeCurrency]);
 
   // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
@@ -60,19 +131,50 @@ export default function ScratchCouponOffer() {
       const currentItems = getStoredCart();
       const hasItems = currentItems.length > 0;
 
-      // 1. Check logged-in or empty cart -> Clear states
-      if (isLoggedIn || !hasItems) {
+      console.log("[ScratchCouponOffer] check:", {
+        isLoggedIn,
+        hasItems,
+        cartItemsCount: currentItems.length,
+        showModal,
+      });
+
+      // 1. Check empty cart -> Clear all states
+      if (!hasItems) {
         localStorage.removeItem("byou_cart_abandoned_start");
         localStorage.removeItem("byou_scratch_offer_last_closed_at");
         localStorage.removeItem("byou_coupon_expiry_time");
+        sessionStorage.removeItem("byou_scratch_offer_claimed_in_session");
+        sessionStorage.removeItem("byou_claimed_coupon_code");
         if (showModal) setShowModal(false);
-        if (timeLeft > 0) setTimeLeft(0);
+        setTimeLeft(0);
+        return;
+      }
+
+      // If user is logged in, we NEVER show the modal.
+      if (isLoggedIn) {
+        if (showModal) setShowModal(false);
+        localStorage.removeItem("byou_cart_abandoned_start");
+        localStorage.removeItem("byou_scratch_offer_last_closed_at");
+
+        // However, we still display the countdown timer if they have an active coupon
+        const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
+        if (couponExpiry) {
+          const remaining = Number(couponExpiry) - now;
+          if (remaining <= 0) {
+            localStorage.removeItem("byou_coupon_expiry_time");
+            setTimeLeft(0);
+          } else {
+            setTimeLeft(Math.ceil(remaining / 1000));
+          }
+        } else {
+          setTimeLeft(0);
+        }
         return;
       }
 
       // Check if coupon claimed in this session
       const claimedInSession = sessionStorage.getItem("byou_scratch_offer_claimed_in_session") === "true";
-      if (claimedInSession) {
+      if (claimedInSession && !isDebug) {
         if (showModal) setShowModal(false);
         const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
         if (couponExpiry) {
@@ -84,7 +186,7 @@ export default function ScratchCouponOffer() {
             setTimeLeft(Math.ceil(remaining / 1000));
           }
         } else {
-          if (timeLeft > 0) setTimeLeft(0);
+          setTimeLeft(0);
         }
         return;
       }
@@ -102,8 +204,21 @@ export default function ScratchCouponOffer() {
 
       const isReappearEligible = !lastClosedAt || (now - Number(lastClosedAt) >= REAPPEAR_THRESHOLD);
 
+      console.log("[ScratchCouponOffer] timer check:", {
+        elapsed,
+        THRESHOLD,
+        couponExpiry,
+        showModal,
+        isReappearEligible,
+        lastClosedAt,
+        REAPPEAR_THRESHOLD,
+        elapsedSeconds: elapsed / 1000,
+        thresholdSeconds: THRESHOLD / 1000
+      });
+
       // Trigger modal if elapsed threshold is met, not dismissed recently, and coupon timer not running yet
       if (elapsed >= THRESHOLD && !couponExpiry && !showModal && isReappearEligible) {
+        console.log("[ScratchCouponOffer] Conditions met! Triggering showModal = true");
         setShowModal(true);
       }
 
@@ -120,7 +235,7 @@ export default function ScratchCouponOffer() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [mounted, userId, showModal, THRESHOLD, REAPPEAR_THRESHOLD, timeLeft]);
+  }, [mounted, userId, showModal, THRESHOLD, REAPPEAR_THRESHOLD, scratchCoupon, isDebug]);
 
   // Canvas Initializer
   useEffect(() => {
@@ -250,11 +365,11 @@ export default function ScratchCouponOffer() {
 
   // Claim button click -> navigate to checkout, apply coupon automatically
   const handleClaim = () => {
-    navigator.clipboard.writeText(COUPON_CODE);
+    navigator.clipboard.writeText(couponCode);
     toast.success("Coupon code copied! Redirecting to checkout...");
 
     sessionStorage.setItem("byou_scratch_offer_claimed_in_session", "true");
-    sessionStorage.setItem("byou_claimed_coupon_code", COUPON_CODE);
+    sessionStorage.setItem("byou_claimed_coupon_code", couponCode);
 
     const expiry = Date.now() + 10 * 60 * 1000;
     localStorage.setItem("byou_coupon_expiry_time", expiry.toString());
@@ -269,7 +384,7 @@ export default function ScratchCouponOffer() {
   // Copy code from floating widget
   const handleCopyCode = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(COUPON_CODE);
+    navigator.clipboard.writeText(couponCode);
     setCopied(true);
     toast.success("Coupon code copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
@@ -342,10 +457,10 @@ export default function ScratchCouponOffer() {
                       Your Exclusive Code
                     </span>
                     <span className="text-3xl font-bold tracking-widest text-black select-all">
-                      {COUPON_CODE}
+                      {couponCode}
                     </span>
                     <span className="text-[10px] text-green-700 font-semibold mt-1">
-                      GET 20% OFF ALL PRODUCTS
+                      {discountLabel}
                     </span>
                   </div>
 
@@ -371,7 +486,7 @@ export default function ScratchCouponOffer() {
                   disabled={!isScratchedFully}
                   className="w-full py-3 bg-black hover:bg-black/90 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-full text-sm transition-colors shadow-md"
                 >
-                  Claim 20% Off Now
+                  {claimButtonLabel}
                 </button>
 
                 <button
@@ -408,7 +523,7 @@ export default function ScratchCouponOffer() {
               {/* Revealed Code & Copy Button (visible on hover) */}
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75 overflow-hidden shrink-0">
                 <span className="font-mono font-bold text-xs tracking-wider text-white">
-                  {COUPON_CODE}
+                  {couponCode}
                 </span>
                 <button
                   onClick={handleCopyCode}

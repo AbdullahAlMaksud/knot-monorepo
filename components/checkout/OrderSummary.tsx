@@ -111,7 +111,7 @@ export default function OrderSummary({
         {appliedCoupon ? (
           <div className="flex items-center justify-between bg-stone-50 border border-stone-250/60 rounded-full px-4 py-2 text-xs">
             <span className="font-semibold text-stone-800">
-              {appliedCoupon.code} ({appliedCoupon.discountType === "PERCENTAGE" || appliedCoupon.discountType === "PERCENT" ? `${appliedCoupon.discountValue}%` : "Flat"} Off)
+              {appliedCoupon.code} ({appliedCoupon.discountType === "PERCENTAGE" || appliedCoupon.discountType === "PERCENT" ? `${appliedCoupon.percentageDiscountValue ?? appliedCoupon.discountValue}%` : "Flat"} Off)
             </span>
             <button
               type="button"
