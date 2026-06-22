@@ -11,14 +11,30 @@ import { useGetPublishedBlogs } from "@/services/blogs/query";
 export default function BlogPageClient() {
   const searchQuery = "";
   const [page, setPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
+  const [selectedTag, setSelectedTag] = useState<string | undefined>();
 
   const { data, isLoading, isError, error, refetch } = useGetPublishedBlogs(
     page,
     searchQuery,
+    10,
+    { category: selectedCategory, tags: selectedTag },
   );
 
   const blogs = data?.data ?? [];
   const meta = data?.meta;
+
+  function handleCategoryChange(category: string | undefined) {
+    setSelectedCategory(category);
+    setPage(1);
+  }
+
+  function handleTagChange(tag: string | undefined) {
+    setSelectedTag(tag);
+    setPage(1);
+  }
 
   return (
     <Layout>
@@ -33,6 +49,10 @@ export default function BlogPageClient() {
           meta={meta}
           page={page}
           onPageChange={setPage}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+          selectedTag={selectedTag}
+          onTagChange={handleTagChange}
         />
 
         <RealStoriesSliderSection />

@@ -6,17 +6,30 @@ import type {
   PaginatedBlogsResponse,
 } from "./type";
 
-const BLOGS_PER_PAGE = 9;
+const BLOGS_PER_PAGE = 10;
+
+export interface BlogFilters {
+  category?: string;
+  tags?: string;
+  isFeatured?: boolean;
+  status?: string;
+}
 
 export const getPublishedBlogs = async (
   page = 1,
   limit = BLOGS_PER_PAGE,
   search?: string,
+  filters?: BlogFilters,
 ): Promise<{ data: Blog[]; meta: BlogMeta }> => {
   const params = new URLSearchParams();
   params.set("page", String(page));
   params.set("limit", String(limit));
   if (search && search.trim()) params.set("searchTerm", search.trim());
+  if (filters?.category) params.set("category", filters.category);
+  if (filters?.tags) params.set("tags", filters.tags);
+  if (filters?.isFeatured !== undefined)
+    params.set("isFeatured", String(filters.isFeatured));
+  if (filters?.status) params.set("status", filters.status);
 
   const response = await apiClient.get<PaginatedBlogsResponse>(
     `/blogs/published?${params.toString()}`,

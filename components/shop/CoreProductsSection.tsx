@@ -234,8 +234,21 @@ export default function CoreProductsSection({
                         discountAmount: pricing.discountAmount,
                         currency: pricing.currency,
                         discountType: pricing.discountType,
-                        discountValue: typeof defaultVariant?.discountType === "object" ? Number(defaultVariant.discountType.value) : (defaultVariant?.discountValue ? Number(defaultVariant.discountValue) : undefined),
-                        maxDiscountValue: typeof defaultVariant?.discountType === "object" ? Number(defaultVariant.discountType.maxValue || defaultVariant.discountType.maxAmount) : (defaultVariant?.discountMaxValue ? Number(defaultVariant.discountMaxValue) : undefined),
+                        discountValue:
+                          typeof defaultVariant?.discountType === "object"
+                            ? Number(defaultVariant.discountType.value)
+                            : defaultVariant?.discountValue
+                              ? Number(defaultVariant.discountValue)
+                              : undefined,
+                        maxDiscountValue:
+                          typeof defaultVariant?.discountType === "object"
+                            ? Number(
+                                defaultVariant.discountType.maxValue ||
+                                  defaultVariant.discountType.maxAmount,
+                              )
+                            : defaultVariant?.discountMaxValue
+                              ? Number(defaultVariant.discountMaxValue)
+                              : undefined,
                         isDiscounted: pricing.hasDiscount,
                       });
                     }}

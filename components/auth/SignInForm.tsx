@@ -26,7 +26,12 @@ import {
   countryPhoneOptions,
   getCountryPhoneOption,
 } from "@/lib/country-phone-options";
-import { sendEmailOtp, verifyEmailOtp, socialSignIn, updateUser } from "@/services/auth/auth";
+import {
+  sendEmailOtp,
+  verifyEmailOtp,
+  socialSignIn,
+  updateUser,
+} from "@/services/auth/auth";
 import { useAuthSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -89,7 +94,7 @@ export default function SignInForm() {
       setValue(
         "phone",
         currentPhone.slice(0, selectedCountry.maxNationalNumberLength),
-        { shouldValidate: true }
+        { shouldValidate: true },
       );
     }
   }, [currentPhone, selectedCountry.maxNationalNumberLength, setValue]);
@@ -97,7 +102,10 @@ export default function SignInForm() {
   // Resend code countdown timer
   useEffect(() => {
     if (resendTimer > 0) {
-      const timerId = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
+      const timerId = setTimeout(
+        () => setResendTimer((prev) => prev - 1),
+        1000,
+      );
       return () => clearTimeout(timerId);
     }
   }, [resendTimer]);
@@ -117,12 +125,18 @@ export default function SignInForm() {
       } else {
         // Phone mock send OTP
         await new Promise((resolve) => setTimeout(resolve, 800));
-        toast.success(`Verification code sent to ${selectedCountry.dialCode} ${data.phone}. (Demo OTP: 123456)`);
+        toast.success(
+          `Verification code sent to ${selectedCountry.dialCode} ${data.phone}. (Demo OTP: 123456)`,
+        );
         setOtpSent(true);
         setResendTimer(30);
       }
-    } catch (err: any) {
-      toast.error(err.message || "An error occurred. Please try again.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again.";
+      toast.error(message);
     } finally {
       setIsPending(false);
     }
@@ -132,15 +146,25 @@ export default function SignInForm() {
     setIsPending(true);
     try {
       if (activeTab === "email") {
-        const nameFromEmail = data.email.split("@")[0].replace(/[^a-zA-Z]/g, " ").trim() || "Customer";
+        const nameFromEmail =
+          data.email
+            .split("@")[0]
+            .replace(/[^a-zA-Z]/g, " ")
+            .trim() || "Customer";
         const formattedName = nameFromEmail
           .split(/\s+/)
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .map(
+            (word) =>
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+          )
           .join(" ");
         const res = await verifyEmailOtp(data.email, data.otp, formattedName);
         if (res.token || res.user || res.success) {
           const userObj = res.user || res.data?.user;
-          const hasName = userObj?.name && userObj.name !== "Customer" && userObj.name.trim().length > 0;
+          const hasName =
+            userObj?.name &&
+            userObj.name !== "Customer" &&
+            userObj.name.trim().length > 0;
           if (hasName) {
             await refetchSession();
             toast.success("Signed in successfully!");
@@ -166,8 +190,12 @@ export default function SignInForm() {
           toast.error("Invalid verification code. Please try 123456.");
         }
       }
-    } catch (err: any) {
-      toast.error(err.message || "Verification failed. Please try again.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again.";
+      toast.error(message);
     } finally {
       setIsPending(false);
     }
@@ -186,8 +214,12 @@ export default function SignInForm() {
       } else {
         toast.error(updateRes.message || "Failed to update profile name.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "An error occurred. Please try again.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again.";
+      toast.error(message);
     } finally {
       setIsPending(false);
     }
@@ -206,8 +238,10 @@ export default function SignInForm() {
         toast.error("OAuth redirect URL not found in API response.");
         setIsGooglePending(false);
       }
-    } catch (err: any) {
-      toast.error(err.message || "Failed to connect with Google.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Failed to connect with Google.";
+      toast.error(message);
       setIsGooglePending(false);
     }
   };
@@ -228,7 +262,7 @@ export default function SignInForm() {
               "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200",
               activeTab === "email"
                 ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-gray-600"
+                : "border-transparent text-gray-400 hover:text-gray-600",
             )}
           >
             Email Login
@@ -240,7 +274,7 @@ export default function SignInForm() {
               "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200",
               activeTab === "phone"
                 ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-gray-600"
+                : "border-transparent text-gray-400 hover:text-gray-600",
             )}
           >
             Phone Login
@@ -320,7 +354,9 @@ export default function SignInForm() {
                               {(item) => (
                                 <ComboboxItem key={item.iso2} value={item}>
                                   <div className="flex w-full min-w-0 items-center justify-between gap-3">
-                                    <span className="truncate">{item.name}</span>
+                                    <span className="truncate">
+                                      {item.name}
+                                    </span>
                                     <span className="shrink-0 text-xs text-gray-500">
                                       {item.dialCode}
                                     </span>
@@ -374,20 +410,14 @@ export default function SignInForm() {
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-end w-full">
               <Button
                 type="submit"
                 disabled={isPending}
-                className="rounded-full px-8 py-3 bg-black hover:bg-gray-800 text-white font-medium"
+                className="rounded-full px-8 py-3 bg-black w-full hover:bg-gray-800 text-white font-medium"
               >
                 {isPending ? "Sending..." : "Send OTP"}
               </Button>
-              <Link
-                href="/auth/signup"
-                className="border-2 border-black text-black px-8 py-3 rounded-full hover:bg-black hover:text-white transition font-medium"
-              >
-                Sign up
-              </Link>
             </div>
           </form>
         ) : otpVerified ? (
@@ -406,7 +436,8 @@ export default function SignInForm() {
                 {...register("name", {
                   required: "Name is required",
                   validate: (value) =>
-                    value.trim().length >= 2 || "Name must be at least 2 characters",
+                    value.trim().length >= 2 ||
+                    "Name must be at least 2 characters",
                 })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition mb-4"
                 placeholder="Your name"
@@ -499,7 +530,15 @@ export default function SignInForm() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => handleSendOtp({ name: "", email: currentEmail, phone: currentPhone, countryIso2: selectedCountryIso2, otp: "" })}
+                  onClick={() =>
+                    handleSendOtp({
+                      name: "",
+                      email: currentEmail,
+                      phone: currentPhone,
+                      countryIso2: selectedCountryIso2,
+                      otp: "",
+                    })
+                  }
                   className="text-xs text-black font-semibold hover:underline"
                 >
                   Resend code

@@ -111,14 +111,15 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const { data: productData, isLoading: productsLoading } = useSearchProducts(
     debouncedQuery,
     5,
-    showResults
+    showResults,
   );
 
   const { data: blogResponse, isLoading: blogsLoading } = useGetPublishedBlogs(
     1,
     debouncedQuery,
     5,
-    showResults
+    undefined,
+    showResults,
   );
 
   const products = productData?.data ?? [];
@@ -151,8 +152,21 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       discountAmount: pricing.discountAmount,
       currency: pricing.currency,
       discountType: pricing.discountType,
-      discountValue: typeof defaultVariant?.discountType === "object" ? Number(defaultVariant.discountType.value) : (defaultVariant?.discountValue ? Number(defaultVariant.discountValue) : undefined),
-      maxDiscountValue: typeof defaultVariant?.discountType === "object" ? Number(defaultVariant.discountType.maxValue || defaultVariant.discountType.maxAmount) : (defaultVariant?.discountMaxValue ? Number(defaultVariant.discountMaxValue) : undefined),
+      discountValue:
+        typeof defaultVariant?.discountType === "object"
+          ? Number(defaultVariant.discountType.value)
+          : defaultVariant?.discountValue
+            ? Number(defaultVariant.discountValue)
+            : undefined,
+      maxDiscountValue:
+        typeof defaultVariant?.discountType === "object"
+          ? Number(
+              defaultVariant.discountType.maxValue ||
+                defaultVariant.discountType.maxAmount,
+            )
+          : defaultVariant?.discountMaxValue
+            ? Number(defaultVariant.discountMaxValue)
+            : undefined,
       isDiscounted: pricing.hasDiscount,
     });
   };
@@ -250,7 +264,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     ))}
                   </div>
                 ) : products.length === 0 ? (
-                  <p className="text-sm text-stone-400 py-4">No products found</p>
+                  <p className="text-sm text-stone-400 py-4">
+                    No products found
+                  </p>
                 ) : (
                   <div className="space-y-4">
                     {products.map((product) => {
@@ -357,7 +373,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     ))}
                   </div>
                 ) : blogs.length === 0 ? (
-                  <p className="text-sm text-stone-400 py-4">No articles found</p>
+                  <p className="text-sm text-stone-400 py-4">
+                    No articles found
+                  </p>
                 ) : (
                   <div className="space-y-4">
                     {blogs.map((blog) => {

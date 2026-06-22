@@ -20,6 +20,10 @@ interface BlogPostsSectionProps {
   errorMessage?: string;
   onRetry?: () => void;
   searchQuery: string;
+  selectedCategory?: string;
+  onCategoryChange?: (category: string | undefined) => void;
+  selectedTag?: string;
+  onTagChange?: (tag: string | undefined) => void;
 }
 
 const sidebarPills = [
@@ -35,12 +39,25 @@ const sidebarPills = [
 ];
 
 const sidebarCategories = [
-  { label: "Hair", keywords: ["hair"] },
-  { label: "Skincare", keywords: ["skincare", "skin", "beauty"] },
-  { label: "Makeup", keywords: ["makeup", "cosmetic"] },
-  { label: "Nails", keywords: ["nail"] },
-  { label: "Men's Grooming", keywords: ["men", "groom"] },
-  { label: "Wellness", keywords: ["wellness", "self care", "self-care"] },
+  { label: "Accessories", keywords: ["accessories"], apiValue: "ACCESSORIES" },
+  { label: "Hair", keywords: ["hair"], apiValue: "HAIR" },
+  { label: "Beauty", keywords: ["beauty"], apiValue: "BEAUTY" },
+  { label: "Skincare", keywords: ["skincare", "skin"], apiValue: "SKINCARE" },
+  { label: "Lifestyle", keywords: ["lifestyle"], apiValue: "LIFESTYLE" },
+  {
+    label: "Wellness",
+    keywords: ["wellness", "self care", "self-care"],
+    apiValue: "WELLNESS",
+  },
+  { label: "Makeup", keywords: ["makeup", "cosmetic"], apiValue: "MAKEUP" },
+  { label: "Nails", keywords: ["nail"], apiValue: "NAILS" },
+  {
+    label: "Fragrance",
+    keywords: ["fragrance", "perfume"],
+    apiValue: "FRAGRANCE",
+  },
+  { label: "Jewelry", keywords: ["jewelry", "jewellery"], apiValue: "JEWELRY" },
+  { label: "Other", keywords: ["other"], apiValue: "OTHER" },
 ];
 
 function getFirstImage(blog: Blog): string | undefined {
@@ -86,11 +103,28 @@ function getCategoryCount(blogs: Blog[], keywords: string[]) {
   }).length;
 }
 
-function SidebarPill({ children }: { children: React.ReactNode }) {
+function SidebarPill({
+  children,
+  active,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+}) {
   return (
-    <span className="inline-flex rounded-full border border-black/8 bg-[#f5f2ec] px-4 py-1.5 text-[0.86rem] font-medium tracking-[-0.02em] text-black shadow-[0_1px_0_rgba(255,255,255,0.85)_inset] transition-colors duration-200 hover:bg-[#ece7de] sm:px-4.5 sm:text-[0.92rem]">
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex rounded-full border px-4 py-1.5 text-[0.86rem] font-medium tracking-[-0.02em] shadow-[0_1px_0_rgba(255,255,255,0.85)_inset] transition-colors duration-200 sm:px-4.5 sm:text-[0.92rem]",
+        active
+          ? "border-black bg-black text-white"
+          : "border-black/8 bg-[#f5f2ec] text-black hover:bg-[#ece7de]",
+      )}
+    >
       {children}
-    </span>
+    </button>
   );
 }
 
@@ -142,14 +176,23 @@ export default function BlogPostsSection({
   meta,
   page = 1,
   onPageChange,
+  selectedCategory,
+  onCategoryChange,
+  selectedTag,
+  onTagChange,
 }: BlogPostsSectionProps) {
   const featuredBlog = blogs.find((blog) => blog.isFeatured) ?? blogs[0];
   const gridBlogs = blogs.filter((blog) => blog._id !== featuredBlog?._id);
   const categoryRows = [
-    { label: "All", count: blogs.length },
+    {
+      label: "All",
+      count: meta?.total ?? blogs.length,
+      apiValue: undefined as string | undefined,
+    },
     ...sidebarCategories.map((category) => ({
       label: category.label,
       count: getCategoryCount(blogs, category.keywords),
+      apiValue: category.apiValue as string | undefined,
     })),
   ];
 
@@ -222,28 +265,25 @@ export default function BlogPostsSection({
                   <SidebarSection title="Categories">
                     <div className="mt-2 divide-y divide-black/6">
                       {categoryRows.map((category) => (
-                        <div
+                        <button
                           key={category.label}
-                          className="flex items-center justify-between gap-4 py-3 text-[1.04rem] tracking-[0.01em] text-black/88"
+                          type="button"
+                          onClick={() => onCategoryChange?.(category.apiValue)}
+                          className={cn(
+                            "flex w-full cursor-pointer items-center justify-between gap-4 py-3 text-[1.04rem] tracking-[0.01em] transition-colors",
+                            selectedCategory === category.apiValue
+                              ? "font-semibold text-black"
+                              : "text-black/88 hover:text-black",
+                          )}
                         >
                           <span>{category.label}</span>
                           <span className="min-w-8 text-right font-medium tracking-[0.12em] text-black/72">
                             {String(category.count).padStart(2, "0")}
                           </span>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </SidebarSection>
-
-                  <div className="mt-6">
-                    <SidebarSection title="Popular Tags">
-                      <div className="mt-4 flex flex-wrap gap-2.5">
-                        {sidebarPills.map((pill) => (
-                          <SidebarPill key={pill}>{pill}</SidebarPill>
-                        ))}
-                      </div>
-                    </SidebarSection>
-                  </div>
                 </div>
               </aside>
             </div>

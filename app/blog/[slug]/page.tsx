@@ -103,6 +103,7 @@ export default function BlogPostPage() {
     1,
     undefined,
     20,
+    undefined,
     Boolean(blog?.category),
   );
 

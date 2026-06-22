@@ -5,12 +5,19 @@ export interface SendOtpResponse {
   message?: string;
 }
 
+export interface AuthUser {
+  id?: string;
+  name?: string;
+  email?: string;
+  image?: string;
+}
+
 export interface VerifyOtpResponse {
   success?: boolean;
   message?: string;
-  data?: any;
+  data?: { user?: AuthUser };
   token?: string;
-  user?: any;
+  user?: AuthUser;
 }
 
 export interface SocialSignInResponse {
@@ -23,19 +30,22 @@ export interface SocialSignInResponse {
 
 export const sendEmailOtp = async (
   email: string,
-  type: "sign-in" | "sign-up"
+  type: "sign-in" | "sign-up",
 ): Promise<SendOtpResponse> => {
-  const response = await apiClient.post("/auth/email-otp/send-verification-otp", {
-    email,
-    type,
-  });
+  const response = await apiClient.post(
+    "/auth/email-otp/send-verification-otp",
+    {
+      email,
+      type,
+    },
+  );
   return response.data;
 };
 
 export const verifyEmailOtp = async (
   email: string,
   otp: string,
-  name?: string
+  name?: string,
 ): Promise<VerifyOtpResponse> => {
   const body: { email: string; otp: string; name?: string } = {
     email,
@@ -49,7 +59,7 @@ export const verifyEmailOtp = async (
 };
 
 export const updateUser = async (
-  name: string
+  name: string,
 ): Promise<{ status: boolean; message?: string }> => {
   const response = await apiClient.post("/auth/update-user", { name });
   return response.data;
@@ -57,7 +67,7 @@ export const updateUser = async (
 
 export const socialSignIn = async (
   provider: "google",
-  callbackURL: string
+  callbackURL: string,
 ): Promise<SocialSignInResponse> => {
   const response = await apiClient.post("/auth/sign-in/social", {
     provider,

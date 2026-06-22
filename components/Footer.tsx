@@ -64,6 +64,7 @@ export default function Footer() {
       ? settingsInfo.locations
       : fallbackLocations;
   const socials = getValidSocials(settingsInfo?.socials);
+  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-black text-white relative overflow-hidden min-h-[600px]">
@@ -183,8 +184,16 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="absolute bottom-6 left-4 sm:left-6 lg:left-8 text-sm text-gray-400 z-20">
-        <p>© 2025 Byou. All rights reserved.</p>
+      <div className="absolute bottom-6 flex w-full px-6 justify-between  text-sm text-gray-400 z-20">
+        <p>© {currentYear} Byou. All rights reserved.</p>
+        <div>
+          <p>
+            Developed by{" "}
+            <Link href={"https://nexulyze.com"} className="text-white">
+              Nexulyze Ltd.
+            </Link>
+          </p>
+        </div>
       </div>
     </footer>
   );
