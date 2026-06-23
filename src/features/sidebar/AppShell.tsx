@@ -39,13 +39,13 @@ export function AppShell() {
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement.requestFullscreen().catch(() => { });
     } else {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   }, []);
 
-  useKeyboard(toggleFullscreen, () => {});
+  useKeyboard(toggleFullscreen, () => { });
 
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
@@ -64,11 +64,11 @@ export function AppShell() {
     setPage(target);
   };
 
-  const showGame     = gameView === "game";
-  const showScore    = gameView !== "game" && page === "score";
+  const showGame = gameView === "game";
+  const showScore = gameView !== "game" && page === "score";
   const showSettings = gameView !== "game" && page === "settings";
-  const showHome     = gameView !== "game" && page === "home";
-  const pageKey      = showGame ? "game" : page;
+  const showHome = gameView !== "game" && page === "home";
+  const pageKey = showGame ? "game" : page;
 
   // Sync page back to home when game resets
   useEffect(() => {
@@ -127,9 +127,9 @@ export function AppShell() {
               transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
               className="w-full h-full flex items-center justify-center"
             >
-              {showHome     && <HomeScreen />}
-              {showGame     && <GameScreen />}
-              {showScore    && <ScoreScreen />}
+              {showHome && <HomeScreen />}
+              {showGame && <GameScreen />}
+              {showScore && <ScoreScreen />}
               {showSettings && (
                 <SettingsScreen
                   isFullscreen={isFullscreen}

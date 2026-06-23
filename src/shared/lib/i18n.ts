@@ -252,8 +252,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "en", // fallback default, will be overridden by store value in AppShell
-    fallbackLng: "en",
+    lng: "bn", // fallback default, will be overridden by store value in AppShell
+    fallbackLng: "bn",
     interpolation: {
       escapeValue: false,
     },

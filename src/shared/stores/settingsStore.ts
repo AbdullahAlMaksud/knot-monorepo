@@ -26,7 +26,7 @@ export const useSettingsStore = create<SettingsStore>()(
       autoNoteEnabled: false,
       showMistakes: true,
       sidebarPinned: false,
-      language: "en",
+      language: "bn",
       toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
       toggleHighlight: () => set((s) => ({ highlightEnabled: !s.highlightEnabled })),
       toggleAutoNote: () => set((s) => ({ autoNoteEnabled: !s.autoNoteEnabled })),
