@@ -194,7 +194,7 @@ export default function SignUpForm() {
             type="button"
             onClick={() => setActiveTab("email")}
             className={cn(
-              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200",
+              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer",
               activeTab === "email"
                 ? "border-black text-black"
                 : "border-transparent text-gray-400 hover:text-gray-600"
@@ -202,18 +202,18 @@ export default function SignUpForm() {
           >
             Email Sign Up
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("phone")}
-            className={cn(
-              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200",
-              activeTab === "phone"
-                ? "border-black text-black"
-                : "border-transparent text-gray-400 hover:text-gray-600"
-            )}
-          >
-            Phone Sign Up
-          </button>
+          <div className="flex-1 relative">
+            <button
+              type="button"
+              disabled
+              className="w-full pb-3 text-center text-sm font-medium border-b-2 border-transparent text-gray-400 cursor-not-allowed"
+            >
+              Phone Sign Up
+            </button>
+            <span className="absolute -top-2.5 right-2 bg-orange-50 text-orange-600 text-[8px] px-1.5 py-0.5 rounded-full border border-orange-200 font-bold tracking-wider uppercase select-none">
+              Upcoming
+            </span>
+          </div>
         </div>
       )}
 
