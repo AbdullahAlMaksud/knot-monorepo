@@ -51,6 +51,20 @@ const resources = {
           try_next: "Try {{diff}}",
           home: "Home",
           pb: "PB!",
+          share_score: "Share Score",
+          share_title: "Sudoku Complete!",
+          share_text: "I completed a Sudoku puzzle ({{difficulty}}) in {{time}} with {{mistakes}} mistakes. Beat my score!",
+          copy_link: "Copy Link",
+          link_copied: "Copied!",
+          share_modal_title: "Share Results",
+          download_image: "Download Image",
+          landing: {
+            title: "Beat My Score!",
+            subtitle: "A friend has challenged you to a Sudoku match",
+            info: "Difficulty: {{diff}} | Time: {{time}} | Mistakes: {{errors}}",
+            play_cta: "Accept Challenge",
+            home_cta: "Main Menu"
+          }
         },
       },
       settings: {
@@ -173,6 +187,20 @@ const resources = {
           try_next: "{{diff}} খেলুন",
           home: "হোম",
           pb: "সেরা!",
+          share_score: "স্কোর শেয়ার",
+          share_title: "সুডোকু সম্পূর্ণ!",
+          share_text: "আমি {{time}} সময়ে এবং {{mistakes}}টি ভুলের সাথে সুডোকু ধাঁধা ({{difficulty}}) সমাধান করেছি। আমার স্কোর পার করতে পারবেন?",
+          copy_link: "লিঙ্ক কপি",
+          link_copied: "কপি হয়েছে!",
+          share_modal_title: "ফলাফল শেয়ার",
+          download_image: "ছবি ডাউনলোড",
+          landing: {
+            title: "আমার স্কোর টপকে যাও!",
+            subtitle: "একজন বন্ধু আপনাকে সুডোকু ম্যাচে চ্যালেঞ্জ জানিয়েছে",
+            info: "কঠিনতা: {{diff}} | সময়: {{time}} | ভুল: {{errors}}",
+            play_cta: "চ্যালেঞ্জ গ্রহণ করুন",
+            home_cta: "মূল মেনু"
+          }
         },
       },
       settings: {

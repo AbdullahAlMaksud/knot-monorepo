@@ -16,6 +16,7 @@ import { useSettingsStore } from "@/shared/stores/settingsStore";
 import { cn } from "@/shared/lib/utils";
 import "@/shared/lib/i18n";
 import { useTranslation } from "react-i18next";
+import { ShareCardLanding } from "@/features/game/ShareCardLanding";
 
 type Page = "home" | "score" | "settings";
 
@@ -109,6 +110,9 @@ export function AppShell() {
             backgroundSize: "128px",
           }}
         />
+
+        {/* Challenge landing modal if URL shared params exist */}
+        <ShareCardLanding />
 
         {/* Floating sidebar */}
         <Sidebar
