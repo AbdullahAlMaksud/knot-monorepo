@@ -41,6 +41,7 @@ export default function MyAccountPage() {
     reset: resetProfile,
   } = useForm<ProfileFormData>({
     defaultValues: { fullName: "", lastName: "", email: "", phone: "" },
+    mode: "onChange",
   });
 
   const {
@@ -48,7 +49,9 @@ export default function MyAccountPage() {
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
     setValue: setValueShipping,
-  } = useForm<ShippingAddress>();
+  } = useForm<ShippingAddress>({
+    mode: "onChange",
+  });
 
   const {
     register: registerPassword,
@@ -56,7 +59,9 @@ export default function MyAccountPage() {
     watch,
     reset: resetPassword,
     formState: { errors: errorsPassword },
-  } = useForm<PasswordFormData>();
+  } = useForm<PasswordFormData>({
+    mode: "onChange",
+  });
 
   useEffect(() => {
     if (isPending) return;
