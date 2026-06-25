@@ -47,3 +47,9 @@ export const getBlogBySlug = async (slug: string): Promise<Blog> => {
 
   return response.data.data;
 };
+
+export const getBlogTags = async (): Promise<string[]> => {
+  const response = await apiClient.get<{ data: string[] }>("/blogs/tags");
+  return response.data.data;
+};
+

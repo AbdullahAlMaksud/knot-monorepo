@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getBlogBySlug, getPublishedBlogs, type BlogFilters } from "./api";
+import { getBlogBySlug, getBlogTags, getPublishedBlogs, type BlogFilters } from "./api";
 import { blogsQueryKeys } from "./querykey";
 
 export const useGetPublishedBlogs = (
@@ -29,3 +29,10 @@ export const useGetBlogBySlug = (slug: string) =>
     queryFn: () => getBlogBySlug(slug),
     enabled: !!slug,
   });
+
+export const useGetBlogTags = () =>
+  useQuery({
+    queryKey: blogsQueryKeys.tags(),
+    queryFn: getBlogTags,
+  });
+

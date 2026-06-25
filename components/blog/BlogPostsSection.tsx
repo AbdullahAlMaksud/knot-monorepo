@@ -24,6 +24,8 @@ interface BlogPostsSectionProps {
   onCategoryChange?: (category: string | undefined) => void;
   selectedTag?: string;
   onTagChange?: (tag: string | undefined) => void;
+  tags?: string[];
+  onResetFilters?: () => void;
 }
 
 const sidebarPills = [
@@ -180,6 +182,8 @@ export default function BlogPostsSection({
   onCategoryChange,
   selectedTag,
   onTagChange,
+  tags = [],
+  onResetFilters,
 }: BlogPostsSectionProps) {
   const featuredBlog = blogs.find((blog) => blog.isFeatured) ?? blogs[0];
   const gridBlogs = blogs.filter((blog) => blog._id !== featuredBlog?._id);
@@ -262,7 +266,7 @@ export default function BlogPostsSection({
               </div>
 
               <aside className="lg:sticky lg:top-24 lg:self-start">
-                <div className="overflow-hidden rounded-none bg-transparent px-5 py-5 shadow-none sm:px-6 sm:py-6">
+                <div className="overflow-hidden rounded-none bg-transparent px-5 py-5 shadow-none sm:px-6 sm:py-6 space-y-8">
                   <SidebarSection title="Categories">
                     <div className="mt-2 divide-y divide-black/6">
                       {categoryRows.map((category) => (
@@ -285,6 +289,34 @@ export default function BlogPostsSection({
                       ))}
                     </div>
                   </SidebarSection>
+
+                  {tags.length > 0 && (
+                    <SidebarSection title="Tags">
+                      <div className="mt-4 flex flex-wrap gap-2 py-2">
+                        {tags.map((tag) => (
+                          <SidebarPill
+                            key={tag}
+                            active={selectedTag === tag}
+                            onClick={() =>
+                              onTagChange?.(selectedTag === tag ? undefined : tag)
+                            }
+                          >
+                            {tag}
+                          </SidebarPill>
+                        ))}
+                      </div>
+                    </SidebarSection>
+                  )}
+
+                  {(selectedCategory || selectedTag) && (
+                    <button
+                      type="button"
+                      onClick={onResetFilters}
+                      className="w-full mt-4 rounded-full border border-black/15 bg-transparent py-2.5 text-sm font-medium tracking-[-0.01em] text-black transition-colors duration-200 hover:bg-black hover:text-white cursor-pointer"
+                    >
+                      Reset Filters
+                    </button>
+                  )}
                 </div>
               </aside>
             </div>

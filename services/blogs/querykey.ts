@@ -7,4 +7,5 @@ export const blogsQueryKeys = {
     tags?: string,
   ) => ["blogs", "published", page, search, limit, category, tags] as const,
   detail: (slug: string) => ["blogs", "published", slug] as const,
+  tags: () => ["blogs", "tags"] as const,
 };
