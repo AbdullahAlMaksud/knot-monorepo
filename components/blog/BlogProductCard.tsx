@@ -93,6 +93,7 @@ export default function BlogProductCard({ product }: BlogProductCardProps) {
           <Image
             src={displayImage}
             fill
+            sizes="(max-width: 768px) 100vw, 380px"
             alt={product.name}
             className="object-cover hover:scale-105 transition-transform duration-300"
           />

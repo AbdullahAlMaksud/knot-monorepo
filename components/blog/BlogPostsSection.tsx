@@ -248,12 +248,13 @@ export default function BlogPostsSection({
 
                 {gridBlogs.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {gridBlogs.map((blog) => (
+                    {gridBlogs.map((blog, index) => (
                       <BlogPostCard
                         key={blog._id}
                         blog={blog}
                         imageSrc={getFirstImage(blog)}
                         excerpt={getFirstText(blog, 72)}
+                        priority={index < 2}
                       />
                     ))}
                   </div>

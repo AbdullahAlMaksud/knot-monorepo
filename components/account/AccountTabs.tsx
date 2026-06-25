@@ -1,9 +1,9 @@
 "use client";
 
-import { Package, Settings, User } from "lucide-react";
+import { Package, Settings, User, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export type AccountTab = "profile" | "orders" | "preference";
+export type AccountTab = "profile" | "orders" | "preference" | "reviews";
 
 type AccountTabsProps = {
   activeTab: AccountTab;
@@ -15,7 +15,7 @@ export default function AccountTabs({
   setActiveTab,
 }: AccountTabsProps) {
   return (
-    <div className="flex gap-4 mb-8">
+    <div className="flex flex-wrap gap-4 mb-8">
       <Button
         onClick={() => setActiveTab("profile")}
         variant={activeTab === "profile" ? "default" : "outline"}
@@ -39,6 +39,14 @@ export default function AccountTabs({
       >
         <Settings size={20} className="mr-2" />
         Prefarence
+      </Button>
+      <Button
+        onClick={() => setActiveTab("reviews")}
+        variant={activeTab === "reviews" ? "default" : "outline"}
+        className="rounded-full"
+      >
+        <Star size={20} className="mr-2" />
+        My Reviews
       </Button>
     </div>
   );

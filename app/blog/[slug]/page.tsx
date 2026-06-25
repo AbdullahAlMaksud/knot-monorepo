@@ -159,6 +159,8 @@ export default function BlogPostPage() {
             <Image
               src={heroImage}
               fill
+              sizes="(max-width: 1080px) 100vw, 1080px"
+              priority
               alt={blog.title}
               className="w-full h-full object-cover"
             />

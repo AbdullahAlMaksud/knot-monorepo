@@ -13,6 +13,7 @@ import {
 import Info from "@/components/home/Info";
 import ErrorState from "@/components/ui/error";
 import Skeleton from "@/components/ui/skeleton";
+import ProductReviewsSection from "@/components/product/ProductReviewsSection";
 
 function ProductDetailSkeleton() {
   return (
@@ -82,6 +83,7 @@ export default function ProductDetailPage() {
             products={coreApiProducts}
           />
         )}
+        <ProductReviewsSection product={apiProduct} />
       </div>
     </Layout>
   );

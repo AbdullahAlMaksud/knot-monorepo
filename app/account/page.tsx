@@ -12,6 +12,7 @@ import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import CountryPreferenceSection from "@/components/account/CountryPreferenceSection";
 import { authClient, useAuthSession } from "@/lib/auth-client";
+import MyReviewsSection from "@/components/account/MyReviewsSection";
 import { toast } from "sonner";
 import { useUpdateShippingAddress } from "@/services/shipping-address/mutation";
 import type { ShippingAddress } from "@/services/shipping-address/type";
@@ -161,6 +162,8 @@ export default function MyAccountPage() {
           {activeTab === "orders" && <OrderHistorySection />}
 
           {activeTab === "preference" && <CountryPreferenceSection />}
+
+          {activeTab === "reviews" && <MyReviewsSection />}
         </div>
       </div>
     </Layout>

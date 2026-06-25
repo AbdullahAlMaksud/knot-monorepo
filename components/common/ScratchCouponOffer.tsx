@@ -429,7 +429,10 @@ export default function ScratchCouponOffer() {
             </div>
 
             {/* Right Column - Scratch Card Content */}
-            <div className="w-full md:w-7/12 p-6 md:p-10 flex flex-col justify-between overflow-y-auto">
+            <div
+              data-lenis-prevent
+              className="w-full md:w-7/12 p-6 md:p-10 flex flex-col justify-between overflow-y-auto"
+            >
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[10px] tracking-widest text-[#A88B58] font-semibold uppercase">

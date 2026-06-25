@@ -223,7 +223,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar bg-white">
+        <div
+          data-lenis-prevent
+          className="flex-1 overflow-y-auto p-6 md:p-8 no-scrollbar bg-white"
+        >
           {!showResults ? (
             // Suggestions State
             <div className="py-2">

@@ -148,7 +148,7 @@ export default function Header() {
                   alt="Logo"
                   width={100}
                   height={40}
-                  loading="eager"
+                  priority
                   className="h-auto w-auto"
                 />
               </Link>
