@@ -1,55 +1,116 @@
 # BYOU Storefront
 
-BYOU Storefront is the public e-commerce website for BYOU skincare products. It handles product discovery, editorial content, customer authentication, cart and checkout flows, customer account management, order history, and content pages for the BYOU brand. The application is built with Next.js App Router, React, TypeScript, Better Auth, TanStack Query, Axios, Tailwind CSS, and a shadcn-style component system.
+> The official e-commerce storefront for BYOU — a premium skincare brand by Nexulyze.
 
-## Live URL
+**Production URL:** [https://landing-byou.vercel.app](https://landing-byou.vercel.app)
 
-The current production storefront URL referenced by the project is:
-
-```text
-https://landing-byou.vercel.app/
-```
+---
 
 ## Overview
 
-The storefront is designed for customers browsing and purchasing BYOU skincare products, while keeping product, blog, order, and account data connected to the BYOU backend API.
+BYOU Storefront is a production-grade Next.js application powering the customer-facing shopping experience for BYOU skincare products. It covers the full customer journey — from product discovery and editorial content, through cart and checkout, to order tracking and account management.
 
-Current modules include:
+Built with a feature-based architecture (`src/screens`, `src/components`, `src/lib`) and connected to the BYOU backend REST API for all dynamic data.
 
-- Home page with hero carousel, product showcases, brand story, concern-based navigation, before/after content, testimonials, and featured products
-- Shop and product detail pages powered by published product API data
-- Cart, buy-now, checkout, order success, and order failure flows
-- Customer authentication for sign in, sign up, Google sign in, forgot password, and session handling
-- Customer account area with profile, shipping address, password update, and order history
-- Blog list and blog detail pages powered by published blog API data
-- Static brand pages including About, Lab, Contact, and Concern pages
-- Shared loading, toast, form, layout, navigation, product, checkout, and content components
+---
 
 ## Tech Stack
 
-| Area               | Tooling                                                    |
-| ------------------ | ---------------------------------------------------------- |
-| Framework          | Next.js 16 App Router                                      |
-| UI                 | React 19, Tailwind CSS v4, Radix UI/Base UI primitives     |
-| Language           | TypeScript                                                 |
-| Data fetching      | TanStack React Query, Axios                                |
-| Auth               | Better Auth client                                         |
-| Forms and UI state | React Hook Form, React state, reusable local UI components |
-| Notifications      | Sonner                                                     |
-| Icons              | Lucide React                                               |
-| Images             | Next.js Image, Cloudflare R2 public assets                 |
-| Package manager    | Yarn Classic                                               |
+| Area | Tooling |
+| --- | --- |
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| UI | React 19, Tailwind CSS v4, Radix UI / Base UI |
+| Data Fetching | TanStack React Query, Axios |
+| Authentication | Better Auth (client + server) |
+| Forms | React Hook Form |
+| Notifications | Sonner |
+| Icons | Lucide React |
+| Image Storage | Cloudflare R2 (public assets) |
+| Package Manager | Yarn Classic (`1.22.22`) |
 
-## Requirements
+---
+
+## Features
+
+- **Home** — Hero carousel, product showcases, brand story, before/after content, concern-based navigation, testimonials
+- **Shop** — Published product listing, featured product hero
+- **Product Detail** — Variants, pricing, reviews, related content
+- **Cart & Checkout** — Cart, buy-now, multi-currency pricing, shipping charges, coupon codes, cash-on-delivery
+- **Orders** — Order creation, success/failure pages, order tracking, order history
+- **Authentication** — Sign in, sign up, Google OAuth, forgot password, session handling
+- **Account** — Profile, shipping address, password change, order history, reviews
+- **Blog** — Published blog listing with tag/category filtering, blog detail pages
+- **Brand Pages** — About, Lab, Contact (with FAQ), Concern pages
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/                  Next.js route segments (App Router)
+│   ├── (auth)/           Auth routes: signin, signup, forgot-password
+│   └── (main)/           Main routes: home, shop, product, blog, checkout, account...
+├── components/
+│   ├── common/           Layout, Navbar, Footer, shared layout components
+│   ├── ui/               Low-level UI primitives (buttons, modals, inputs...)
+│   └── shared/           Cross-feature components (carousels, testimonials, modals)
+├── screens/              Feature screens — business logic + composition
+│   ├── auth/
+│   ├── blog/
+│   ├── checkout/
+│   ├── product/
+│   ├── shop/
+│   ├── orders/
+│   ├── account/
+│   └── ...
+├── hooks/                Shared React hooks
+├── lib/                  Auth client, Axios instance, cart, checkout, orders, utilities
+├── providers/            App-level React context providers
+├── constants/            App-wide constants
+├── data/                 Static fallback/content data
+└── utils/                Shared utility functions
+```
+
+---
+
+## Routes
+
+| Route | Description |
+| --- | --- |
+| `/` | Home page |
+| `/shop` | Product listing |
+| `/product/[slug]` | Product detail |
+| `/checkout` | Checkout flow |
+| `/checkout/success` | Order confirmed |
+| `/checkout/failed` | Order failed |
+| `/orders/[orderId]` | Order detail & tracking |
+| `/account` | Customer account (profile, orders, reviews) |
+| `/signin` | Sign in |
+| `/signup` | Sign up |
+| `/forgot-password` | Password reset |
+| `/blog` | Blog listing |
+| `/blog/[slug]` | Blog detail |
+| `/concern` | Concern listing |
+| `/concern/[slug]` | Concern detail |
+| `/about` | About BYOU |
+| `/lab` | Lab & formulation content |
+| `/contact` | Contact, FAQ, and testimonials |
+
+---
+
+## Getting Started
+
+### Prerequisites
 
 - Node.js compatible with Next.js 16
 - Yarn Classic `1.22.22`
 - Access to the BYOU backend API
-- Environment variables configured in `.env.local`
 
-## Environment Variables
+### Environment Variables
 
-Create `.env.local` in the project root.
+Create a `.env.local` file in the project root:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://your-api-domain.com
@@ -57,152 +118,73 @@ NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
 NEXT_PUBLIC_R2_PUBLIC_BASE_URL=https://your-public-assets-domain.com
 ```
 
-Common variables used by the app:
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | Yes | Backend API origin. Defaults to `https://byou-api.nexulyze.com` if omitted. |
+| `NEXT_PUBLIC_FRONTEND_URL` | Yes | Frontend origin used by the Better Auth client. |
+| `NEXT_PUBLIC_R2_PUBLIC_BASE_URL` | No | Public base URL for R2-hosted product images. |
 
-| Variable                         | Required | Purpose                                                                                                                                                 |
-| -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_URL`            | Yes      | Backend API origin. If the value does not include `/api/v1`, the app appends it where needed. Defaults to `https://byou-api.nexulyze.com` when omitted. |
-| `NEXT_PUBLIC_FRONTEND_URL`       | Yes      | Frontend origin used by the Better Auth client when browser origin is unavailable.                                                                      |
-| `NEXT_PUBLIC_R2_PUBLIC_BASE_URL` | No       | Public product image base URL for R2 image keys returned by the backend.                                                                                |
-
-For production Google OAuth and Better Auth setup, keep the backend auth configuration and Google redirect URI aligned with the deployed frontend domain.
-
-## API Routing
-
-The app uses a same-origin API proxy for browser requests.
-
-```ts
-// next.config.ts
-source: "/api/v1/:path*";
-destination: `${backendApiUrl}/api/v1/:path*`;
-```
-
-Browser-side services call relative `/api/v1` routes. Server-side calls use the configured backend origin directly. This keeps browser requests same-origin while still supporting server rendering and API access.
-
-## Product Experience
-
-The storefront supports the current published catalog payload shape:
-
-- Published product list and product detail data
-- Product slugs for storefront detail routes
-- Featured product placement on the home and shop pages
-- Product variants with price, quantity, and default variant handling
-- R2-backed product image keys and public image URL resolution
-- Add-to-cart and buy-now flows
-- Product checkout item resolution against the latest published product data
-
-## Checkout and Orders
-
-The checkout flow supports:
-
-- Cart checkout and direct buy-now checkout
-- Customer session-aware order creation
-- Bangladesh-focused shipping fields and phone formatting
-- Inside-Dhaka and outside-Dhaka delivery fee handling
-- Cash payment method payloads
-- Order success and failure pages
-- Customer order history in the account area
-
-## Blog and Content
-
-The blog and content surfaces support:
-
-- Published blog listing
-- Blog filtering by category, search text, and tag
-- Blog detail pages by slug
-- Static editorial and brand pages for About, Lab, Contact, and Concerns
-- Sanitized HTML rendering where backend content requires it
-
-## Getting Started
-
-Install dependencies:
+### Install & Run
 
 ```bash
 yarn install
-```
-
-Start the development server:
-
-```bash
 yarn dev
 ```
 
-Open the app:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```bash
-http://localhost:3000
-```
+---
 
 ## Scripts
 
-| Command      | Description                                 |
-| ------------ | ------------------------------------------- |
-| `yarn dev`   | Start the Next.js development server.       |
-| `yarn build` | Create a production build.                  |
-| `yarn start` | Start the production server after building. |
-| `yarn lint`  | Run ESLint across the codebase.             |
+| Command | Description |
+| --- | --- |
+| `yarn dev` | Start the development server |
+| `yarn build` | Create a production build |
+| `yarn start` | Serve the production build |
+| `yarn lint` | Run ESLint |
 
-## Project Structure
+---
 
-```text
-app/                 Next.js routes, layouts, loading, not-found, and global styles
-components/          Shared UI, page, product, checkout, account, auth, and content components
-data/                Local static product and concern fallback/content data
-docs/                API and order-flow documentation
-hooks/               Shared React hooks
-lib/                 Auth, API client, cart, checkout, orders, sanitize, and utility helpers
-providers/           Application-level React providers
-public/              Static images and public assets
-services/            API clients, queries, mutations, query keys, helpers, and types
+## API Proxy
+
+Browser-side requests are proxied through Next.js to avoid CORS and keep requests same-origin:
+
+```ts
+// next.config.ts
+source: "/api/v1/:path*"
+destination: `${backendApiUrl}/api/v1/:path*`
 ```
 
-Important storefront routes:
+Server-side calls use the configured backend origin directly.
 
-| Route                   | Purpose                                                  |
-| ----------------------- | -------------------------------------------------------- |
-| `/`                     | Home page                                                |
-| `/shop`                 | Product listing and featured product surfaces            |
-| `/product/[slug]`       | Product detail page                                      |
-| `/checkout`             | Checkout flow                                            |
-| `/checkout/success`     | Successful order page                                    |
-| `/checkout/failed`      | Failed checkout page                                     |
-| `/account`              | Customer profile, shipping address, password, and orders |
-| `/orders/[orderId]`     | Order detail page                                        |
-| `/auth/signin`          | Customer sign-in                                         |
-| `/auth/signup`          | Customer registration                                    |
-| `/auth/forgot-password` | Password reset request                                   |
-| `/blog`                 | Blog listing                                             |
-| `/blog/[slug]`          | Blog detail page                                         |
-| `/concern`              | Concern listing                                          |
-| `/concern/[slug]`       | Concern detail page                                      |
-| `/about`                | About BYOU                                               |
-| `/lab`                  | Lab and formulation content                              |
-| `/contact`              | Contact form, contact methods, FAQ, and testimonials     |
+---
 
-## Development Notes
+## Development Guidelines
 
-- Keep API contracts in `services/*/type.ts` aligned with backend payloads.
-- Use `lib/axios.ts` for API calls so browser and server base URLs stay consistent.
-- Prefer existing components and page patterns before adding new abstractions.
-- Keep cart and checkout payload changes aligned with `lib/cart`, `lib/checkout`, `lib/orders`, and `services/orders`.
-- Resolve product images through `getR2ImageUrl` when working with backend image keys.
-- Avoid committing generated build artifacts such as `.next` and `tsconfig.tsbuildinfo`.
+- Keep API types in `src/screens/*/services/type.ts` aligned with backend payloads.
+- Use `src/lib/axios.ts` for all HTTP calls — it handles browser vs. server base URL automatically.
+- Route files under `src/app/` should contain minimal logic — delegate to the corresponding screen in `src/screens/`.
+- Resolve product images through `getR2ImageUrl()` when working with backend image keys.
+- Do not commit `.next/`, `tsconfig.tsbuildinfo`, or any generated build artifacts.
 
-## Verification
-
-Before opening a pull request or handing off a change, run:
+### Before Merging
 
 ```bash
 yarn lint
 yarn build
 ```
 
-For TypeScript-only verification during local development:
+For TypeScript-only checks during development:
 
 ```bash
-./node_modules/.bin/tsc --noEmit
+npx tsc --noEmit
 ```
+
+---
 
 ## License
 
-This project is private.
+Copyright (c) 2026 Nexulyze. All Rights Reserved.
+
+This is proprietary software. Unauthorized use, copying, or distribution is strictly prohibited.
