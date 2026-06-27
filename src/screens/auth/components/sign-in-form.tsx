@@ -90,17 +90,14 @@ const SignInForm = () => {
 
   // Phone input character constraint
   useEffect(() => {
-    if (
-      currentPhone &&
-      currentPhone.length > selectedCountry.maxNationalNumberLength
-    ) {
+    if (currentPhone && currentPhone.length > 11) {
       setValue(
         "phone",
-        currentPhone.slice(0, selectedCountry.maxNationalNumberLength),
+        currentPhone.slice(0, 11),
         { shouldValidate: true },
       );
     }
-  }, [currentPhone, selectedCountry.maxNationalNumberLength, setValue]);
+  }, [currentPhone, setValue]);
 
   // Resend code countdown timer
   useEffect(() => {
@@ -126,10 +123,10 @@ const SignInForm = () => {
           toast.error(res.message || "Failed to send verification code.");
         }
       } else {
-        const fullPhoneNumber = `${selectedCountry.dialCode}${data.phone}`;
-        await sendPhoneOtp(fullPhoneNumber);
+        const cleanPhone = data.phone.startsWith("0") ? data.phone : "0" + data.phone;
+        await sendPhoneOtp(cleanPhone);
         toast.success(
-          `Verification code sent to ${selectedCountry.dialCode} ${data.phone}.`,
+          `Verification code sent to ${cleanPhone}.`,
         );
         setOtpSent(true);
         setResendTimer(30);
@@ -182,8 +179,8 @@ const SignInForm = () => {
           toast.error(res.message || "Invalid verification code.");
         }
       } else {
-        const fullPhoneNumber = `${selectedCountry.dialCode}${data.phone}`;
-        const res = await verifyPhoneOtp(fullPhoneNumber, data.otp);
+        const cleanPhone = data.phone.startsWith("0") ? data.phone : "0" + data.phone;
+        const res = await verifyPhoneOtp(cleanPhone, data.otp);
         if (res.status === true || res.token) {
           await refetchSession();
           toast.success("Signed in successfully!");
@@ -274,13 +271,16 @@ const SignInForm = () => {
             type="button"
             onClick={() => setActiveTab("phone")}
             className={cn(
-              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer",
+              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5",
               activeTab === "phone"
                 ? "border-black text-black"
                 : "border-transparent text-gray-400 hover:text-gray-600",
             )}
           >
-            Phone Login
+            <span>Phone Login</span>
+            <span className="relative -top-1 inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-medium leading-tight  bg-emerald-600 text-white border border-emerald-600 transition-all duration-300">
+              BD
+            </span>
           </button>
         </div>
       )}
@@ -321,94 +321,46 @@ const SignInForm = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Number
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-[160px_minmax(0,1fr)] gap-3">
-                  <div>
-                    <Controller
-                      name="countryIso2"
-                      control={control}
-                      rules={{ required: "Country code is required" }}
-                      render={({ field }) => (
-                        <Combobox
-                          items={countryPhoneOptions}
-                          value={getCountryPhoneOption(field.value)}
-                          onValueChange={(value) =>
-                            field.onChange(value?.iso2 ?? "")
-                          }
-                          itemToStringValue={(item) => item.label}
-                        >
-                          <ComboboxTrigger
-                            render={
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full h-12 justify-between overflow-hidden font-normal rounded-lg border-gray-300 px-4"
-                              >
-                                <ComboboxValue placeholder="Code" />
-                              </Button>
-                            }
-                          />
-                          <ComboboxContent>
-                            <ComboboxInput
-                              showTrigger={false}
-                              placeholder="Search..."
-                            />
-                            <ComboboxEmpty>No country found.</ComboboxEmpty>
-                            <ComboboxList>
-                              {(item) => (
-                                <ComboboxItem key={item.iso2} value={item}>
-                                  <div className="flex w-full min-w-0 items-center justify-between gap-3">
-                                    <span className="truncate">
-                                      {item.name}
-                                    </span>
-                                    <span className="shrink-0 text-xs text-gray-500">
-                                      {item.dialCode}
-                                    </span>
-                                  </div>
-                                </ComboboxItem>
-                              )}
-                            </ComboboxList>
-                          </ComboboxContent>
-                        </Combobox>
-                      )}
-                    />
-                  </div>
-
-                  <div>
-                    <Controller
-                      name="phone"
-                      control={control}
-                      rules={{
-                        required: "Contact number is required",
-                        validate: {
-                          digitsOnly: (value) =>
-                            /^\d+$/.test(value) || "Only numbers are allowed",
-                          minLength: (value) =>
-                            value.length >= 7 ||
-                            "Contact number must be at least 7 digits",
-                        },
-                      }}
-                      render={({ field }) => (
+                <div>
+                  <Controller
+                    name="phone"
+                    control={control}
+                    rules={{
+                      required: "Contact number is required",
+                      validate: {
+                        digitsOnly: (value) =>
+                          /^\d+$/.test(value) || "Only numbers are allowed",
+                        validBD: (value) =>
+                          /^(01[3-9]\d{8}|1[3-9]\d{8})$/.test(value) ||
+                          "Please enter a valid Bangladesh phone number (e.g. 01XXXXXXXXX)",
+                      },
+                    }}
+                    render={({ field }) => (
+                      <div className="flex items-center w-full h-12 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-black focus-within:border-transparent outline-none transition bg-white">
+                        <span className="pl-4 pr-2 text-gray-500 font-medium select-none">
+                          +880
+                        </span>
                         <input
                           type="tel"
                           id="phone"
                           inputMode="numeric"
-                          maxLength={selectedCountry.maxNationalNumberLength}
+                          maxLength={11}
                           value={field.value}
                           onChange={(e) => {
                             const val = e.target.value.replace(/\D/g, "");
                             field.onChange(val);
                           }}
-                          className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
-                          placeholder={`Up to ${selectedCountry.maxNationalNumberLength} digits`}
+                          className="w-full h-full pr-4 outline-none bg-transparent text-sm"
+                          placeholder="01XXXXXXXXX"
                         />
-                      )}
-                    />
-                    {errors.phone && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.phone.message}
-                      </p>
+                      </div>
                     )}
-                  </div>
+                  />
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -484,7 +436,7 @@ const SignInForm = () => {
                 <span className="font-semibold text-gray-700">
                   {activeTab === "email"
                     ? currentEmail
-                    : `${selectedCountry.dialCode} ${currentPhone}`}
+                    : currentPhone.startsWith("0") ? currentPhone : "0" + currentPhone}
                 </span>
                 .
               </p>
@@ -545,8 +497,8 @@ const SignInForm = () => {
                     } else {
                       setIsPending(true);
                       try {
-                        const fullPhoneNumber = `${selectedCountry.dialCode}${currentPhone}`;
-                        await resendPhoneOtp(fullPhoneNumber);
+                        const cleanPhone = currentPhone.startsWith("0") ? currentPhone : "0" + currentPhone;
+                        await resendPhoneOtp(cleanPhone);
                         toast.success("Verification code resent.");
                         setResendTimer(30);
                       } catch {
