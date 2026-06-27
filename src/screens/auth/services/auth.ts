@@ -65,6 +65,58 @@ export const updateUser = async (
   return response.data;
 };
 
+export interface SendPhoneOtpResponse {
+  message?: string;
+}
+
+export interface VerifyPhoneOtpResponse {
+  status?: boolean;
+  token?: string;
+  user?: AuthUser & {
+    phoneNumber?: string;
+    phoneNumberVerified?: boolean;
+    userType?: string;
+    mustChangePassword?: boolean;
+  };
+  message?: string;
+}
+
+export interface ResendPhoneOtpResponse {
+  success?: boolean;
+  message?: string;
+  code?: number;
+  data?: { phoneNumber?: string };
+}
+
+export const sendPhoneOtp = async (
+  phoneNumber: string,
+): Promise<SendPhoneOtpResponse> => {
+  const response = await apiClient.post("/auth/phone-number/send-otp", {
+    phoneNumber,
+  });
+  return response.data;
+};
+
+export const verifyPhoneOtp = async (
+  phoneNumber: string,
+  code: string,
+): Promise<VerifyPhoneOtpResponse> => {
+  const response = await apiClient.post("/auth/phone-number/verify", {
+    phoneNumber,
+    code,
+  });
+  return response.data;
+};
+
+export const resendPhoneOtp = async (
+  phoneNumber: string,
+): Promise<ResendPhoneOtpResponse> => {
+  const response = await apiClient.post("/otp/phone-number/resend-otp", {
+    phoneNumber,
+  });
+  return response.data;
+};
+
 export const socialSignIn = async (
   provider: "google",
   callbackURL: string,

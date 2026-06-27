@@ -29,6 +29,9 @@ import {
 import {
   sendEmailOtp,
   verifyEmailOtp,
+  sendPhoneOtp,
+  verifyPhoneOtp,
+  resendPhoneOtp,
   socialSignIn,
   updateUser,
 } from "@/screens/auth/services/auth";
@@ -123,10 +126,10 @@ const SignInForm = () => {
           toast.error(res.message || "Failed to send verification code.");
         }
       } else {
-        // Phone mock send OTP
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        const fullPhoneNumber = `${selectedCountry.dialCode}${data.phone}`;
+        await sendPhoneOtp(fullPhoneNumber);
         toast.success(
-          `Verification code sent to ${selectedCountry.dialCode} ${data.phone}. (Demo OTP: 123456)`,
+          `Verification code sent to ${selectedCountry.dialCode} ${data.phone}.`,
         );
         setOtpSent(true);
         setResendTimer(30);
@@ -179,15 +182,15 @@ const SignInForm = () => {
           toast.error(res.message || "Invalid verification code.");
         }
       } else {
-        // Phone mock verify OTP
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        if (data.otp === "123456") {
+        const fullPhoneNumber = `${selectedCountry.dialCode}${data.phone}`;
+        const res = await verifyPhoneOtp(fullPhoneNumber, data.otp);
+        if (res.status === true || res.token) {
           await refetchSession();
-          toast.success("Signed in successfully! (Demo)");
+          toast.success("Signed in successfully!");
           router.push(callbackUrl);
           router.refresh();
         } else {
-          toast.error("Invalid verification code. Please try 123456.");
+          toast.error(res.message || "Invalid verification code.");
         }
       }
     } catch (err: unknown) {
@@ -267,18 +270,18 @@ const SignInForm = () => {
           >
             Email Login
           </button>
-          <div className="flex-1 relative">
-            <button
-              type="button"
-              disabled
-              className="w-full pb-3 text-center text-sm font-medium border-b-2 border-transparent text-gray-400 cursor-not-allowed"
-            >
-              Phone Login
-            </button>
-            <span className="absolute -top-2.5 right-2 bg-orange-50 text-orange-600 text-[8px] px-1.5 py-0.5 rounded-full border border-orange-200 font-bold tracking-wider uppercase select-none">
-              Upcoming
-            </span>
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab("phone")}
+            className={cn(
+              "flex-1 pb-3 text-center text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer",
+              activeTab === "phone"
+                ? "border-black text-black"
+                : "border-transparent text-gray-400 hover:text-gray-600",
+            )}
+          >
+            Phone Login
+          </button>
         </div>
       )}
 
@@ -530,15 +533,29 @@ const SignInForm = () => {
               ) : (
                 <button
                   type="button"
-                  onClick={() =>
-                    handleSendOtp({
-                      name: "",
-                      email: currentEmail,
-                      phone: currentPhone,
-                      countryIso2: selectedCountryIso2,
-                      otp: "",
-                    })
-                  }
+                  onClick={async () => {
+                    if (activeTab === "email") {
+                      handleSendOtp({
+                        name: "",
+                        email: currentEmail,
+                        phone: currentPhone,
+                        countryIso2: selectedCountryIso2,
+                        otp: "",
+                      });
+                    } else {
+                      setIsPending(true);
+                      try {
+                        const fullPhoneNumber = `${selectedCountry.dialCode}${currentPhone}`;
+                        await resendPhoneOtp(fullPhoneNumber);
+                        toast.success("Verification code resent.");
+                        setResendTimer(30);
+                      } catch {
+                        toast.error("Failed to resend code. Please try again.");
+                      } finally {
+                        setIsPending(false);
+                      }
+                    }
+                  }}
                   className="text-xs text-black font-semibold hover:underline"
                 >
                   Resend code
