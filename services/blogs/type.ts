@@ -1,7 +1,9 @@
+import type { ApiProduct } from "@/services/products/type";
+
 export interface BlogContent {
   order: number;
-  type: "text" | "image" | "video";
-  content: string;
+  type: "TEXT" | "IMAGE" | "VIDEO" | "PRODUCT";
+  content: string | ApiProduct;
   contentKey?: string;
 }
 
@@ -16,6 +18,19 @@ export interface Blog {
   contents: BlogContent[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BlogMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
+}
+
+export interface PaginatedBlogsResponse {
+  data: Blog[];
+  meta: BlogMeta;
+  message: string;
 }
 
 export interface BlogDetailResponse {

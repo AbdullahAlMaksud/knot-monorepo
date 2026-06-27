@@ -10,6 +10,7 @@ import type { ApiProduct } from "@/services/products/type";
 import {
   getDefaultProductVariant,
   getProductImages,
+  getVariantId,
   getVariantPricing,
 } from "@/services/products/utils";
 
@@ -76,6 +77,7 @@ export default function CoreProductsSection({
             const defaultVariant = getDefaultProductVariant(product);
             const pricing = getVariantPricing(defaultVariant);
             const price = pricing.discountedPrice;
+            const variantId = getVariantId(defaultVariant);
             const defaultVariantInStock =
               typeof defaultVariant?.quantity === "number"
                 ? defaultVariant.quantity > 0
@@ -213,21 +215,41 @@ export default function CoreProductsSection({
                   <Button
                     type="button"
                     className="w-full rounded-full"
-                    disabled={!defaultVariant?._id || !defaultVariantInStock}
+                    disabled={!variantId || !defaultVariantInStock}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (!defaultVariant?._id || !defaultVariantInStock) {
+                      if (!variantId || !defaultVariantInStock) {
                         return;
                       }
 
                       addItem({
                         id: product._id,
-                        variantId: defaultVariant._id,
+                        variantId,
                         name: product.name,
                         price,
                         image: images[0] ?? "",
                         quantity: 1,
+                        originalPrice: pricing.originalPrice,
+                        discountAmount: pricing.discountAmount,
+                        currency: pricing.currency,
+                        discountType: pricing.discountType,
+                        discountValue:
+                          typeof defaultVariant?.discountType === "object"
+                            ? Number(defaultVariant.discountType.value)
+                            : defaultVariant?.discountValue
+                              ? Number(defaultVariant.discountValue)
+                              : undefined,
+                        maxDiscountValue:
+                          typeof defaultVariant?.discountType === "object"
+                            ? Number(
+                                defaultVariant.discountType.maxValue ||
+                                  defaultVariant.discountType.maxAmount,
+                              )
+                            : defaultVariant?.discountMaxValue
+                              ? Number(defaultVariant.discountMaxValue)
+                              : undefined,
+                        isDiscounted: pricing.hasDiscount,
                       });
                     }}
                   >

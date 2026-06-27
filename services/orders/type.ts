@@ -2,24 +2,28 @@ export type { Order, CheckoutFormData } from "@/lib/orders/types";
 
 export type OrderPayloadType = {
   customerId?: string;
-  items: {
-    productId: string;
+  orderedItems: {
     variantId: string;
     quantity: number;
   }[];
+  currencyId: string;
+  orderAmount: number;
   shipment: {
     name: string;
     email: string;
     phone: string;
-    apartment?: string;
+    addressLine?: string;
     city: string;
     district: string;
     postalCode: string;
     country: string;
   };
+  shippingChargeId: string;
   payment?: {
     method: string;
+    transactionId?: string;
   };
+  couponCode?: string;
   note?: string;
 };
 

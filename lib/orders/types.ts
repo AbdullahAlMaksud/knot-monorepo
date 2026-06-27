@@ -75,6 +75,7 @@ export type CheckoutFormData = {
   postalCode: string;
   country: string;
   extraNotes: string;
+  countryIso2?: string;
 };
 
 export type Order = {

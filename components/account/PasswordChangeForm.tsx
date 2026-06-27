@@ -48,7 +48,7 @@ export default function PasswordChangeForm({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current Password
+              Current Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -66,7 +66,7 @@ export default function PasswordChangeForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              New Password
+              New Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -88,7 +88,7 @@ export default function PasswordChangeForm({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm New Password
+              Confirm New Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"

@@ -78,31 +78,12 @@ export default function CountryConfirmModal({
             placeholder="Switch country"
           />
 
-          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={closeModal}
-              className="rounded-full"
-            >
-              Not now
-            </Button>
-            {canKeepDetectedCountry && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={keepCountry}
-                disabled={isDetecting}
-                className="rounded-full"
-              >
-                Keep {detectedCountry?.country}
-              </Button>
-            )}
+          <div className="flex justify-end">
             <Button
               type="button"
               onClick={saveCountry}
               disabled={!canSaveManualCountry || isDetecting}
-              className="rounded-full"
+              className="rounded-full w-full sm:w-auto text-center"
             >
               Save country
             </Button>

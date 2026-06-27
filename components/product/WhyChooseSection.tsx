@@ -1,7 +1,43 @@
 import Image from "next/image";
 import { Droplets, Droplet, Hand, Sparkles, Clock, Leaf } from "lucide-react";
-import type { ProductDetail } from "@/data/products";
 import { Fragment } from "react/jsx-runtime";
+
+export interface ProductDetailIdealFor {
+  label: string;
+  value: string;
+}
+
+export interface ProductDetailWhyChoose {
+  description: string;
+  idealFor: ProductDetailIdealFor[];
+  benefits: string[];
+}
+
+export interface ProductDetailHowToUseStep {
+  title: string;
+  description: string;
+}
+
+export interface ProductDetailHowToUse {
+  description: string;
+  steps: ProductDetailHowToUseStep[];
+}
+
+export interface ProductDetailIngredientItem {
+  name: string;
+  benefit: string;
+}
+
+export interface ProductDetailIngredients {
+  description: string;
+  items: ProductDetailIngredientItem[];
+}
+
+export interface ProductDetail {
+  whyChoose: ProductDetailWhyChoose;
+  howToUse: ProductDetailHowToUse;
+  ingredients: ProductDetailIngredients;
+}
 
 const stepIcons = [Sparkles, Droplet, Hand, Droplets, Clock];
 const ingredientIcons = [Leaf, Droplets, Sparkles, Droplet];

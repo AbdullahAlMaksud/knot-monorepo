@@ -93,7 +93,7 @@ export default function ProductSections({
               <ul className="mt-8 max-w-xl space-y-4">
                 {items.map((item, itemIndex) => (
                   <li
-                    key={`${section._id}-${item.text}-${itemIndex}`}
+                    key={`${section._id || index}-${item.text}-${itemIndex}`}
                     className="flex items-start gap-4"
                   >
                     <span
@@ -126,7 +126,7 @@ export default function ProductSections({
         ) : null;
 
         return (
-          <section key={section._id} className={sectionClasses}>
+          <section key={section._id || `section-${index}`} className={sectionClasses}>
             <div
               className={`mx-auto grid max-w-6xl grid-cols-1 ${
                 image ? "lg:grid-cols-2" : ""

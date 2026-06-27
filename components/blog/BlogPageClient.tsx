@@ -1,67 +1,73 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import Layout from "@/components/Layout";
 import BlogPostsSection from "@/components/blog/BlogPostsSection";
 import RealStoriesSliderSection from "@/components/blog/RealStoriesSliderSection";
 import TestimonialsSection from "@/components/shared/TestimonialsSection";
-import HeroCarousel from "@/components/shared/HeroCarousel";
-import { useGetPublishedBlogs } from "@/services/blogs/query";
+import { useGetPublishedBlogs, useGetBlogTags } from "@/services/blogs/query";
 
 export default function BlogPageClient() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const {
-    data: fetchedBlogs = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetPublishedBlogs();
+  const searchQuery = "";
+  const [page, setPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
+  const [selectedTag, setSelectedTag] = useState<string | undefined>();
 
-  const blogs = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return fetchedBlogs;
-    return fetchedBlogs.filter((b) => b.title.toLowerCase().includes(q));
-  }, [fetchedBlogs, searchQuery]);
+  const { data, isLoading, isError, error, refetch } = useGetPublishedBlogs(
+    page,
+    searchQuery,
+    10,
+    { category: selectedCategory, tags: selectedTag },
+  );
 
-  const heroMedia = [{ type: "image" as const, src: "/images/blog/cover.jpg" }];
+  const { data: tagsData } = useGetBlogTags();
+
+  const blogs = data?.data ?? [];
+  const meta = data?.meta;
+
+  function handleCategoryChange(category: string | undefined) {
+    setSelectedCategory(category);
+    setPage(1);
+  }
+
+  function handleTagChange(tag: string | undefined) {
+    setSelectedTag(tag);
+    setPage(1);
+  }
+
+  function handleResetFilters() {
+    setSelectedCategory(undefined);
+    setSelectedTag(undefined);
+    setPage(1);
+  }
 
   return (
     <Layout>
-      <HeroCarousel
-        mediaItems={heroMedia}
-        title={
-          <>
-            Your Daily Glow
-            <br />
-            Guide
-          </>
-        }
-        description={
-          <>
-            From expert tips to real stories, explore everything you need for
-            healthier skin.
-          </>
-        }
-        searchBar={{
-          placeholder: "Search articles...",
-          value: searchQuery,
-          onChange: setSearchQuery,
-        }}
-      />
+      <div className="pt-32">
+        <BlogPostsSection
+          blogs={blogs}
+          isLoading={isLoading}
+          isError={isError}
+          errorMessage={error?.message}
+          onRetry={refetch}
+          searchQuery={searchQuery}
+          meta={meta}
+          page={page}
+          onPageChange={setPage}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+          selectedTag={selectedTag}
+          onTagChange={handleTagChange}
+          tags={tagsData}
+          onResetFilters={handleResetFilters}
+        />
 
-      <BlogPostsSection
-        blogs={blogs}
-        isLoading={isLoading}
-        isError={isError}
-        errorMessage={error?.message}
-        onRetry={refetch}
-        searchQuery={searchQuery}
-      />
-
-      <RealStoriesSliderSection />
-      <TestimonialsSection />
+        <RealStoriesSliderSection />
+        <TestimonialsSection />
+      </div>
     </Layout>
   );
 }

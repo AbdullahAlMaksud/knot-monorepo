@@ -5,16 +5,20 @@ import { DELIVERY_OPTIONS, type DeliveryArea } from "@/lib/checkout/constants";
 import { CurrencyIcon, HandCoins, PackageCheck } from "lucide-react";
 
 type PaymentMethodSectionProps = {
-  deliveryArea: DeliveryArea;
+  shippingFee: number;
+  currencySymbol?: string;
+  estimatedDelivery: string;
+  deliveryLabel: string;
   selectedDistrict?: string;
 };
 
 export default function PaymentMethodSection({
-  deliveryArea,
+  shippingFee,
+  currencySymbol,
+  estimatedDelivery,
+  deliveryLabel,
   selectedDistrict,
 }: PaymentMethodSectionProps) {
-  const activeOption = DELIVERY_OPTIONS[deliveryArea];
-
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-6">Payment & Delivery</h2>
@@ -39,9 +43,9 @@ export default function PaymentMethodSection({
         <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-medium text-gray-900">{activeOption.label}</p>
+              <p className="font-medium text-gray-900">{deliveryLabel}</p>
               <p className="text-sm text-gray-500 mt-1">
-                Estimated delivery: {activeOption.estimatedDelivery}
+                Estimated delivery: {estimatedDelivery}
               </p>
               <p className="text-xs text-gray-500 mt-3">
                 {selectedDistrict
@@ -52,7 +56,7 @@ export default function PaymentMethodSection({
 
             <div className="text-right shrink-0">
               <p className="font-semibold text-gray-900">
-                <CurrencyAmount amount={activeOption.shippingFee} />
+                <CurrencyAmount amount={shippingFee} currency={currencySymbol} />
               </p>
               <p className="text-xs text-gray-500 mt-1">Shipping</p>
             </div>

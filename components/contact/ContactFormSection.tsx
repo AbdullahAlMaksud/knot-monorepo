@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import Image from "next/image";
 import {
@@ -17,8 +17,9 @@ import {
   countryPhoneOptions,
   getCountryPhoneOption,
 } from "@/lib/country-phone-options";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { Button } from "../ui/button";
+import { useSubmitContact } from "@/services/contact/mutation";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 type FormData = {
   name: string;
@@ -29,19 +30,22 @@ type FormData = {
 };
 
 export default function ContactFormSection() {
-  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
-  useBodyScrollLock(isComingSoonOpen);
+  const { mutate: sendContact, isPending } = useSubmitContact();
+  const { email: userEmail } = useAuthUser();
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       countryIso2: "BD",
       phone: "",
+      email: userEmail ?? "",
     },
+    mode: "onChange",
   });
 
   const selectedCountryIso2 = useWatch({
@@ -53,6 +57,12 @@ export default function ContactFormSection() {
     name: "phone",
   });
   const selectedCountry = getCountryPhoneOption(selectedCountryIso2);
+
+  useEffect(() => {
+    if (userEmail) {
+      setValue("email", userEmail);
+    }
+  }, [userEmail, setValue]);
 
   useEffect(() => {
     if (
@@ -67,8 +77,36 @@ export default function ContactFormSection() {
     }
   }, [currentPhone, selectedCountry.maxNationalNumberLength, setValue]);
 
-  const onSubmit = () => {
-    setIsComingSoonOpen(true);
+  const onSubmit = (data: FormData) => {
+    const selectedCountry = getCountryPhoneOption(data.countryIso2);
+    let formattedPhone = data.phone.trim();
+    if (data.countryIso2 === "BD") {
+      const digitsOnly = formattedPhone.replace(/\D/g, "");
+      if (digitsOnly.startsWith("880") && digitsOnly.length >= 13) {
+        formattedPhone = `0${digitsOnly.slice(3)}`.slice(0, 11);
+      } else if (digitsOnly.startsWith("0")) {
+        formattedPhone = digitsOnly.slice(0, 11);
+      } else {
+        formattedPhone = `0${digitsOnly}`.slice(0, 11);
+      }
+    } else {
+      formattedPhone = `${selectedCountry.dialCode}${formattedPhone}`;
+    }
+
+    sendContact({
+      name: data.name.trim(),
+      email: (userEmail || data.email).trim(),
+      phone: formattedPhone,
+      message: data.message.trim(),
+    }, {
+      onSuccess: () => {
+        reset({
+          countryIso2: "BD",
+          phone: "",
+          email: userEmail ?? "",
+        });
+      }
+    });
   };
 
   return (
@@ -90,18 +128,19 @@ export default function ContactFormSection() {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Name
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   id="name"
+                  disabled={isPending}
                   {...register("name", {
                     required: "Name is required",
                     validate: (value) =>
                       value.trim().length >= 2 ||
                       "Name must be at least 2 characters",
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Your name"
                 />
                 {errors.name && (
@@ -116,11 +155,12 @@ export default function ContactFormSection() {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Email
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   id="email"
+                  disabled={isPending || !!userEmail}
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -128,7 +168,7 @@ export default function ContactFormSection() {
                       message: "Invalid email address",
                     },
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="your.email@example.com"
                 />
                 {errors.email && (
@@ -140,7 +180,7 @@ export default function ContactFormSection() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Number
+                  Contact Number <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)] gap-3">
                   <div>
@@ -164,6 +204,7 @@ export default function ContactFormSection() {
                               <Button
                                 type="button"
                                 variant="outline"
+                                disabled={isPending}
                                 aria-invalid={
                                   errors.countryIso2 ? true : undefined
                                 }
@@ -230,6 +271,7 @@ export default function ContactFormSection() {
                           autoComplete="tel-national"
                           maxLength={selectedCountry.maxNationalNumberLength}
                           pattern="[0-9]*"
+                          disabled={isPending}
                           value={field.value}
                           onChange={(event) => {
                             const digitsOnly = event.target.value
@@ -241,7 +283,7 @@ export default function ContactFormSection() {
 
                             field.onChange(digitsOnly);
                           }}
-                          className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
+                          className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed"
                           placeholder={`Up to ${selectedCountry.maxNationalNumberLength} digits`}
                           aria-invalid={errors.phone ? true : undefined}
                         />
@@ -261,18 +303,19 @@ export default function ContactFormSection() {
                   htmlFor="message"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  How can we help
+                  How can we help <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="message"
                   rows={6}
+                  disabled={isPending}
                   {...register("message", {
                     required: "Message is required",
                     validate: (value) =>
                       value.trim().length >= 10 ||
                       "Message must be at least 10 characters",
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Tell us about your inquiry..."
                 />
                 {errors.message && (
@@ -284,9 +327,10 @@ export default function ContactFormSection() {
 
               <Button
                 type="submit"
-                className="w-full sm:w-auto bg-black text-white px-8 py-6 rounded-full hover:bg-gray-800 transition"
+                disabled={isPending}
+                className="w-full sm:w-auto bg-black text-white px-8 py-6 rounded-full hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Let Us Know
+                {isPending ? "Sending..." : "Let Us Know"}
               </Button>
             </form>
           </div>
@@ -303,38 +347,6 @@ export default function ContactFormSection() {
           </div>
         </div>
       </div>
-      {isComingSoonOpen && (
-        <div
-          data-lenis-prevent
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="contact-coming-soon-title"
-          onClick={() => setIsComingSoonOpen(false)}
-          onWheel={(event) => event.stopPropagation()}
-        >
-          <div
-            className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2
-              id="contact-coming-soon-title"
-              className="text-2xl font-semibold"
-            >
-              This feature will be available soon!
-            </h2>
-            <div className="mt-6 flex justify-end">
-              <Button
-                type="button"
-                onClick={() => setIsComingSoonOpen(false)}
-                className="rounded-full px-6"
-              >
-                Got it
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

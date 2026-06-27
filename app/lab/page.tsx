@@ -14,29 +14,11 @@ import Team2 from "@/components/home/Team2";
 import { useGetPublishedProducts } from "@/services/products/query";
 
 export default function LabPage() {
-  const heroMedia = [{ type: "image" as const, src: "/images/lab/lab-bg.jpg" }];
   const { data: products = [] } = useGetPublishedProducts();
 
   return (
     <Layout>
-      <HeroCarousel
-        mediaItems={heroMedia}
-        title={
-          <>
-            Science Meets
-            <br />
-            Beauty
-          </>
-        }
-        description={
-          <>
-            Welcome to Byou Labs, where innovation, research, and expert
-            insights come together to create the future of skincare.
-          </>
-        }
-        buttonText="Choose Your Glow"
-        buttonLink="/shop"
-      />
+      <HeroCarousel />
       <Innovation />
       <Team2 />
       <Info />

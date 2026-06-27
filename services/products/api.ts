@@ -5,9 +5,19 @@ import type {
   ProductsListResponse,
 } from "./type";
 
-export const getPublishedProducts = async (): Promise<ProductsListResponse> => {
+export interface GetPublishedProductsParams {
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
+  isFeatured?: boolean;
+}
+
+export const getPublishedProducts = async (
+  params?: GetPublishedProductsParams,
+): Promise<ProductsListResponse> => {
   const response = await apiClient.get<ProductsListResponse>(
     "/products/published",
+    { params },
   );
   return response.data;
 };

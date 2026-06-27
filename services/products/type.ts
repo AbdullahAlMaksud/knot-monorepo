@@ -10,15 +10,33 @@ export type ProductVariantDiscount = {
   maxDiscountAmount?: number | string;
 };
 
+export interface ProductVariantPrice {
+  id?: string;
+  isDefault?: boolean;
+  price: number;
+  makingCost?: number;
+  currencyId?: {
+    _id?: string;
+    name?: string;
+    code?: string;
+    symbol?: string;
+    isActive?: boolean;
+    isDefault?: boolean;
+  };
+  discountType?: ProductVariantDiscount;
+}
+
 export interface ProductVariant {
-  _id: string;
+  _id?: string;
+  id?: string;
   sku?: string;
-  size: string;
+  size?: string;
   inStock?: boolean;
   quantity?: number;
-  price: number;
+  price?: number;
+  prices?: ProductVariantPrice[];
   isDefault: boolean;
-  isDiscounted: boolean;
+  isDiscounted?: boolean;
   discountType?: ProductDiscountType | ProductVariantDiscount;
   discountValue?: number | string;
   discountAmount?: number | string;

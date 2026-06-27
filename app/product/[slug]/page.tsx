@@ -13,6 +13,7 @@ import {
 import Info from "@/components/home/Info";
 import ErrorState from "@/components/ui/error";
 import Skeleton from "@/components/ui/skeleton";
+import ProductReviewsSection from "@/components/product/ProductReviewsSection";
 
 function ProductDetailSkeleton() {
   return (
@@ -26,7 +27,7 @@ function ProductDetailSkeleton() {
                   <Skeleton key={index} className="h-20 w-full sm:h-24" />
                 ))}
               </div>
-              <Skeleton className="min-h-[360px] rounded-sm sm:min-h-[470px]" />
+              <Skeleton className="min-h-90 rounded-sm sm:min-h-117.5" />
             </div>
             <div className="flex flex-col justify-center space-y-5 lg:pl-4">
               <Skeleton className="h-3 w-32" />
@@ -82,6 +83,7 @@ export default function ProductDetailPage() {
             products={coreApiProducts}
           />
         )}
+        <ProductReviewsSection product={apiProduct} />
       </div>
     </Layout>
   );

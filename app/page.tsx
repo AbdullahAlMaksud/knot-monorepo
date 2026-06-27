@@ -40,14 +40,14 @@ const buildHeroProduct = (apiProduct: ApiProduct | undefined) => {
 };
 
 export default function Home() {
-  const heroMedia = [
-    { type: "image" as const, src: "/images/home/hero-bg.jpg" },
-    { type: "image" as const, src: "/images/about/about-bg.jpg" },
-  ];
   const { data: products = [] } = useGetPublishedProducts();
   const featuredProducts = useMemo(
     () => products.filter((product) => product.isFeatured),
     [products],
+  );
+  const homeFeaturedProducts = useMemo(
+    () => featuredProducts.slice(0, 4),
+    [featuredProducts],
   );
   const heroMist = useMemo(
     () => buildHeroProduct(featuredProducts[0] ?? products[0]),
@@ -62,30 +62,12 @@ export default function Home() {
     <>
       <LoadingLogo />
       <Layout>
-        <HeroCarousel
-          mediaItems={heroMedia}
-          title={
-            <>
-              Unveil Your Natural
-              <br />
-              Glow
-            </>
-          }
-          description={
-            <>
-              Byou brings you simple, pure, and effective beauty
-              <br />
-              essentials designed to highlight your true self.{" "}
-            </>
-          }
-          buttonText="Choose Your Glow"
-          buttonLink="/shop"
-        />
-        {products.length > 0 && (
+        <HeroCarousel />
+        {homeFeaturedProducts.length > 0 && (
           <CoreProductsSection
             subtitle="MADE JUST FOR YOU"
             title="Our Core Products"
-            products={products}
+            products={homeFeaturedProducts}
           />
         )}
         <Info />

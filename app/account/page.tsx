@@ -12,6 +12,7 @@ import PasswordChangeForm from "@/components/account/PasswordChangeForm";
 import OrderHistorySection from "@/components/account/OrderHistorySection";
 import CountryPreferenceSection from "@/components/account/CountryPreferenceSection";
 import { authClient, useAuthSession } from "@/lib/auth-client";
+import MyReviewsSection from "@/components/account/MyReviewsSection";
 import { toast } from "sonner";
 import { useUpdateShippingAddress } from "@/services/shipping-address/mutation";
 import type { ShippingAddress } from "@/services/shipping-address/type";
@@ -41,6 +42,7 @@ export default function MyAccountPage() {
     reset: resetProfile,
   } = useForm<ProfileFormData>({
     defaultValues: { fullName: "", lastName: "", email: "", phone: "" },
+    mode: "onChange",
   });
 
   const {
@@ -48,7 +50,9 @@ export default function MyAccountPage() {
     handleSubmit: handleSubmitShipping,
     formState: { errors: errorsShipping },
     setValue: setValueShipping,
-  } = useForm<ShippingAddress>();
+  } = useForm<ShippingAddress>({
+    mode: "onChange",
+  });
 
   const {
     register: registerPassword,
@@ -56,7 +60,9 @@ export default function MyAccountPage() {
     watch,
     reset: resetPassword,
     formState: { errors: errorsPassword },
-  } = useForm<PasswordFormData>();
+  } = useForm<PasswordFormData>({
+    mode: "onChange",
+  });
 
   useEffect(() => {
     if (isPending) return;
@@ -156,6 +162,8 @@ export default function MyAccountPage() {
           {activeTab === "orders" && <OrderHistorySection />}
 
           {activeTab === "preference" && <CountryPreferenceSection />}
+
+          {activeTab === "reviews" && <MyReviewsSection />}
         </div>
       </div>
     </Layout>

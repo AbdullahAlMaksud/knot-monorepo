@@ -16,6 +16,7 @@ import {
   UseFormSetValue,
   useWatch,
 } from "react-hook-form";
+import { useUserCountry } from "@/hooks/useUserCountry";
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
@@ -34,6 +35,10 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  countryPhoneOptions,
+  getCountryPhoneOption,
+} from "@/lib/country-phone-options";
 
 const normalizePhoneForInput = (phone: string): string => {
   const digitsOnly = phone.replace(/\D/g, "");
@@ -85,15 +90,22 @@ const ShippingForm = ({
 }: ShippingFormProps) => {
   const { data: session } = useAuthSession();
   const { id: userId, name, email } = session?.user || {};
+  const { countryCode, country } = useUserCountry();
   const selectedDistrict = useWatch({
     control,
     name: "state",
   });
 
+  const selectedCountryIso = useWatch({
+    control,
+    name: "countryIso2",
+  }) || "BD";
+
+  const isBangladesh = selectedCountryIso === "BD";
+
   useEffect(() => {
-    if (name) setValue("name", name);
-    if (email) setValue("email", email);
-    setValue("country", DEFAULT_COUNTRY);
+    if (name) setValue("name", name, { shouldValidate: true });
+    if (email) setValue("email", email, { shouldValidate: true });
   }, [email, name, setValue]);
 
   useEffect(() => {
@@ -113,15 +125,22 @@ const ShippingForm = ({
         if (!data) return;
 
         // populate form values if available
-        if (data.name) setValue("name", data.name);
-        if (data.email) setValue("email", data.email);
-        if (data.phone) setValue("phone", normalizePhoneForInput(data.phone));
-        if (data.apartment) setValue("apartment", data.apartment);
-        if (data.city) setValue("city", data.city);
-        if (data.state) setValue("state", data.state);
-        if (data.postalCode) setValue("postalCode", data.postalCode);
-        if (data.extraNotes) setValue("extraNotes", data.extraNotes);
-        setValue("country", DEFAULT_COUNTRY);
+        if (data.name) setValue("name", data.name, { shouldValidate: true });
+        if (data.email) setValue("email", data.email, { shouldValidate: true });
+        if (data.phone) setValue("phone", normalizePhoneForInput(data.phone), { shouldValidate: true });
+        if (data.apartment) setValue("apartment", data.apartment, { shouldValidate: true });
+        if (data.city) setValue("city", data.city, { shouldValidate: true });
+        if (data.state) setValue("state", data.state, { shouldValidate: true });
+        if (data.postalCode) setValue("postalCode", data.postalCode, { shouldValidate: true });
+        if (data.extraNotes) setValue("extraNotes", data.extraNotes, { shouldValidate: true });
+        
+        if (data.country) {
+          setValue("country", data.country, { shouldValidate: true });
+          const matchedCountry = countryPhoneOptions.find(opt => opt.name.toLowerCase() === data.country.toLowerCase());
+          if (matchedCountry) {
+            setValue("countryIso2", matchedCountry.iso2, { shouldValidate: true });
+          }
+        }
       } catch (err) {
         console.error(err);
       }
@@ -176,37 +195,96 @@ const ShippingForm = ({
 
         <div>
           <RequiredLabel htmlFor="phone">Phone:</RequiredLabel>
-          <InputGroup>
-            <InputGroupAddon align="inline-start" className="pr-4">
-              +88
-            </InputGroupAddon>
-            <InputGroupInput
-              id="phone"
-              type="tel"
-              aria-invalid={errors.phone ? true : undefined}
-              {...register("phone", {
-                required: "Phone is required",
-                minLength: {
-                  value: 11,
-                  message: "Phone must be 11 digits",
-                },
-                maxLength: {
-                  value: 11,
-                  message: "Phone must be 11 digits",
-                },
-                pattern: {
-                  value: /^01\d{9}$/,
-                  message: "Use a valid 11 digit Bangladesh mobile number",
-                },
-                onChange: (event) => {
-                  event.target.value = sanitizePhoneInput(event.target.value);
-                },
-              })}
-              inputMode="numeric"
-              maxLength={11}
-              placeholder="01XXXXXXXXX"
-            />
-          </InputGroup>
+          <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-3">
+            <div>
+              <Controller
+                name="countryIso2"
+                control={control}
+                render={({ field }) => (
+                  <Combobox
+                    items={countryPhoneOptions}
+                    value={getCountryPhoneOption(field.value || "BD")}
+                    onValueChange={(value) => {
+                      field.onChange(value?.iso2 ?? "BD");
+                      setValue("country", value?.name ?? "");
+                    }}
+                    itemToStringValue={(item) => item.label}
+                  >
+                    <ComboboxTrigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full h-9 justify-between overflow-hidden font-normal rounded-md border-gray-300 px-3 shadow-none bg-stone-50/50"
+                        >
+                          <ComboboxValue placeholder="Code" />
+                        </Button>
+                      }
+                    />
+                    <ComboboxContent>
+                      <ComboboxInput
+                        showTrigger={false}
+                        placeholder="Search..."
+                      />
+                      <ComboboxEmpty>No country found.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(item) => (
+                          <ComboboxItem key={item.iso2} value={item}>
+                            <div className="flex w-full min-w-0 items-center justify-between gap-3 text-xs">
+                              <span className="truncate">{item.name}</span>
+                              <span className="shrink-0 text-gray-500">
+                                {item.dialCode}
+                              </span>
+                            </div>
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
+                )}
+              />
+            </div>
+
+            <div>
+              <Controller
+                name="phone"
+                control={control}
+                rules={{
+                  required: "Phone is required",
+                  validate: {
+                    digitsOnly: (value) =>
+                      /^\d+$/.test(value || "") || "Only numbers are allowed",
+                    minLength: (value) =>
+                      (value || "").length >= 7 ||
+                      "Phone number must be at least 7 digits",
+                  },
+                }}
+                render={({ field }) => {
+                  const selectedCountryIso = useWatch({
+                    control,
+                    name: "countryIso2",
+                  }) || "BD";
+                  const selectedOption = getCountryPhoneOption(selectedCountryIso);
+
+                  return (
+                    <Input
+                      id="phone"
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={selectedOption.maxNationalNumberLength}
+                      value={field.value || ""}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "");
+                        field.onChange(val);
+                      }}
+                      className="w-full shadow-none border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-transparent outline-none h-9 px-3"
+                      placeholder={`Up to ${selectedOption.maxNationalNumberLength} digits`}
+                    />
+                  );
+                }}
+              />
+            </div>
+          </div>
           {errors.phone && (
             <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
           )}
@@ -220,84 +298,164 @@ const ShippingForm = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        {/* Country */}
         <div>
-          <RequiredLabel htmlFor="state">District:</RequiredLabel>
+          <RequiredLabel htmlFor="country">Country:</RequiredLabel>
           <Controller
-            name="state"
+            name="country"
             control={control}
-            rules={{ required: "District is required" }}
-            render={({ field }) => (
-              <Combobox
-                items={BANGLADESH_DISTRICTS}
-                value={field.value || null}
-                onValueChange={(value) => field.onChange(value ?? "")}
-                itemToStringValue={(item) => item}
-              >
-                <ComboboxTrigger
-                  render={
-                    <Button
-                      type="button"
-                      variant="outline"
-                      aria-invalid={errors.state ? true : undefined}
-                      className="w-full h-9 justify-between overflow-hidden shadow-none font-normal px-3"
-                    >
-                      <span className="truncate">
-                        <ComboboxValue
-                          placeholder={selectedDistrict || "Select district"}
-                        />
-                      </span>
-                      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-                    </Button>
-                  }
-                />
-                <ComboboxContent>
-                  <ComboboxInput
-                    showTrigger={false}
-                    placeholder="Search district..."
+            rules={{ required: "Country is required" }}
+            render={({ field }) => {
+              const countryNames = countryPhoneOptions.map((opt) => opt.name);
+
+              return (
+                <Combobox
+                  items={countryNames}
+                  value={field.value || ""}
+                  onValueChange={(value) => {
+                    if (value) {
+                      field.onChange(value);
+                      const matched = countryPhoneOptions.find((opt) => opt.name === value);
+                      if (matched) {
+                        setValue("countryIso2", matched.iso2);
+                      }
+                    }
+                  }}
+                  itemToStringValue={(item) => item}
+                >
+                  <ComboboxTrigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="outline"
+                        aria-invalid={errors.country ? true : undefined}
+                        className="w-full h-9 justify-between overflow-hidden shadow-none font-normal px-3 border-gray-300 rounded-md bg-stone-50/50"
+                      >
+                        <span className="truncate">
+                          <ComboboxValue placeholder="Select country" />
+                        </span>
+                        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                      </Button>
+                    }
                   />
-                  <ComboboxEmpty>No district found.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(item) => (
-                      <ComboboxItem key={item} value={item}>
-                        {item}
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            )}
+                  <ComboboxContent>
+                    <ComboboxInput
+                      showTrigger={false}
+                      placeholder="Search country..."
+                    />
+                    <ComboboxEmpty>No country found.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(item) => (
+                        <ComboboxItem key={item} value={item}>
+                          {item}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              );
+            }}
           />
-          {errors.state && (
-            <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
+          {errors.country && (
+            <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
           )}
         </div>
 
+        {/* District / State */}
         <div>
-          <RequiredLabel htmlFor="city">City/Area:</RequiredLabel>
+          {isBangladesh ? (
+            <>
+              <RequiredLabel htmlFor="state">District:</RequiredLabel>
+              <Controller
+                name="state"
+                control={control}
+                rules={{ required: "District is required" }}
+                render={({ field }) => (
+                  <Combobox
+                    items={BANGLADESH_DISTRICTS}
+                    value={field.value || null}
+                    onValueChange={(value) => field.onChange(value ?? "")}
+                    itemToStringValue={(item) => item}
+                  >
+                    <ComboboxTrigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          aria-invalid={errors.state ? true : undefined}
+                          className="w-full h-9 justify-between overflow-hidden shadow-none font-normal px-3 border-gray-300 rounded-md bg-stone-50/50"
+                        >
+                          <span className="truncate">
+                            <ComboboxValue
+                              placeholder={selectedDistrict || "Select district"}
+                            />
+                          </span>
+                          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                        </Button>
+                      }
+                    />
+                    <ComboboxContent>
+                      <ComboboxInput
+                        showTrigger={false}
+                        placeholder="Search district..."
+                      />
+                      <ComboboxEmpty>No district found.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(item) => (
+                          <ComboboxItem key={item} value={item}>
+                            {item}
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
+                )}
+              />
+              {errors.state && (
+                <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
+              )}
+            </>
+          ) : (
+            <>
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="state">
+                State/Province:
+              </label>
+              <Input
+                id="state"
+                type="text"
+                {...register("state")}
+                placeholder="State or Province"
+                className="shadow-none h-9 border-gray-300 rounded-md"
+                aria-invalid={errors.state ? true : undefined}
+              />
+            </>
+          )}
+        </div>
+
+        {/* City/Area */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="city">
+            City/Area:
+          </label>
           <Input
             id="city"
             type="text"
-            {...register("city", { required: "City/Area is required" })}
+            {...register("city")}
             placeholder="City or area"
-            className="shadow-none"
+            className="shadow-none h-9 border-gray-300 rounded-md"
             aria-invalid={errors.city ? true : undefined}
           />
-          {errors.city && (
-            <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
-          )}
         </div>
 
+        {/* Postal Code */}
         <div>
-          <RequiredLabel htmlFor="postalCode">Postal Code:</RequiredLabel>
+          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="postalCode">
+            Postal Code:
+          </label>
           <Input
             id="postalCode"
             type="text"
             {...register("postalCode", {
-              required: "Postal code is required",
-              minLength: {
-                value: 3,
-                message: "Postal code must be at least 3 characters",
-              },
               onChange: (event) => {
                 event.target.value = event.target.value
                   .replace(/\D/g, "")
@@ -306,33 +464,10 @@ const ShippingForm = ({
             })}
             inputMode="numeric"
             maxLength={4}
-            className="shadow-none"
+            className="shadow-none h-9 border-gray-300 rounded-md"
             placeholder="Postal code"
             aria-invalid={errors.postalCode ? true : undefined}
           />
-          {errors.postalCode && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.postalCode.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <RequiredLabel htmlFor="country">Country:</RequiredLabel>
-          <Input
-            className="shadow-none bg-gray-50 text-gray-600"
-            id="country"
-            type="text"
-            {...register("country", { required: "Country is required" })}
-            readOnly
-            defaultValue={DEFAULT_COUNTRY}
-            aria-invalid={errors.country ? true : undefined}
-          />
-          {errors.country && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.country.message}
-            </p>
-          )}
         </div>
       </div>
 
