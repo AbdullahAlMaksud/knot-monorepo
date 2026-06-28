@@ -6,8 +6,8 @@ import {
   TextStyle,
   ViewStyle,
 } from "react-native";
-import { useTheme } from "../../styles/ThemeContext";
-import hapticService from "../../utils/hapticService";
+import { useTheme } from "@/styles/ThemeContext";
+import hapticService from "@/services/hapticService";
 import { ThemedText } from "./ThemedText";
 
 interface ButtonProps {

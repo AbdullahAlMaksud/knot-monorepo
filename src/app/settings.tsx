@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
-import { Button } from "../components/ui/Button";
-import { Card } from "../components/ui/Card";
-import { Header } from "../components/ui/Header";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useSettingsStore } from "../store/settingsStore";
-import { useTheme } from "../styles/ThemeContext";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Header } from "@/components/ui/Header";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useSettingsStore } from "@/store/settingsStore";
+import { useTheme } from "@/styles/ThemeContext";
 
 export default function SettingsScreen() {
   const { theme } = useTheme();

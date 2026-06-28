@@ -2,11 +2,11 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { Card } from "../components/ui/Card";
-import { Header } from "../components/ui/Header";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useTheme } from "../styles/ThemeContext";
-import hapticService from "../utils/hapticService";
+import { Card } from "@/components/ui/Card";
+import { Header } from "@/components/ui/Header";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/styles/ThemeContext";
+import hapticService from "@/services/hapticService";
 
 export default function AboutScreen() {
     const { theme } = useTheme();

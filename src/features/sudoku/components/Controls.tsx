@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { useGameStore } from "../../store/gameStore";
-import { useTheme } from "../../styles/ThemeContext";
-import hapticService from "../../utils/hapticService";
+import { useGameStore } from "@/features/sudoku/store/gameStore";
+import { useTheme } from "@/styles/ThemeContext";
+import hapticService from "@/services/hapticService";
 import { GameSettingsModal } from "./GameSettingsModal";
 
 export const Controls: React.FC = () => {

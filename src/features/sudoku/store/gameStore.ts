@@ -1,17 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { generateSudoku } from "../features/sudoku/generator";
+import { generateSudoku } from "@/features/sudoku/generator";
 import {
   CellValue,
   Difficulty,
   GameState,
   Grid,
-} from "../features/sudoku/types";
-import { isGameWon } from "../features/sudoku/validator";
-import hapticService from "../utils/hapticService";
-import soundService from "../utils/soundService";
-import { useStatsStore } from "./statsStore";
+} from "@/features/sudoku/types";
+import { isGameWon } from "@/features/sudoku/validator";
+import hapticService from "@/services/hapticService";
+import soundService from "@/services/soundService";
+import { useStatsStore } from "@/features/sudoku/store/statsStore";
 
 interface GameActions {
   startGame: (difficulty: Difficulty) => void;

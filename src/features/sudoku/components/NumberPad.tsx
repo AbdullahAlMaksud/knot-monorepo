@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { useGameStore } from "../../store/gameStore";
-import { useTheme } from "../../styles/ThemeContext";
-import { toBangla } from "../../utils/bangla";
-import hapticService from "../../utils/hapticService";
-import { ThemedText } from "../ui/ThemedText";
+import { useGameStore } from "@/features/sudoku/store/gameStore";
+import { useTheme } from "@/styles/ThemeContext";
+import { toBangla } from "@/utils/bangla";
+import hapticService from "@/services/hapticService";
+import { ThemedText } from "@/components/ui/ThemedText";
 
 interface NumberPadProps {
   inputMode: "numpad" | "single";

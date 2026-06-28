@@ -1,9 +1,9 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useTheme } from "../styles/ThemeContext";
-import { toBangla } from "../utils/bangla";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/styles/ThemeContext";
+import { toBangla } from "@/utils/bangla";
 
 export default function SplashScreen() {
   const { theme } = useTheme();
@@ -89,20 +89,7 @@ export default function SplashScreen() {
               {
                 width: loadingWidth.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ["0%", "60%"],
-                }),
-              },
-            ]}
-          />
-        </View>
-        <View style={styles.loadingBarContainerSecondary}>
-          <Animated.View
-            style={[
-              styles.loadingBarSecondary,
-              {
-                width: loadingWidth.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: ["0%", "30%", "50%"],
+                  outputRange: ["0%", "100%"],
                 }),
               },
             ]}
@@ -162,31 +149,17 @@ const createStyles = (theme: any) =>
       bottom: 80,
       width: "100%",
       alignItems: "center",
-      gap: 12,
     },
     loadingBarContainer: {
-      width: 120,
-      height: 4,
+      width: 140,
+      height: 3,
       backgroundColor: theme.colors.surfaceLight || theme.colors.highlight,
-      borderRadius: 2,
+      borderRadius: 1.5,
       overflow: "hidden",
     },
     loadingBar: {
       height: "100%",
       backgroundColor: theme.colors.primary,
-      borderRadius: 2,
-    },
-    loadingBarContainerSecondary: {
-      width: 100,
-      height: 4,
-      backgroundColor: theme.colors.surfaceLight || theme.colors.highlight,
-      borderRadius: 2,
-      overflow: "hidden",
-    },
-    loadingBarSecondary: {
-      height: "100%",
-      backgroundColor: theme.colors.primary,
-      borderRadius: 2,
-      opacity: 0.6,
+      borderRadius: 1.5,
     },
   });

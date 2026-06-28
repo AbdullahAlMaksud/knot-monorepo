@@ -1,7 +1,7 @@
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import { useGameStore } from "../../store/gameStore";
-import { useTheme } from "../../styles/ThemeContext";
+import { useGameStore } from "@/features/sudoku/store/gameStore";
+import { useTheme } from "@/styles/ThemeContext";
 import { Cell } from "./Cell";
 
 interface BoardProps {

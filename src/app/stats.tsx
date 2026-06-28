@@ -1,13 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Card } from "../components/ui/Card";
-import { Header } from "../components/ui/Header";
-import { ThemedText } from "../components/ui/ThemedText";
-import { Difficulty } from "../features/sudoku/types";
-import { useStatsStore } from "../store/statsStore";
-import { useTheme } from "../styles/ThemeContext";
-import { toBangla } from "../utils/bangla";
+import { Card } from "@/components/ui/Card";
+import { Header } from "@/components/ui/Header";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { Difficulty } from "@/features/sudoku/types";
+import { useStatsStore } from "@/features/sudoku/store/statsStore";
+import { useTheme } from "@/styles/ThemeContext";
+import { toBangla } from "@/utils/bangla";
 
 type DifficultyMode = "Easy" | "Medium" | "Hard";
 

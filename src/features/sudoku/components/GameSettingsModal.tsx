@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, Platform, Pressable, StyleSheet, Switch, View } from "react-native";
-import { useSettingsStore } from "../../store/settingsStore";
-import { useTheme } from "../../styles/ThemeContext";
-import hapticService from "../../utils/hapticService";
-import { ThemedText } from "../ui/ThemedText";
+import { useSettingsStore } from "@/store/settingsStore";
+import { useTheme } from "@/styles/ThemeContext";
+import hapticService from "@/services/hapticService";
+import { ThemedText } from "@/components/ui/ThemedText";
 
 interface GameSettingsModalProps {
     visible: boolean;

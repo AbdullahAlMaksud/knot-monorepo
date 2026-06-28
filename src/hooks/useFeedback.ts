@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
-import { useSettingsStore } from "../store/settingsStore";
-import hapticService from "../utils/hapticService";
-import soundService from "../utils/soundService";
+import { useSettingsStore } from "@/store/settingsStore";
+import hapticService from "@/services/hapticService";
+import soundService from "@/services/soundService";
 
 /**
  * useFeedback Hook

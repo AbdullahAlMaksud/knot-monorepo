@@ -8,10 +8,10 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useGameStore } from "../store/gameStore";
-import { useTheme } from "../styles/ThemeContext";
-import hapticService from "../utils/hapticService";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useGameStore } from "@/features/sudoku/store/gameStore";
+import { useTheme } from "@/styles/ThemeContext";
+import hapticService from "@/services/hapticService";
 
 type DifficultyOption = "Easy" | "Medium" | "Hard";
 

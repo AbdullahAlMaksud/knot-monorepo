@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Card } from "../components/ui/Card";
-import { Header } from "../components/ui/Header";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useTheme } from "../styles/ThemeContext";
-import { toBangla } from "../utils/bangla";
+import { Card } from "@/components/ui/Card";
+import { Header } from "@/components/ui/Header";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/styles/ThemeContext";
+import { toBangla } from "@/utils/bangla";
 
 const rules = [
   {

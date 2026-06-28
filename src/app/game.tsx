@@ -2,16 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { BackHandler, Pressable, StyleSheet, View } from "react-native";
-import { Board } from "../components/game/Board";
-import { Controls } from "../components/game/Controls";
-import { NumberPad } from "../components/game/NumberPad";
-import { PauseModal } from "../components/game/PauseModal";
-import { WinModal } from "../components/game/WinModal";
-import { ThemedText } from "../components/ui/ThemedText";
-import { useGameStore } from "../store/gameStore";
-import { useTheme } from "../styles/ThemeContext";
-import { toBangla } from "../utils/bangla";
-import hapticService from "../utils/hapticService";
+import { Board } from "@/features/sudoku/components/Board";
+import { Controls } from "@/features/sudoku/components/Controls";
+import { NumberPad } from "@/features/sudoku/components/NumberPad";
+import { PauseModal } from "@/features/sudoku/components/PauseModal";
+import { WinModal } from "@/features/sudoku/components/WinModal";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useGameStore } from "@/features/sudoku/store/gameStore";
+import { useTheme } from "@/styles/ThemeContext";
+import { toBangla } from "@/utils/bangla";
+import hapticService from "@/services/hapticService";
 
 type InputMode = "numpad" | "single";
 

@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { Difficulty } from "../features/sudoku/types";
+import { Difficulty } from "@/features/sudoku/types";
 
 export interface GameRecord {
   id: string;

@@ -1,5 +1,5 @@
 import { ComponentType } from "react";
-import { AppTheme, useTheme } from "../ThemeContext";
+import { AppTheme, useTheme } from "@/styles/ThemeContext";
 
 export type WithTheme<T = unknown> = T & {
   theme: AppTheme;
