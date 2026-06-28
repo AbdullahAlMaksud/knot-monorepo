@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ThemeProvider, useTheme } from "@/styles/ThemeContext";
+import { ThemeProvider, useTheme } from "@/shared/lib/theme/ThemeContext";
 
 function RootLayoutContent() {
   const { theme, themeName } = useTheme();

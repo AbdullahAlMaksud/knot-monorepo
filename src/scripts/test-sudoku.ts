@@ -1,6 +1,6 @@
-import { generateSudoku } from "../features/sudoku/generator";
-import { hasUniqueSolution } from "../features/sudoku/solver";
-import { isBoardFull, isValidMove } from "../features/sudoku/validator";
+import { generateSudoku } from "../features/sudoku/utils/generator";
+import { hasUniqueSolution } from "../features/sudoku/utils/solver";
+import { isBoardFull, isValidMove } from "../features/sudoku/utils/validator";
 
 console.log("Running Sudoku Logic Tests...");
 

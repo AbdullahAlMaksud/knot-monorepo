@@ -1,10 +1,49 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { useGameStore } from "@/features/sudoku/store/gameStore";
-import { useTheme } from "@/styles/ThemeContext";
-import hapticService from "@/services/hapticService";
+import { useGameStore } from "@/features/sudoku/services/gameStore";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import hapticService from "@/shared/lib/hapticService";
 import { GameSettingsModal } from "./GameSettingsModal";
+
+interface ControlButtonProps {
+  icon?: string;
+  onPress: () => void;
+  isActive?: boolean;
+  hasIndicator?: boolean;
+  iconComponent?: React.ReactNode;
+  styles: any;
+  theme: any;
+}
+
+const ControlButton: React.FC<ControlButtonProps> = ({
+  icon,
+  onPress,
+  isActive = false,
+  hasIndicator = false,
+  iconComponent,
+  styles,
+  theme,
+}) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.button,
+      pressed && { opacity: 0.7, transform: [{ scale: 0.9 }] },
+    ]}
+    onPress={onPress}
+  >
+    <View style={styles.iconWrapper}>
+      {iconComponent || (
+        <MaterialCommunityIcons
+          name={icon as any}
+          size={24}
+          color={isActive ? theme.colors.primary : theme.colors.textSecondary}
+        />
+      )}
+      {hasIndicator && <View style={styles.indicator} />}
+    </View>
+  </Pressable>
+);
 
 export const Controls: React.FC = () => {
   const { theme } = useTheme();
@@ -37,54 +76,40 @@ export const Controls: React.FC = () => {
     setIsSettingsVisible(true);
   };
 
-  const ControlButton = ({
-    icon,
-    onPress,
-    isActive = false,
-    hasIndicator = false,
-    iconComponent,
-  }: {
-    icon?: string;
-    onPress: () => void;
-    isActive?: boolean;
-    hasIndicator?: boolean;
-    iconComponent?: React.ReactNode;
-  }) => (
-    <Pressable
-      style={({ pressed }) => [
-        styles.button,
-        pressed && { opacity: 0.7, transform: [{ scale: 0.9 }] },
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.iconWrapper}>
-        {iconComponent || (
-          <MaterialCommunityIcons
-            name={icon as any}
-            size={24}
-            color={isActive ? theme.colors.primary : theme.colors.textSecondary}
-          />
-        )}
-        {hasIndicator && <View style={styles.indicator} />}
-      </View>
-    </Pressable>
-  );
-
   return (
     <>
       <View style={styles.container}>
-        <ControlButton icon="cog-outline" onPress={handleSettings} />
-        <ControlButton icon="refresh" onPress={handleReset} />
+        <ControlButton
+          icon="cog-outline"
+          onPress={handleSettings}
+          styles={styles}
+          theme={theme}
+        />
+        <ControlButton
+          icon="refresh"
+          onPress={handleReset}
+          styles={styles}
+          theme={theme}
+        />
         <ControlButton
           icon="pencil-outline"
           onPress={handleNote}
           isActive={isNoteMode}
+          styles={styles}
+          theme={theme}
         />
-        <ControlButton icon="undo" onPress={handleUndo} />
+        <ControlButton
+          icon="undo"
+          onPress={handleUndo}
+          styles={styles}
+          theme={theme}
+        />
         <ControlButton
           icon="lightbulb-outline"
           onPress={handleHint}
           hasIndicator={true}
+          styles={styles}
+          theme={theme}
         />
       </View>
 

@@ -1,15 +1,53 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, Platform, Pressable, StyleSheet, Switch, View } from "react-native";
-import { useSettingsStore } from "@/store/settingsStore";
-import { useTheme } from "@/styles/ThemeContext";
-import hapticService from "@/services/hapticService";
+import { useSettingsStore } from "@/features/settings/services/settingsStore";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import hapticService from "@/shared/lib/hapticService";
 import { ThemedText } from "@/components/ui/ThemedText";
 
 interface GameSettingsModalProps {
     visible: boolean;
     onClose: () => void;
 }
+
+interface SettingRowProps {
+    icon: string;
+    label: string;
+    value: boolean;
+    onToggle: () => void;
+    styles: any;
+    colors: any;
+}
+
+const SettingRow: React.FC<SettingRowProps> = ({
+    icon,
+    label,
+    value,
+    onToggle,
+    styles,
+    colors,
+}) => (
+    <View style={styles.settingRow}>
+        <View style={styles.settingLeft}>
+            <View style={styles.iconBox}>
+                <Ionicons name={icon as any} size={20} color={colors.primary} />
+            </View>
+            <ThemedText variant="body" weight="bold">
+                {label}
+            </ThemedText>
+        </View>
+        <Switch
+            value={value}
+            onValueChange={() => {
+                hapticService.selection();
+                onToggle();
+            }}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor="#FFF"
+        />
+    </View>
+);
 
 export const GameSettingsModal: React.FC<GameSettingsModalProps> = ({
     visible,
@@ -32,38 +70,6 @@ export const GameSettingsModal: React.FC<GameSettingsModalProps> = ({
         onClose();
     };
 
-    const SettingRow = ({
-        icon,
-        label,
-        value,
-        onToggle,
-    }: {
-        icon: string;
-        label: string;
-        value: boolean;
-        onToggle: () => void;
-    }) => (
-        <View style={styles.settingRow}>
-            <View style={styles.settingLeft}>
-                <View style={styles.iconBox}>
-                    <Ionicons name={icon as any} size={20} color={colors.primary} />
-                </View>
-                <ThemedText variant="body" weight="bold">
-                    {label}
-                </ThemedText>
-            </View>
-            <Switch
-                value={value}
-                onValueChange={() => {
-                    hapticService.selection();
-                    onToggle();
-                }}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor="#FFF"
-            />
-        </View>
-    );
-
     return (
         <Modal visible={visible} transparent animationType="fade">
             <Pressable style={styles.overlay} onPress={handleClose}>
@@ -85,6 +91,8 @@ export const GameSettingsModal: React.FC<GameSettingsModalProps> = ({
                             label="শব্দ"
                             value={soundEnabled}
                             onToggle={toggleSound}
+                            styles={styles}
+                            colors={colors}
                         />
                         <View style={styles.divider} />
                         <SettingRow
@@ -92,6 +100,8 @@ export const GameSettingsModal: React.FC<GameSettingsModalProps> = ({
                             label="ভাইব্রেশন"
                             value={vibrationEnabled}
                             onToggle={toggleVibration}
+                            styles={styles}
+                            colors={colors}
                         />
                         <View style={styles.divider} />
                         <SettingRow
@@ -99,6 +109,8 @@ export const GameSettingsModal: React.FC<GameSettingsModalProps> = ({
                             label="ভুল হাইলাইট"
                             value={errorHighlight}
                             onToggle={toggleErrorHighlight}
+                            styles={styles}
+                            colors={colors}
                         />
                     </View>
 

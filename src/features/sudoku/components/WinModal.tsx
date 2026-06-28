@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { Modal, Platform, Pressable, StyleSheet, View } from "react-native";
-import { useTheme } from "@/styles/ThemeContext";
-import { toBangla } from "@/utils/bangla";
-import hapticService from "@/services/hapticService";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import { toBangla } from "@/shared/lib/bangla";
+import hapticService from "@/shared/lib/hapticService";
 import { ThemedText } from "@/components/ui/ThemedText";
 
 interface WinModalProps {

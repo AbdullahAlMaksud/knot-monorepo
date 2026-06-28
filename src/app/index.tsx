@@ -1,15 +1,15 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ui/ThemedText";
-import { useTheme } from "@/styles/ThemeContext";
-import { toBangla } from "@/utils/bangla";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import { toBangla } from "@/shared/lib/bangla";
 
 export default function SplashScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const opacity = useRef(new Animated.Value(0)).current;
-  const loadingWidth = useRef(new Animated.Value(0)).current;
+  const opacity = useMemo(() => new Animated.Value(0), []);
+  const loadingWidth = useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
     // Fade in animation

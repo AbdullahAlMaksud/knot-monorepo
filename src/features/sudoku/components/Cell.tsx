@@ -1,9 +1,9 @@
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { Cell as CellType } from "@/features/sudoku/types";
-import { useTheme } from "@/styles/ThemeContext";
-import { toBangla } from "@/utils/bangla";
-import hapticService from "@/services/hapticService";
+import { Cell as CellType } from "@/features/sudoku/types/types";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import { toBangla } from "@/shared/lib/bangla";
+import hapticService from "@/shared/lib/hapticService";
 import { ThemedText } from "@/components/ui/ThemedText";
 
 interface CellProps {

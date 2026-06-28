@@ -1,0 +1,201 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Header } from "@/components/common/Header";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useSettingsStore } from "@/features/settings/services/settingsStore";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+
+interface SettingsItemProps {
+  label: string;
+  icon: any;
+  value: boolean;
+  onToggle: () => void;
+  styles: any;
+  theme: any;
+}
+
+const SettingsItem: React.FC<SettingsItemProps> = ({ label, icon, value, onToggle, styles, theme }) => (
+  <View style={styles.item}>
+    <View style={styles.itemLeft}>
+      <View style={styles.iconBox}>
+        <Ionicons name={icon} size={20} color={theme.colors.primary} />
+      </View>
+      <ThemedText variant="body" weight="bold">
+        {label}
+      </ThemedText>
+    </View>
+    <Switch
+      value={value}
+      onValueChange={onToggle}
+      trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+    />
+  </View>
+);
+
+export default function SettingsScreen() {
+  const { theme } = useTheme();
+  const router = useRouter();
+  const {
+    soundEnabled,
+    toggleSound,
+    vibrationEnabled,
+    toggleVibration,
+    errorHighlight,
+    toggleErrorHighlight,
+    setTheme,
+    theme: currentThemeMode,
+    resetSettings,
+  } = useSettingsStore();
+
+  const styles = createStyles(theme);
+
+  return (
+    <View style={styles.container}>
+      <Header title="সেটিংস" showBack />
+
+      <ScrollView contentContainerStyle={styles.content}>
+        <Card padding="lg">
+          <SettingsItem
+            label="শব্দ"
+            icon="volume-high"
+            value={soundEnabled}
+            onToggle={toggleSound}
+            styles={styles}
+            theme={theme}
+          />
+          <View style={styles.divider} />
+          <SettingsItem
+            label="ভাইব্রেশন"
+            icon="phone-portrait-outline"
+            value={vibrationEnabled}
+            onToggle={toggleVibration}
+            styles={styles}
+            theme={theme}
+          />
+          <View style={styles.divider} />
+          <SettingsItem
+            label="ভুল হাইলাইট"
+            icon="alert-circle-outline"
+            value={errorHighlight}
+            onToggle={toggleErrorHighlight}
+            styles={styles}
+            theme={theme}
+          />
+        </Card>
+
+        <ThemedText variant="label" style={styles.sectionLabel}>
+          থিম
+        </ThemedText>
+        <Card padding="lg" style={styles.themeCard}>
+          <View style={styles.themeOptions}>
+            <Button
+              title="লাইট"
+              variant={currentThemeMode === "light" ? "primary" : "ghost"}
+              onPress={() => setTheme("light")}
+              size="sm"
+            />
+            <Button
+              title="ডার্ক"
+              variant={currentThemeMode === "dark" ? "primary" : "ghost"}
+              onPress={() => setTheme("dark")}
+              size="sm"
+            />
+            <Button
+              title="সিস্টেম"
+              variant={currentThemeMode === "system" ? "primary" : "ghost"}
+              onPress={() => setTheme("system")}
+              size="sm"
+            />
+          </View>
+        </Card>
+
+        <ThemedText variant="label" style={styles.sectionLabel}>
+          অন্যান্য
+        </ThemedText>
+        <Card padding="lg">
+          <Pressable style={styles.item} onPress={() => router.push("/about")}>
+            <View style={styles.itemLeft}>
+              <View style={styles.iconBox}>
+                <Ionicons name="information-circle" size={20} color={theme.colors.primary} />
+              </View>
+              <ThemedText variant="body" weight="bold">
+                অ্যাপ সম্পর্কে
+              </ThemedText>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+        </Card>
+
+        <View style={{ marginTop: 40 }}>
+          <Button
+            title="অগ্রগতি রিসেট করুন"
+            variant="outline"
+            onPress={resetSettings}
+            style={{ borderColor: theme.colors.error }}
+            textStyle={{ color: theme.colors.error }}
+          />
+          <ThemedText
+            variant="caption"
+            align="center"
+            style={{ marginTop: 10, opacity: 0.5 }}
+          >
+            ভার্সন ১.০.০
+          </ThemedText>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    content: {
+      padding: theme.spacing.lg,
+    },
+    item: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: theme.spacing.sm,
+    },
+    itemLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: theme.spacing.md,
+    },
+    iconBox: {
+      width: 32,
+      height: 32,
+      backgroundColor: theme.colors.selection,
+      borderRadius: theme.radius.md,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: theme.colors.border,
+      marginVertical: theme.spacing.sm,
+    },
+    sectionLabel: {
+      marginTop: theme.spacing.lg,
+      marginBottom: theme.spacing.sm,
+      color: theme.colors.textSecondary,
+    },
+    themeCard: {},
+    themeOptions: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+    },
+  });

@@ -1,6 +1,6 @@
 import React from "react";
 import { Platform, View, ViewProps } from "react-native";
-import { useTheme } from "@/styles/ThemeContext";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
 
 interface CardProps extends ViewProps {
   variant?: "elevated" | "flat" | "outlined" | "glow";

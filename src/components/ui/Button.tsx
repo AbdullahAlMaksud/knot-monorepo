@@ -6,9 +6,9 @@ import {
   TextStyle,
   ViewStyle,
 } from "react-native";
-import { useTheme } from "@/styles/ThemeContext";
-import hapticService from "@/services/hapticService";
-import { ThemedText } from "./ThemedText";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import hapticService from "@/shared/lib/hapticService";
+import { ThemedText } from "@/components/ui/ThemedText";
 
 interface ButtonProps {
   title: string;

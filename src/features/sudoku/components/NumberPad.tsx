@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { useGameStore } from "@/features/sudoku/store/gameStore";
-import { useTheme } from "@/styles/ThemeContext";
-import { toBangla } from "@/utils/bangla";
-import hapticService from "@/services/hapticService";
+import { useGameStore } from "@/features/sudoku/services/gameStore";
+import { useTheme } from "@/shared/lib/theme/ThemeContext";
+import { toBangla } from "@/shared/lib/bangla";
+import hapticService from "@/shared/lib/hapticService";
 import { ThemedText } from "@/components/ui/ThemedText";
 
 interface NumberPadProps {
