@@ -2,7 +2,7 @@
 
 import Layout from "@/components/common/layout";
 import HeroCarousel from "@/components/shared/hero-carousel";
-import Info from "@/screens/home/components/info";
+import Info from "@/components/shared/info";
 import OurJourneySection from "@/screens/home/components/our-journey-section";
 import CoreProductsSection from "@/screens/shop/components/core-products-section";
 import ConcernsSection from "@/screens/home/components/concerns-section";

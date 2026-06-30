@@ -35,12 +35,19 @@ export const getDefaultProductVariant = (
 };
 
 export const getProductImages = (product: ApiProduct): string[] => {
+  const variantImages = (product.variants ?? product.sizeVariants ?? [])
+    .flatMap((v) => v.variantImages ?? [])
+    .filter((key): key is string => Boolean(key));
+
   const imageKeys = [
     product.displayImageKey,
     ...(product.relatedImagesKeys ?? []),
+    ...variantImages,
   ].filter((key): key is string => Boolean(key));
 
-  return imageKeys.map(getR2ImageUrl);
+  const uniqueKeys = Array.from(new Set(imageKeys));
+
+  return uniqueKeys.map(getR2ImageUrl);
 };
 
 export const getProductSectionImage = (

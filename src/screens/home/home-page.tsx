@@ -11,7 +11,7 @@ import CoreProductsSection from "@/screens/shop/components/core-products-section
 import ConcernsSection from "@/screens/home/components/concerns-section";
 import FeaturedProductHero from "@/screens/shop/components/featured-product-hero";
 import Team2 from "@/screens/home/components/team-2";
-import Info from "@/screens/home/components/info";
+import Info from "@/components/shared/info";
 import LoadingLogo from "@/components/common/loading-logo";
 import type { ApiProduct } from "@/screens/product/services/type";
 import { useGetPublishedProducts } from "@/screens/product/services/query";
@@ -46,7 +46,7 @@ const Home = () => {
     [products],
   );
   const homeFeaturedProducts = useMemo(
-    () => featuredProducts.slice(0, 4),
+    () => featuredProducts.slice(0, 2),
     [featuredProducts],
   );
   const heroMist = useMemo(

@@ -10,7 +10,8 @@ import {
   useGetProductById,
   useGetPublishedProducts,
 } from "@/screens/product/services/query";
-import Info from "@/screens/home/components/info";
+import Info from "@/components/shared/info";
+import { productInfoFeatures } from "@/constants/common-info-data";
 import ErrorState from "@/components/ui/error";
 import Skeleton from "@/components/ui/skeleton";
 import ProductReviewsSection from "@/screens/product/components/product-reviews-section";
@@ -74,7 +75,7 @@ const ProductDetailPage = () => {
     <Layout>
       <div className="pt-32">
         <ProductDetailHero product={apiProduct} />
-        <Info />
+        <Info features={productInfoFeatures} />
         <ProductSections product={apiProduct} sections={apiProduct.sections} />
         {coreApiProducts.length > 0 && (
           <CoreProductsSection

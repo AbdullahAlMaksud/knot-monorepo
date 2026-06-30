@@ -108,6 +108,43 @@ const ShippingForm = ({
     if (email) setValue("email", email, { shouldValidate: true });
   }, [email, name, setValue]);
 
+  // Load country & phone from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedPhone = window.localStorage.getItem("user_phone") || window.localStorage.getItem("phone");
+      if (savedPhone) {
+        setValue("phone", savedPhone, { shouldValidate: true });
+      }
+
+      const savedCountryRaw = window.localStorage.getItem("user_country");
+      if (savedCountryRaw) {
+        try {
+          const parsed = JSON.parse(savedCountryRaw);
+          if (parsed?.country) {
+            setValue("country", parsed.country, { shouldValidate: true });
+          }
+          if (parsed?.countryCode) {
+            setValue("countryIso2", parsed.countryCode.toUpperCase(), { shouldValidate: true });
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+  }, [setValue]);
+
+  // Save phone to localStorage whenever it changes
+  const watchedPhone = useWatch({
+    control,
+    name: "phone",
+  });
+
+  useEffect(() => {
+    if (watchedPhone && typeof window !== "undefined") {
+      window.localStorage.setItem("user_phone", watchedPhone);
+    }
+  }, [watchedPhone]);
+
   useEffect(() => {
     if (!userId) return;
 
@@ -127,14 +164,38 @@ const ShippingForm = ({
         // populate form values if available
         if (data.name) setValue("name", data.name, { shouldValidate: true });
         if (data.email) setValue("email", data.email, { shouldValidate: true });
-        if (data.phone) setValue("phone", normalizePhoneForInput(data.phone), { shouldValidate: true });
+
+        // Only set phone if not already set in localStorage
+        const savedPhone = typeof window !== "undefined" ? (window.localStorage.getItem("user_phone") || window.localStorage.getItem("phone")) : null;
+        if (savedPhone) {
+          setValue("phone", savedPhone, { shouldValidate: true });
+        } else if (data.phone) {
+          setValue("phone", normalizePhoneForInput(data.phone), { shouldValidate: true });
+        }
+
         if (data.apartment) setValue("apartment", data.apartment, { shouldValidate: true });
         if (data.city) setValue("city", data.city, { shouldValidate: true });
         if (data.state) setValue("state", data.state, { shouldValidate: true });
         if (data.postalCode) setValue("postalCode", data.postalCode, { shouldValidate: true });
         if (data.extraNotes) setValue("extraNotes", data.extraNotes, { shouldValidate: true });
-        
-        if (data.country) {
+
+        // Only set country if not already set in localStorage
+        const savedCountryRaw = typeof window !== "undefined" ? window.localStorage.getItem("user_country") : null;
+        let hasSavedCountry = false;
+        if (savedCountryRaw) {
+          try {
+            const parsed = JSON.parse(savedCountryRaw);
+            if (parsed?.country) {
+              setValue("country", parsed.country, { shouldValidate: true });
+              hasSavedCountry = true;
+            }
+            if (parsed?.countryCode) {
+              setValue("countryIso2", parsed.countryCode.toUpperCase(), { shouldValidate: true });
+            }
+          } catch (e) { }
+        }
+
+        if (!hasSavedCountry && data.country) {
           setValue("country", data.country, { shouldValidate: true });
           const matchedCountry = countryPhoneOptions.find(opt => opt.name.toLowerCase() === data.country.toLowerCase());
           if (matchedCountry) {
@@ -202,6 +263,7 @@ const ShippingForm = ({
                 control={control}
                 render={({ field }) => (
                   <Combobox
+                    disabled
                     items={countryPhoneOptions}
                     value={getCountryPhoneOption(field.value || "BD")}
                     onValueChange={(value) => {
@@ -209,13 +271,15 @@ const ShippingForm = ({
                       setValue("country", value?.name ?? "");
                     }}
                     itemToStringValue={(item) => item.label}
+
                   >
                     <ComboboxTrigger
                       render={
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full h-9 justify-between overflow-hidden font-normal rounded-md border-gray-300 px-3 shadow-none bg-stone-50/50"
+                          disabled
+                          className="w-full h-9 justify-between overflow-hidden font-normal rounded-md border-gray-300 px-3 shadow-none bg-stone-100/50 cursor-not-allowed opacity-60"
                         >
                           <ComboboxValue placeholder="Code" />
                         </Button>
@@ -310,6 +374,7 @@ const ShippingForm = ({
 
               return (
                 <Combobox
+                  disabled
                   items={countryNames}
                   value={field.value || ""}
                   onValueChange={(value) => {
@@ -328,8 +393,9 @@ const ShippingForm = ({
                       <Button
                         type="button"
                         variant="outline"
+                        disabled
                         aria-invalid={errors.country ? true : undefined}
-                        className="w-full h-9 justify-between overflow-hidden shadow-none font-normal px-3 border-gray-300 rounded-md bg-stone-50/50"
+                        className="w-full h-9 justify-between overflow-hidden shadow-none font-normal px-3 border-gray-300 rounded-md bg-stone-100/50 cursor-not-allowed opacity-60"
                       >
                         <span className="truncate">
                           <ComboboxValue placeholder="Select country" />

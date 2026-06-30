@@ -15,6 +15,7 @@ import {
 export interface MediaItem {
   type: "image" | "video";
   src: string;
+  mobileSrc?: string;
   alt?: string;
 }
 
@@ -33,13 +34,18 @@ export interface HeroCarouselProps {
   autoPlay?: boolean;
   autoPlayInterval?: number;
   searchBar?: HeroSearchBarProps;
+  aspectRatio?: string;
 }
 
 interface HeroSlide extends MediaItem {
   title?: string | React.ReactNode;
+  subtitle?: string | React.ReactNode;
   description?: string | React.ReactNode;
   buttonText?: string;
   link?: string;
+  badge?: string;
+  features?: string[];
+  textColor?: "black" | "white";
 }
 
 const FALLBACK_HERO_SLIDES: Record<string, HeroSlide[]> = {
@@ -47,48 +53,35 @@ const FALLBACK_HERO_SLIDES: Record<string, HeroSlide[]> = {
     {
       type: "image",
       src: "/images/home/hero-bg.jpg",
-      title: (
-        <>
-          Unveil Your Natural
-          <br />
-          Glow
-        </>
-      ),
-      description: (
-        <>
-          Byou brings you simple, pure, and effective beauty
-          <br />
-          essentials designed to highlight your true self.
-        </>
-      ),
-      buttonText: "Choose Your Glow",
+      mobileSrc: "/images/home/hero-bg-mobile.jpg",
+      title: "Hydrating Factors 7.3%",
+      subtitle: "Hair Shampoo",
+      description: "Formulated for dull, dry & frizzy hair. Helps increase hydration by gently cleansing scalp and hair.",
+      features: ["NON-STRIPPING", "GENTLE", "SULFATE-FREE"],
+      badge: "NEW LAUNCH",
+      buttonText: "Shop Now",
       link: "/shop",
+      textColor: "black",
     },
     {
       type: "image",
       src: "/images/about/about-bg.jpg",
-      title: (
-        <>
-          Unveil Your Natural
-          <br />
-          Glow
-        </>
-      ),
-      description: (
-        <>
-          Byou brings you simple, pure, and effective beauty
-          <br />
-          essentials designed to highlight your true self.
-        </>
-      ),
+      mobileSrc: "/images/about/about-bg-mobile.jpg",
+      title: "Unveil Your Natural Glow",
+      subtitle: "Skincare Essentials",
+      description: "Byou brings you simple, pure, and effective beauty essentials designed to highlight your true self.",
+      features: ["DERMATOLOGIST CERTIFIED", "LOCALLY CRAFTED", "SCIENCE-BACKED"],
+      badge: "BEST SELLER",
       buttonText: "Choose Your Glow",
       link: "/shop",
+      textColor: "black",
     },
   ],
   about: [
     {
       type: "image",
       src: "/images/about/about-bg.jpg",
+      mobileSrc: "/images/about/about-bg-mobile.jpg",
       title: "Our Story",
       description: (
         <>
@@ -105,12 +98,14 @@ const FALLBACK_HERO_SLIDES: Record<string, HeroSlide[]> = {
       ),
       buttonText: "Shop Now",
       link: "/shop",
+      textColor: "black",
     },
   ],
   lab: [
     {
       type: "image",
       src: "/images/lab/lab-bg.jpg",
+      mobileSrc: "/images/lab/lab-bg-mobile.jpg",
       title: (
         <>
           Science Meets
@@ -126,6 +121,7 @@ const FALLBACK_HERO_SLIDES: Record<string, HeroSlide[]> = {
       ),
       buttonText: "Choose Your Glow",
       link: "/shop",
+      textColor: "black",
     },
   ],
 };
@@ -185,6 +181,10 @@ function SlideMedia({
   slide: HeroSlide;
   isActive: boolean;
 }) {
+  const overlayClass = slide.textColor === "black"
+    ? "bg-white/10 sm:bg-white/5"
+    : "bg-black/35 sm:bg-black/25";
+
   const media = (
     <>
       {slide.type === "video" ? (
@@ -197,24 +197,33 @@ function SlideMedia({
             muted
             playsInline
           />
-          <div className="absolute inset-0 bg-black/35 sm:bg-black/25" />
+          <div className={`absolute inset-0 ${overlayClass}`} />
         </div>
       ) : (
-        <div
-          className="h-full w-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${slide.src})` }}
-        >
-          <div className="h-full w-full bg-black/35 sm:bg-black/25" />
-        </div>
+        <>
+          {/* Desktop Image */}
+          <div
+            className="h-full w-full bg-cover bg-center hidden md:block"
+            style={{ backgroundImage: `url(${slide.src})` }}
+          >
+            <div className={`h-full w-full ${overlayClass}`} />
+          </div>
+          {/* Mobile Image */}
+          <div
+            className="h-full w-full bg-cover bg-center md:hidden block"
+            style={{ backgroundImage: `url(${slide.mobileSrc || slide.src})` }}
+          >
+            <div className={`h-full w-full ${overlayClass}`} />
+          </div>
+        </>
       )}
     </>
   );
 
-  const baseClassName = `absolute inset-0 block transition-opacity duration-1000 ${
-    isActive
-      ? "pointer-events-auto z-10 opacity-100"
-      : "pointer-events-none z-0 opacity-0"
-  }`;
+  const baseClassName = `absolute inset-0 block transition-opacity duration-1000 ${isActive
+    ? "pointer-events-auto z-10 opacity-100"
+    : "pointer-events-none z-0 opacity-0"
+    }`;
 
   if (slide.link && !slide.buttonText) {
     return (
@@ -249,6 +258,7 @@ export default function HeroCarousel({
   autoPlay = true,
   autoPlayInterval = 5000,
   searchBar,
+  aspectRatio,
 }: HeroCarouselProps) {
   const pathname = usePathname();
   const pageName = getBannerPageNameFromPath(pathname);
@@ -347,10 +357,55 @@ export default function HeroCarousel({
     resetAutoPlay();
   };
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNext();
+    } else if (isRightSwipe) {
+      goToPrevious();
+    }
+  };
+
   if (resolvedSlides.length === 0) return null;
 
+  const dotActiveColor = activeSlide?.textColor === "black" ? "bg-black" : "bg-white";
+  const dotInactiveColor =
+    activeSlide?.textColor === "black"
+      ? "bg-black/30 hover:bg-black/55"
+      : "bg-white/30 hover:bg-white/55";
+
+  const buttonClass =
+    activeSlide?.textColor === "black"
+      ? "min-w-40 rounded-full bg-black px-6 text-white hover:bg-black/85 sm:min-w-45"
+      : "min-w-40 rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-45";
+
   return (
-    <section className="relative h-svh overflow-hidden">
+    <section
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={`relative w-full overflow-hidden ${!aspectRatio ? "aspect-[4/5] md:aspect-[21/9]" : ""
+        }`}
+      style={aspectRatio ? { aspectRatio } : undefined}
+    >
       {/* Media Carousel */}
       <div className="absolute inset-0">
         {resolvedSlides.map((slide, index) => (
@@ -370,44 +425,126 @@ export default function HeroCarousel({
             variant="ghost"
             size="icon"
             onClick={goToPrevious}
-            className="absolute left-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/20 text-white backdrop-blur-sm hover:bg-white/40 sm:inline-flex lg:left-6"
+            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 text-white shadow-md hover:bg-gray-100 h-9 w-9 sm:h-12 sm:w-12 flex items-center justify-center"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
             onClick={goToNext}
-            className="absolute right-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white/20 text-white backdrop-blur-sm hover:bg-white/40 sm:inline-flex lg:right-6"
+            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 text-white shadow-md hover:bg-gray-100 h-9 w-9 sm:h-12 sm:w-12 flex items-center justify-center"
             aria-label="Next slide"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
         </>
       )}
 
       {/* Content Overlay */}
-      <div className="pointer-events-none relative z-10 flex h-full items-end px-4 pb-24 pt-28 sm:items-center sm:px-6 sm:pb-20 sm:pt-32 lg:px-8 lg:pt-36">
-        <div className="mx-auto w-full max-w-7xl">
+      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-5xl">
           <div
-            className={`max-w-xl text-white lg:max-w-2xl ${
-              hasOverlayInteraction ? "pointer-events-auto" : ""
-            }`}
+            className={`max-w-xl lg:max-w-2xl ${hasOverlayInteraction ? "pointer-events-auto" : ""
+              }`}
           >
+            {activeSlide?.badge ? (
+              <span
+                className={`inline-block px-2.5 py-1 text-[10px] sm:text-xs font-semibold tracking-widest uppercase mb-3 rounded-sm ${activeSlide.textColor === "black"
+                  ? "bg-black text-white"
+                  : "bg-white text-black"
+                  }`}
+              >
+                {activeSlide.badge}
+              </span>
+            ) : null}
+
             {activeSlide?.title ? (
-              <h1 className="mb-4 text-4xl leading-[0.95] font-semibold tracking-[0.08em] sm:text-5xl sm:tracking-[0.12em] lg:text-7xl lg:tracking-[0.16em]">
+              <h1
+                className={`mb-1 text-xl leading-[0.95] font-semibold tracking-[0.04em] sm:mb-2 sm:text-3xl sm:tracking-[0.08em] lg:text-4xl ${activeSlide.textColor === "black" ? "text-black" : "text-white"
+                  }`}
+              >
                 {activeSlide.title}
               </h1>
             ) : null}
+
+            {activeSlide?.subtitle ? (
+              <h2
+                className={`mb-2 text-sm sm:text-xl font-medium tracking-wide ${activeSlide.textColor === "black"
+                  ? "text-black/80"
+                  : "text-white/80"
+                  }`}
+              >
+                {activeSlide.subtitle}
+              </h2>
+            ) : null}
+
+            {(activeSlide?.title || activeSlide?.subtitle) && (
+              <hr
+                className={`w-12 border-t-2 my-3 ${activeSlide.textColor === "black"
+                  ? "border-black/20"
+                  : "border-white/20"
+                  }`}
+              />
+            )}
+
             {activeSlide?.description ? (
-              <p className="mb-6 max-w-md text-sm leading-relaxed tracking-normal text-white/90 sm:text-base sm:tracking-[0.08em] lg:max-w-xl lg:text-lg">
+              <p
+                className={`mb-4 max-w-xs text-xs leading-relaxed tracking-normal sm:mb-6 sm:max-w-md sm:text-base ${activeSlide.textColor === "black"
+                  ? "text-black/70"
+                  : "text-white/90"
+                  }`}
+              >
                 {activeSlide.description}
               </p>
             ) : null}
+
+            {activeSlide?.features && activeSlide.features.length > 0 ? (
+              <>
+                {/* Desktop Features: Horizontal list with separators */}
+                <div
+                  className={`hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1 mb-6 text-xs font-semibold tracking-wider uppercase ${activeSlide.textColor === "black"
+                    ? "text-black/80"
+                    : "text-white/80"
+                    }`}
+                >
+                  {activeSlide.features.map((feature, i) => (
+                    <span key={feature} className="flex items-center">
+                      {feature}
+                      {i < activeSlide.features!.length - 1 && (
+                        <span
+                          className={`ml-3 ${activeSlide.textColor === "black"
+                            ? "text-black/30"
+                            : "text-white/30"
+                            }`}
+                        >
+                          |
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+                {/* Mobile Features: Vertical list with checkmarks */}
+                <div
+                  className={`flex sm:hidden flex-col gap-1.5 mb-5 text-[10px] font-semibold tracking-wider uppercase ${activeSlide.textColor === "black"
+                    ? "text-black/80"
+                    : "text-white/80"
+                    }`}
+                >
+                  {activeSlide.features.map((feature) => (
+                    <span key={feature} className="flex items-center gap-1">
+                      <span>✓</span>
+                      <span>{feature}</span>
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : null}
+
             {searchBar ? (
-              <div className="relative mt-2 w-full max-w-md">
+              <div className="relative mt-1 w-full max-w-md sm:mt-2">
                 <Search
                   className="absolute left-5 top-1/2 -translate-y-1/2 text-black/40"
                   size={18}
@@ -423,18 +560,13 @@ export default function HeroCarousel({
               </div>
             ) : activeSlide?.buttonText ? (
               activeSlide.link ? (
-                <Button
-                  asChild
-                  className="min-w-40 rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-45"
-                >
+                <Button asChild className={buttonClass}>
                   <LinkWrapper href={activeSlide.link}>
                     {activeSlide.buttonText}
                   </LinkWrapper>
                 </Button>
               ) : (
-                <Button className="min-w-40 rounded-full bg-white px-6 text-black hover:bg-gray-100 sm:min-w-45">
-                  {activeSlide.buttonText}
-                </Button>
+                <Button className={buttonClass}>{activeSlide.buttonText}</Button>
               )
             ) : null}
           </div>
@@ -450,11 +582,10 @@ export default function HeroCarousel({
               type="button"
               variant="ghost"
               onClick={() => goToSlide(index)}
-              className={`min-w-0 rounded-full p-0 transition-all ${
-                index === activeIndex
-                  ? "h-2 w-8 bg-white"
-                  : "h-2 w-2 bg-white/50 hover:bg-white/75"
-              }`}
+              className={`min-w-0 rounded-full p-0 transition-all ${index === activeIndex
+                ? `h-2 w-8 ${dotActiveColor}`
+                : `h-2 w-2 ${dotInactiveColor}`
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

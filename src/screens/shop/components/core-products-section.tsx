@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
@@ -29,6 +29,27 @@ const CoreProductsSection = ({
     Record<string, number>
   >({});
   const { addItem } = useCart();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollBy({
+        left: -(container.clientWidth / 2 + 8),
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollBy({
+        left: container.clientWidth / 2 + 8,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const getCurrentIndex = (productId: string): number => {
     return currentImageIndex[productId] || 0;
@@ -63,13 +84,40 @@ const CoreProductsSection = ({
   return (
     <section className="py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          {subtitle && <p className="text-gray-600 text-sm mb-2">{subtitle}</p>}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light">
-            {title}
-          </h2>
+        <div className="mb-12 flex items-end justify-between">
+          <div>
+            {subtitle && <p className="text-gray-600 text-sm mb-2">{subtitle}</p>}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light">
+              {title}
+            </h2>
+          </div>
+          <div className="flex gap-2 md:hidden">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={scrollLeft}
+              className="rounded-full w-10 h-10 border-gray-300 hover:bg-gray-50 flex items-center justify-center"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={scrollRight}
+              className="rounded-full w-10 h-10 border-gray-300 hover:bg-gray-50 flex items-center justify-center"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        <div
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 pb-4 md:pb-0 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {products.map((product) => {
             const images = getProductImages(product);
             const currentIndex = getCurrentIndex(product._id);
@@ -90,17 +138,16 @@ const CoreProductsSection = ({
             return (
               <div
                 key={product._id}
-                className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition"
+                className="group flex flex-col items-center border rounded-2xl border-gray-200 hover:shadow transition w-[calc(50%-8px)] md:w-auto shrink-0 md:shrink snap-start"
               >
                 <Link href={`/product/${product._id}`} className="w-full">
-                  <div className="relative w-full h-[400px] sm:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
+                  <div className="relative w-full aspect-[3/4] md:aspect-auto md:h-[500px] bg-gray-200 rounded-lg overflow-hidden mb-4">
                     {images.length > 0 ? (
                       images.map((image, index) => (
                         <div
                           key={index}
-                          className={`absolute inset-0 transition-opacity duration-500 ${
-                            index === currentIndex ? "opacity-100" : "opacity-0"
-                          }`}
+                          className={`absolute inset-0 transition-opacity duration-500 ${index === currentIndex ? "opacity-100" : "opacity-0"
+                            }`}
                         >
                           <Image
                             src={image}
@@ -160,11 +207,10 @@ const CoreProductsSection = ({
                                 [product._id]: index,
                               }));
                             }}
-                            className={`h-2 min-w-0 p-0 rounded-full transition-all ${
-                              index === currentIndex
-                                ? "bg-white w-6"
-                                : "bg-white/50 hover:bg-white/75"
-                            }`}
+                            className={`h-2 min-w-0 p-0 rounded-full transition-all ${index === currentIndex
+                              ? "bg-white w-6"
+                              : "bg-white/50 hover:bg-white/75"
+                              }`}
                             aria-label={`Go to image ${index + 1}`}
                           />
                         ))}
@@ -173,19 +219,17 @@ const CoreProductsSection = ({
                   </div>
                 </Link>
 
-                <div className="px-6 pb-6 w-full flex flex-col items-center">
+                <div className="px-6 pb-6 w-full flex flex-col items-center flex-1">
                   <Link href={`/product/${product._id}`}>
                     <h3 className="text-xl font-medium mb-2 group-hover:text-gray-600 transition text-center">
                       {product.name}
                     </h3>
                   </Link>
-                  {product.description && (
-                    <p className="text-sm text-gray-500 mb-2 text-center max-w-md line-clamp-2">
-                      {product.description}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-500 mb-2 text-center max-w-md line-clamp-2 h-10">
+                    {product.description || ""}
+                  </p>
 
-                  <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-gray-600 font-medium">
+                  <div className="mt-auto mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-gray-600 font-medium">
                     <CurrencyAmount
                       amount={pricing.discountedPrice}
                       currency={pricing.currency}
@@ -243,9 +287,9 @@ const CoreProductsSection = ({
                         maxDiscountValue:
                           typeof defaultVariant?.discountType === "object"
                             ? Number(
-                                defaultVariant.discountType.maxValue ||
-                                  defaultVariant.discountType.maxAmount,
-                              )
+                              defaultVariant.discountType.maxValue ||
+                              defaultVariant.discountType.maxAmount,
+                            )
                             : defaultVariant?.discountMaxValue
                               ? Number(defaultVariant.discountMaxValue)
                               : undefined,

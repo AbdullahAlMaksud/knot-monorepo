@@ -8,9 +8,6 @@ const backendApiUrl = configuredBackendUrl.endsWith("/api/v1")
   : configuredBackendUrl;
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: process.cwd(),
-  },
   images: {
     remotePatterns: [
       {

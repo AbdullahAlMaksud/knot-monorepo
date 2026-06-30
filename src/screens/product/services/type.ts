@@ -35,6 +35,7 @@ export interface ProductVariant {
   quantity?: number;
   price?: number;
   prices?: ProductVariantPrice[];
+  variantImages?: string[];
   isDefault: boolean;
   isDiscounted?: boolean;
   discountType?: ProductDiscountType | ProductVariantDiscount;

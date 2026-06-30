@@ -15,6 +15,7 @@ import {
   getVariantPricing,
 } from "@/screens/product/services/utils";
 import { useRouter } from "next/navigation";
+import { getR2ImageUrl } from "@/lib/utils";
 
 type ProductDetailHeroProps = {
   product: ApiProduct;
@@ -32,6 +33,21 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
   );
   const [quantity, setQuantity] = useState(1);
   const [showStickyBar, setShowStickyBar] = useState(false);
+
+  const handleVariantSelect = (variantId: string | undefined) => {
+    setSelectedVariantId(variantId);
+    setQuantity(1);
+
+    const variant = variants.find((v) => v._id === variantId);
+    if (variant && variant.variantImages && variant.variantImages.length > 0) {
+      const firstVariantImageKey = variant.variantImages[0];
+      const firstVariantImageUrl = getR2ImageUrl(firstVariantImageKey);
+      const index = images.indexOf(firstVariantImageUrl);
+      if (index !== -1) {
+        setSelectedImage(index);
+      }
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,15 +149,28 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
     <>
       <section className="bg-white pt-10 pb-12">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-[1.08fr_1fr] lg:px-8">
-          <div className="grid grid-cols-[72px_1fr] gap-3 sm:grid-cols-[88px_1fr]">
-            <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[88px_1fr]">
+            <div className="relative order-1 min-h-[360px] overflow-hidden rounded-sm bg-stone-100 lg:order-2 lg:min-h-[470px]">
+              {currentImage ? (
+                <Image
+                  src={currentImage}
+                  alt={product.name}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 560px, 80vw"
+                  className="object-cover"
+                />
+              ) : null}
+            </div>
+
+            <div className="order-2 flex flex-row gap-2 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-x-visible lg:pb-0">
               {images.map((image, index) => (
                 <Button
                   key={image}
                   type="button"
                   variant="ghost"
                   onClick={() => setSelectedImage(index)}
-                  className={`relative h-20 w-full overflow-hidden rounded-sm border p-0 sm:h-24 ${
+                  className={`relative h-20 w-[72px] shrink-0 overflow-hidden rounded-sm border p-0 lg:h-24 lg:w-full ${
                     selectedImage === index
                       ? "border-black"
                       : "border-transparent opacity-80"
@@ -156,19 +185,6 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
                   />
                 </Button>
               ))}
-            </div>
-
-            <div className="relative min-h-[360px] overflow-hidden rounded-sm bg-stone-100 sm:min-h-[470px]">
-              {currentImage ? (
-                <Image
-                  src={currentImage}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 560px, 80vw"
-                  className="object-cover"
-                />
-              ) : null}
             </div>
           </div>
 
@@ -230,10 +246,7 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
                       type="button"
                       variant="outline"
                       disabled={!isAvailable}
-                      onClick={() => {
-                        setSelectedVariantId(variant._id);
-                        setQuantity(1);
-                      }}
+                      onClick={() => handleVariantSelect(variant._id)}
                       className={`h-8 rounded-full px-4 text-xs ${
                         isSelected ? "bg-black text-white" : "bg-white"
                       }`}
@@ -273,7 +286,7 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
               </Button>
             </div>
 
-            <div className="max-w-lg space-y-3">
+            <div className="flex flex-col gap-3">
               <Button
                 type="button"
                 disabled={!canAddToCart}
@@ -306,7 +319,7 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
 
       {/* Sticky Bottom Bar */}
       <div
-        className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-stone-200 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-40 transition-transform duration-300 ease-in-out py-3 px-4 sm:px-6 lg:px-8 ${
+        className={`fixed bottom-0 left-0 right-0 w-full bg-white border-t border-stone-200 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-40 transition-transform duration-300 ease-in-out py-2 px-3 sm:px-6 md:py-3 lg:px-8 ${
           showStickyBar ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -379,10 +392,7 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
                           type="button"
                           variant="outline"
                           disabled={!isAvailable}
-                          onClick={() => {
-                            setSelectedVariantId(variant._id);
-                            setQuantity(1);
-                          }}
+                          onClick={() => handleVariantSelect(variant._id)}
                           className={`h-8 rounded-full px-4 text-xs ${
                             isSelected
                               ? "border-black bg-black text-white"
@@ -424,96 +434,43 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
             </div>
           </div>
 
-          {/* Mobile Layout */}
-          <div className="flex flex-col gap-3 md:hidden">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                {currentImage && (
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-sm bg-stone-100 border border-stone-200">
-                    <Image
-                      src={currentImage}
-                      alt={product.name}
-                      fill
-                      sizes="40px"
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-xs font-semibold text-stone-900 truncate">
-                    {product.name}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-stone-600">
-                    {productDescription}
-                  </p>
-                  <div className="mt-1.5 flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-stone-950">
-                      <CurrencyAmount
-                        amount={price}
-                        currency={pricing.currency}
-                      />
-                    </span>
-                    {pricing.hasDiscount && (
-                      <span className="text-[10px] text-stone-400 line-through">
-                        <CurrencyAmount
-                          amount={pricing.originalPrice}
-                          currency={pricing.currency}
-                        />
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {!inStock && (
-                <span className="shrink-0 text-[10px] font-semibold text-red-600">
-                  Out of stock
-                </span>
-              )}
-            </div>
-
-            {variants.length > 0 && (
-              <div>
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-                  Choose Variant
-                </p>
-                <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-                  {variants.map((variant) => {
-                    const isSelected = variant._id === selectedVariant?._id;
-                    const isAvailable =
-                      typeof variant.quantity === "number"
-                        ? variant.quantity > 0
-                        : true;
-
-                    return (
-                      <Button
-                        key={variant._id}
-                        type="button"
-                        variant="outline"
-                        disabled={!isAvailable}
-                        onClick={() => {
-                          setSelectedVariantId(variant._id);
-                          setQuantity(1);
-                        }}
-                        className={`h-8 shrink-0 rounded-full px-3 text-[11px] ${
-                          isSelected
-                            ? "border-black bg-black text-white"
-                            : "bg-white text-stone-900"
-                        }`}
-                      >
-                        {variant.size}
-                      </Button>
-                    );
-                  })}
-                </div>
+          {/* Mobile Layout — compact single row, no variant */}
+          <div className="flex items-center gap-2 md:hidden">
+            {currentImage && (
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-sm bg-stone-100 border border-stone-200">
+                <Image
+                  src={currentImage}
+                  alt={product.name}
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                />
               </div>
             )}
-
-            <div className="grid grid-cols-2 gap-2">
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-xs font-semibold text-stone-900">
+                {product.name}
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-stone-950">
+                  <CurrencyAmount amount={price} currency={pricing.currency} />
+                </span>
+                {pricing.hasDiscount && (
+                  <span className="text-[10px] text-stone-400 line-through">
+                    <CurrencyAmount
+                      amount={pricing.originalPrice}
+                      currency={pricing.currency}
+                    />
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex shrink-0 gap-1.5">
               <Button
                 type="button"
                 disabled={!canAddToCart}
                 onClick={addProductToCart}
-                className="flex h-9 items-center justify-center gap-1.5 rounded-full bg-black text-xs text-white hover:bg-black/80"
+                className="h-8 rounded-full bg-black px-3 text-[11px] text-white hover:bg-black/80"
               >
                 Add to cart
               </Button>
@@ -522,7 +479,7 @@ const ProductDetailHero = ({ product }: ProductDetailHeroProps) => {
                 variant="outline"
                 disabled={!canAddToCart}
                 onClick={buyNow}
-                className="flex h-9 items-center justify-center gap-1.5 rounded-full border-black text-xs hover:bg-stone-50"
+                className="h-8 rounded-full border-black px-3 text-[11px]"
               >
                 Buy Now
               </Button>
