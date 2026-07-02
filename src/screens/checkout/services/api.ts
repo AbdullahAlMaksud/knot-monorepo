@@ -29,7 +29,9 @@ export const getAllCurrencies = async (): Promise<Currency[]> => {
 };
 
 export const getAllShippingCharges = async (): Promise<ShippingCharge[]> => {
-  const response = await apiClient.get<{ data: ShippingCharge[] }>("/shipping-charges");
+  const response = await apiClient.get<{ data: ShippingCharge[] }>(
+    "/shipping-charges",
+  );
   return response.data.data;
 };
 
@@ -54,11 +56,11 @@ export interface ValidateCouponResponse {
 }
 
 export const validateCoupon = async (
-  params: ValidateCouponParams
+  params: ValidateCouponParams,
 ): Promise<ValidateCouponResponse> => {
   const response = await apiClient.post<ValidateCouponResponse>(
     "/coupons/validate",
-    params
+    params,
   );
   return response.data;
 };
@@ -74,6 +76,8 @@ export interface Coupon {
     maxDiscountAmount: number;
     flatDiscountValue?: number;
   }[];
+  usageLimit?: number;
+  perUserLimit?: number;
   isActive: boolean;
   isScratchApplicable: boolean;
   expiresAt?: string | null;

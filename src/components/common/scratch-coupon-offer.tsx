@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, Copy, Check, Gift } from "lucide-react";
@@ -9,14 +15,23 @@ import { getStoredCart } from "@/lib/cart/types";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { useBodyScrollLock } from "@/hooks/use-body-scroll-lock";
 import { toast } from "sonner";
-import { useGetActiveCoupons, useGetCurrencies } from "@/screens/checkout/services/query";
+import {
+  useGetActiveCoupons,
+  useGetCurrencies,
+} from "@/screens/checkout/services/query";
 import { useUserCountry } from "@/hooks/use-user-country";
 
 export default function ScratchCouponOffer() {
   const router = useRouter();
-  const { items } = useCart();
+  const {} = useCart();
   const { user } = useAuthUser();
-  const [mounted, setMounted] = useState(false);
+
+  // useSyncExternalStore: returns false on server, true on client — no setState needed
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   // States
   const [showModal, setShowModal] = useState(false);
@@ -27,19 +42,19 @@ export default function ScratchCouponOffer() {
   // Canvas ref
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
-
-  // Check for debug flag in URL
-  const [isDebug, setIsDebug] = useState(false);
-
+  const showModalRef = useRef(showModal);
   useEffect(() => {
-    setMounted(true);
-    if (typeof window !== "undefined") {
-      setIsDebug(
-        window.location.search.includes("debug_timer") ||
-        localStorage.getItem("byou_debug_timer") === "true"
-      );
-    }
-  }, []);
+    showModalRef.current = showModal;
+  }, [showModal]);
+
+  // Read debug flag once on client — no setState in effect needed
+  const isDebug = useMemo(() => {
+    if (!isMounted) return false;
+    return (
+      window.location.search.includes("debug_timer") ||
+      localStorage.getItem("byou_debug_timer") === "true"
+    );
+  }, [isMounted]);
 
   const THRESHOLD = isDebug ? 15 * 1000 : 1 * 60 * 1000; // 15s for debug, 1m for production
   const REAPPEAR_THRESHOLD = isDebug ? 30 * 1000 : 5 * 60 * 1000; // 30s for debug, 5m for production
@@ -69,49 +84,52 @@ export default function ScratchCouponOffer() {
   }, [currencies, targetCurrencyCode]);
 
   const scratchCoupon = useMemo(() => {
-    if (activeCoupons.length === 0 || !activeCurrency) return null;
-    return activeCoupons.find((coupon) => {
-      if (!coupon.isScratchApplicable) return false;
-      return coupon.couponAmountsCurrencies?.some(
-        (entry) => String(entry.currency) === String(activeCurrency._id)
-      );
-    });
-  }, [activeCoupons, activeCurrency]);
+    if (activeCoupons.length === 0) return null;
+    return activeCoupons.find((coupon) => coupon.isScratchApplicable) ?? null;
+  }, [activeCoupons]);
 
-  const couponCode = scratchCoupon?.code || "SAVE2110";
+  const couponCode = scratchCoupon?.code ?? "";
 
   const discountLabel = useMemo(() => {
     if (!scratchCoupon) return "GET 20% OFF ALL PRODUCTS";
-    if (scratchCoupon.discountType === "PERCENTAGE" || scratchCoupon.discountType === "PERCENT") {
+    if (
+      scratchCoupon.discountType === "PERCENTAGE" ||
+      scratchCoupon.discountType === "PERCENT"
+    ) {
       return `GET ${scratchCoupon.percentageDiscountValue}% OFF ALL PRODUCTS`;
     }
     if (activeCurrency) {
       const entry = scratchCoupon.couponAmountsCurrencies?.find(
-        (c) => String(c.currency) === String(activeCurrency._id)
+        (c) => String(c.currency) === String(activeCurrency._id),
       );
       if (entry?.flatDiscountValue) {
-        const symbol = activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
+        const symbol =
+          activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
         return `GET ${symbol}${entry.flatDiscountValue} OFF ALL PRODUCTS`;
       }
     }
     return "GET A SPECIAL DISCOUNT";
   }, [scratchCoupon, activeCurrency]);
 
-  const claimButtonLabel = useMemo(() => {
-    if (!scratchCoupon) return "Claim 20% Off Now";
-    if (scratchCoupon.discountType === "PERCENTAGE" || scratchCoupon.discountType === "PERCENT") {
-      return `Claim ${scratchCoupon.percentageDiscountValue}% Off Now`;
+  const discountHeadline = useMemo(() => {
+    if (!scratchCoupon) return "GET 20% OFF";
+    if (
+      scratchCoupon.discountType === "PERCENTAGE" ||
+      scratchCoupon.discountType === "PERCENT"
+    ) {
+      return `GET ${scratchCoupon.percentageDiscountValue}% OFF`;
     }
     if (activeCurrency) {
       const entry = scratchCoupon.couponAmountsCurrencies?.find(
-        (c) => String(c.currency) === String(activeCurrency._id)
+        (c) => String(c.currency) === String(activeCurrency._id),
       );
       if (entry?.flatDiscountValue) {
-        const symbol = activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
-        return `Claim ${symbol}${entry.flatDiscountValue} Off Now`;
+        const symbol =
+          activeCurrency.symbol || (activeCurrency.code === "BDT" ? "৳" : "$");
+        return `GET ${symbol}${entry.flatDiscountValue} OFF`;
       }
     }
-    return "Claim Discount Now";
+    return "GET A SPECIAL DISCOUNT";
   }, [scratchCoupon, activeCurrency]);
 
   // Lock body scroll when modal is open
@@ -121,7 +139,7 @@ export default function ScratchCouponOffer() {
   const userId = user?.id;
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!isMounted) return;
 
     const interval = setInterval(() => {
       const now = Date.now();
@@ -135,7 +153,7 @@ export default function ScratchCouponOffer() {
         isLoggedIn,
         hasItems,
         cartItemsCount: currentItems.length,
-        showModal,
+        showModal: showModalRef.current,
       });
 
       // 1. Check empty cart -> Clear all states
@@ -145,37 +163,17 @@ export default function ScratchCouponOffer() {
         localStorage.removeItem("byou_coupon_expiry_time");
         sessionStorage.removeItem("byou_scratch_offer_claimed_in_session");
         sessionStorage.removeItem("byou_claimed_coupon_code");
-        if (showModal) setShowModal(false);
+        if (showModalRef.current) setShowModal(false);
         setTimeLeft(0);
         return;
       }
 
-      // If user is logged in, we NEVER show the modal.
-      if (isLoggedIn) {
-        if (showModal) setShowModal(false);
-        localStorage.removeItem("byou_cart_abandoned_start");
-        localStorage.removeItem("byou_scratch_offer_last_closed_at");
-
-        // However, we still display the countdown timer if they have an active coupon
-        const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
-        if (couponExpiry) {
-          const remaining = Number(couponExpiry) - now;
-          if (remaining <= 0) {
-            localStorage.removeItem("byou_coupon_expiry_time");
-            setTimeLeft(0);
-          } else {
-            setTimeLeft(Math.ceil(remaining / 1000));
-          }
-        } else {
-          setTimeLeft(0);
-        }
-        return;
-      }
-
       // Check if coupon claimed in this session
-      const claimedInSession = sessionStorage.getItem("byou_scratch_offer_claimed_in_session") === "true";
+      const claimedInSession =
+        sessionStorage.getItem("byou_scratch_offer_claimed_in_session") ===
+        "true";
       if (claimedInSession && !isDebug) {
-        if (showModal) setShowModal(false);
+        if (showModalRef.current) setShowModal(false);
         const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
         if (couponExpiry) {
           const remaining = Number(couponExpiry) - now;
@@ -200,25 +198,35 @@ export default function ScratchCouponOffer() {
 
       const elapsed = now - Number(abandonedStart);
       const couponExpiry = localStorage.getItem("byou_coupon_expiry_time");
-      const lastClosedAt = localStorage.getItem("byou_scratch_offer_last_closed_at");
+      const lastClosedAt = localStorage.getItem(
+        "byou_scratch_offer_last_closed_at",
+      );
 
-      const isReappearEligible = !lastClosedAt || (now - Number(lastClosedAt) >= REAPPEAR_THRESHOLD);
+      const isReappearEligible =
+        !lastClosedAt || now - Number(lastClosedAt) >= REAPPEAR_THRESHOLD;
 
       console.log("[ScratchCouponOffer] timer check:", {
         elapsed,
         THRESHOLD,
         couponExpiry,
-        showModal,
+        showModal: showModalRef.current,
         isReappearEligible,
         lastClosedAt,
         REAPPEAR_THRESHOLD,
         elapsedSeconds: elapsed / 1000,
-        thresholdSeconds: THRESHOLD / 1000
+        thresholdSeconds: THRESHOLD / 1000,
       });
 
       // Trigger modal if elapsed threshold is met, not dismissed recently, and coupon timer not running yet
-      if (elapsed >= THRESHOLD && !couponExpiry && !showModal && isReappearEligible) {
-        console.log("[ScratchCouponOffer] Conditions met! Triggering showModal = true");
+      if (
+        elapsed >= THRESHOLD &&
+        !couponExpiry &&
+        !showModalRef.current &&
+        isReappearEligible
+      ) {
+        console.log(
+          "[ScratchCouponOffer] Conditions met! Triggering showModal = true",
+        );
         setShowModal(true);
       }
 
@@ -235,7 +243,7 @@ export default function ScratchCouponOffer() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [mounted, userId, showModal, THRESHOLD, REAPPEAR_THRESHOLD, scratchCoupon, isDebug]);
+  }, [isMounted, userId, THRESHOLD, REAPPEAR_THRESHOLD, isDebug]);
 
   // Canvas Initializer
   useEffect(() => {
@@ -246,11 +254,16 @@ export default function ScratchCouponOffer() {
     if (!ctx) return;
 
     // Standard width/height for scratch container
-    canvas.width = 280;
-    canvas.height = 120;
+    canvas.width = 340;
+    canvas.height = 160;
 
     // Fill with premium gold/sand gradient
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    const gradient = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
     gradient.addColorStop(0, "#C5A880"); // Muted gold
     gradient.addColorStop(0.5, "#E5D3B3"); // Sand/Champagne
     gradient.addColorStop(1, "#A88B58"); // Deep gold
@@ -357,7 +370,10 @@ export default function ScratchCouponOffer() {
 
   // Close modal -> do not start timer, just record closed timestamp for reappear logic
   const handleClose = () => {
-    localStorage.setItem("byou_scratch_offer_last_closed_at", Date.now().toString());
+    localStorage.setItem(
+      "byou_scratch_offer_last_closed_at",
+      Date.now().toString(),
+    );
     localStorage.removeItem("byou_coupon_expiry_time");
     setTimeLeft(0);
     setShowModal(false);
@@ -397,7 +413,7 @@ export default function ScratchCouponOffer() {
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   return (
     <>
@@ -405,7 +421,6 @@ export default function ScratchCouponOffer() {
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="relative w-full max-w-4xl bg-[#FCFBF9] border border-[#EBE8E0] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-in fade-in zoom-in duration-300">
-
             {/* Close Button */}
             <button
               onClick={handleClose}
@@ -446,32 +461,47 @@ export default function ScratchCouponOffer() {
                 </h2>
 
                 <p className="text-xs md:text-sm text-gray-600 leading-relaxed mb-6 font-sans">
-                  We noticed you left something in your cart! Scratch the card below to reveal a special discount code prepared just for you.
+                  We noticed you left something in your cart! Scratch the card
+                  below to reveal a special discount code prepared just for you.
                 </p>
               </div>
 
               {/* Scratch card area */}
               <div className="flex flex-col items-center justify-center my-4">
-                <div className="relative w-[280px] h-[120px] rounded-lg overflow-hidden select-none">
-
+                <div className="relative w-[340px] h-[160px] rounded-2xl overflow-hidden select-none border border-stone-200">
                   {/* Under layer (revealed coupon) */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#FAF8F5] border-2 border-dashed border-[#C5A880] rounded-lg">
-                    <span className="text-[10px] tracking-wider text-gray-500 font-semibold mb-1 uppercase">
-                      Your Exclusive Code
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-white rounded-2xl px-5">
+                    <span className="text-xs text-gray-400 font-medium tracking-wide">
+                      Congratulations! You
                     </span>
-                    <span className="text-3xl font-bold tracking-widest text-black select-all">
+                    <span className="text-2xl font-bold text-emerald-700 tracking-tight leading-none">
+                      {discountHeadline}
+                    </span>
+                    <span
+                      className="px-4 py-1 rounded text-xs font-bold text-gray-700 tracking-widest"
+                      style={{
+                        background:
+                          "repeating-linear-gradient(-45deg, #e5e7eb, #e5e7eb 2px, #f3f4f6 2px, #f3f4f6 8px)",
+                      }}
+                    >
                       {couponCode}
                     </span>
-                    <span className="text-[10px] text-green-700 font-semibold mt-1">
-                      {discountLabel}
+                    <span className="text-[11px] text-gray-400 font-medium">
+                      All Products
+                      {scratchCoupon?.perUserLimit != null
+                        ? ` · Valid ${scratchCoupon.perUserLimit === 1 ? "once" : `${scratchCoupon.perUserLimit}×`} per customer`
+                        : " · Conditions apply"}
                     </span>
                   </div>
 
                   {/* Canvas scratch layer */}
                   <canvas
                     ref={canvasRef}
-                    className={`absolute inset-0 z-10 cursor-pointer transition-opacity duration-500 ${isScratchedFully ? "opacity-0 pointer-events-none" : "opacity-100"
-                      }`}
+                    className={`absolute inset-0 z-10 cursor-pointer transition-opacity duration-500 ${
+                      isScratchedFully
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100"
+                    }`}
                   />
                 </div>
 
@@ -489,7 +519,7 @@ export default function ScratchCouponOffer() {
                   disabled={!isScratchedFully}
                   className="w-full py-3 bg-black hover:bg-black/90 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-full text-sm transition-colors shadow-md"
                 >
-                  {claimButtonLabel}
+                  Claim Now
                 </button>
 
                 <button
@@ -508,10 +538,8 @@ export default function ScratchCouponOffer() {
       {timeLeft > 0 && (
         <div className="fixed bottom-6 right-6 z-[90] font-sans group">
           <div className="relative flex items-center justify-end">
-
             {/* The Floating Bubble */}
             <div className="flex items-center gap-2 bg-black border border-[#C5A880] text-white py-2.5 px-4 rounded-full shadow-2xl h-11 w-32 group-hover:w-[260px] overflow-hidden transition-all duration-500 ease-in-out">
-
               {/* Default Left Section (Icon & Countdown) */}
               <div className="flex items-center gap-1.5 shrink-0 select-none">
                 <Gift className="size-4 text-[#C5A880] animate-bounce shrink-0" />
@@ -533,7 +561,11 @@ export default function ScratchCouponOffer() {
                   className="p-1 bg-[#C5A880]/20 hover:bg-[#C5A880]/40 text-[#E5D3B3] hover:text-white rounded-md transition-colors shrink-0"
                   title="Copy Coupon Code"
                 >
-                  {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+                  {copied ? (
+                    <Check size={12} className="text-green-400" />
+                  ) : (
+                    <Copy size={12} />
+                  )}
                 </button>
               </div>
             </div>
