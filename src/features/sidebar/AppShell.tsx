@@ -17,8 +17,14 @@ import { cn } from "@/shared/lib/utils";
 import "@/shared/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { ShareCardLanding } from "@/features/game/ShareCardLanding";
+import dynamic from "next/dynamic";
 
-type Page = "home" | "score" | "settings";
+const QueensScreen = dynamic(
+  () => import("@/features/queens/QueensScreen").then((m) => m.QueensScreen),
+  { ssr: false }
+);
+
+type Page = "home" | "queens" | "score" | "settings";
 
 export function AppShell() {
   const [page, setPage] = useState<Page>("home");
@@ -54,10 +60,10 @@ export function AppShell() {
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
 
-  const activePage: "home" | "game" | "score" | "settings" =
+  const activePage: "home" | "game" | "queens" | "score" | "settings" =
     gameView === "game" ? "game" : page;
 
-  const handleNavigate = (target: "home" | "score" | "settings") => {
+  const handleNavigate = (target: "home" | "queens" | "score" | "settings") => {
     // If game is running and they click home, reset to home
     if (target === "home" && gameView === "game") {
       useGameStore.getState().resetGame();
@@ -65,7 +71,8 @@ export function AppShell() {
     setPage(target);
   };
 
-  const showGame = gameView === "game";
+  const showGame = gameView === "game" && page !== "queens";
+  const showQueens = page === "queens" && gameView !== "game";
   const showScore = gameView !== "game" && page === "score";
   const showSettings = gameView !== "game" && page === "settings";
   const showHome = gameView !== "game" && page === "home";
@@ -131,8 +138,9 @@ export function AppShell() {
               transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
               className="w-full h-full flex items-center justify-center"
             >
-              {showHome && <HomeScreen />}
+              {showHome && <HomeScreen onNavigateQueens={() => setPage("queens")} />}
               {showGame && <GameScreen />}
+              {showQueens && <QueensScreen onBack={() => setPage("home")} />}
               {showScore && <ScoreScreen />}
               {showSettings && (
                 <SettingsScreen

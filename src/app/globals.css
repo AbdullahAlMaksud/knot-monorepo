@@ -178,6 +178,22 @@
 /* ── Cell grid borders (Tailwind can't generate dynamic nth-child) ─── */
 /* Box-separator border overrides applied via JS className in SudokuGrid */
 
+/* ── Queens game animations ────────────────────────────────────────── */
+@keyframes queens-conflict-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+.queens-conflict-shake { animation: queens-conflict-shake 0.35s ease-in-out; }
+
+@keyframes queens-win-glow {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50% { box-shadow: 0 0 40px 6px rgba(245, 158, 11, 0.45); }
+}
+.queens-win-glow { animation: queens-win-glow 1.8s ease-in-out infinite; }
+
 /* ── Focus ring suppression for game buttons ───────────────────────── */
 button:focus-visible { outline: none; }
 

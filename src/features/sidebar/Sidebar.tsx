@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart2, Settings, Pin } from "lucide-react";
+import { BarChart2, Settings, Pin, Crown } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useSettingsStore } from "@/shared/stores/settingsStore";
@@ -17,8 +17,8 @@ import {
 import { ParentNavigator } from "@/components/commons/parent-navigator";
 
 interface SidebarProps {
-  activePage: "home" | "game" | "score" | "settings";
-  onNavigate: (page: "home" | "score" | "settings") => void;
+  activePage: "home" | "game" | "queens" | "score" | "settings";
+  onNavigate: (page: "home" | "queens" | "score" | "settings") => void;
 }
 
 export function Sidebar({ activePage, onNavigate }: SidebarProps) {
@@ -30,6 +30,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
 
   const navItems = [
     { id: "home" as const, icon: SudokuLogo, label: t("navigation.sudoku") },
+    { id: "queens" as const, icon: Crown, label: t("navigation.queens") },
     { id: "score" as const, icon: BarChart2, label: t("navigation.scores") },
     { id: "settings" as const, icon: Settings, label: t("navigation.settings") },
   ];
@@ -71,7 +72,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
                   label={label}
                   active={isActive}
                   accent={theme.accent}
-                  onClick={() => onNavigate(id)}
+                  onClick={() => onNavigate(id as "home" | "queens" | "score" | "settings")}
                 >
                   <Icon size={16} />
                 </SidebarBtn>
