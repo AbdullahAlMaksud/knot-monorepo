@@ -3,37 +3,36 @@
 import { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "@/features/sidebar/Sidebar";
-import { HomeScreen } from "@/features/game/HomeScreen";
-import { GameScreen } from "@/features/game/GameScreen";
-import { ScoreScreen } from "@/features/score/ScoreScreen";
-import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
-import { useGameStore } from "@/shared/stores/gameStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { useKeyboard } from "@/shared/hooks/useKeyboard";
 import { useTimer } from "@/shared/hooks/useTimer";
 import { useSettingsStore } from "@/shared/stores/settingsStore";
+import { useGameStore } from "@/shared/stores/gameStore";
 import { cn } from "@/shared/lib/utils";
 import "@/shared/lib/i18n";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
 import { ShareCardLanding } from "@/features/game/ShareCardLanding";
-import dynamic from "next/dynamic";
 
-const QueensScreen = dynamic(
-  () => import("@/features/queens/QueensScreen").then((m) => m.QueensScreen),
-  { ssr: false }
-);
+type Page = "home" | "sudoku" | "queens" | "score" | "settings";
 
-type Page = "home" | "queens" | "score" | "settings";
+function pathnameToPage(pathname: string): Page {
+  if (pathname.startsWith("/sudoku")) return "sudoku";
+  if (pathname.startsWith("/queens")) return "queens";
+  if (pathname.startsWith("/score")) return "score";
+  if (pathname.startsWith("/settings")) return "settings";
+  return "home"; // covers both "/" and any unrecognized path
+}
 
-export function AppShell() {
-  const [page, setPage] = useState<Page>("home");
+function MainLayout({ children }: { children: React.ReactNode }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const gameView = useGameStore((s) => s.view);
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const { language } = useSettingsStore();
   const { i18n } = useTranslation();
+  const pathname = usePathname();
+  const gameView = useGameStore((s) => s.view);
 
   useTimer();
 
@@ -46,13 +45,13 @@ export function AppShell() {
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => { });
+      document.documentElement.requestFullscreen().catch(() => {});
     } else {
-      document.exitFullscreen().catch(() => { });
+      document.exitFullscreen().catch(() => {});
     }
   }, []);
 
-  useKeyboard(toggleFullscreen, () => { });
+  useKeyboard(toggleFullscreen, () => {});
 
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
@@ -60,28 +59,10 @@ export function AppShell() {
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
 
-  const activePage: "home" | "game" | "queens" | "score" | "settings" =
-    gameView === "game" ? "game" : page;
-
-  const handleNavigate = (target: "home" | "queens" | "score" | "settings") => {
-    // If game is running and they click home, reset to home
-    if (target === "home" && gameView === "game") {
-      useGameStore.getState().resetGame();
-    }
-    setPage(target);
-  };
-
-  const showGame = gameView === "game" && page !== "queens";
-  const showQueens = page === "queens" && gameView !== "game";
-  const showScore = gameView !== "game" && page === "score";
-  const showSettings = gameView !== "game" && page === "settings";
-  const showHome = gameView !== "game" && page === "home";
-  const pageKey = showGame ? "game" : page;
-
-  // Sync page back to home when game resets
-  useEffect(() => {
-    if (gameView === "home") setPage("home");
-  }, [gameView]);
+  const currentPage = pathnameToPage(pathname);
+  // When game is active, sidebar shows sudoku as active
+  const activePage: Page =
+    gameView === "game" ? "sudoku" : currentPage;
 
   return (
     <ThemeProvider>
@@ -92,7 +73,6 @@ export function AppShell() {
         )}
         style={{ background: "var(--bg-app, #080808)", transition: "background-color 0.3s ease" }}
       >
-
         {/* Animated background gradient that reacts to theme */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
@@ -124,34 +104,26 @@ export function AppShell() {
         {/* Floating sidebar */}
         <Sidebar
           activePage={activePage}
-          onNavigate={handleNavigate}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
         />
 
         {/* Main content area */}
-        <div className="relative w-full h-full flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pageKey}
-              initial={{ opacity: 0, y: 14, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.975 }}
-              transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
-              className="w-full h-full flex items-center justify-center"
-            >
-              {showHome && <HomeScreen onNavigateQueens={() => setPage("queens")} />}
-              {showGame && <GameScreen />}
-              {showQueens && <QueensScreen onBack={() => setPage("home")} />}
-              {showScore && <ScoreScreen />}
-              {showSettings && (
-                <SettingsScreen
-                  isFullscreen={isFullscreen}
-                  onToggleFullscreen={toggleFullscreen}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 14, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.975 }}
+            transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+            className="relative w-full h-full flex items-center justify-center"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </ThemeProvider>
   );
 }
+
+export default MainLayout;

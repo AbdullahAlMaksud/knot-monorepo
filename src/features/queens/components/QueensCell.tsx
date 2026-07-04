@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/utils";
 import { hexToRgba } from "../lib/themes";
 import { QueenIcon } from "./QueenIcon";
 import type { CellState } from "../lib/types";
+import { CrossIcon, X } from "lucide-react";
 
 type QueensCellProps = {
   state: CellState;
@@ -39,7 +40,7 @@ export function QueensCell({
       disabled={disabled}
       aria-label={`Row ${row + 1}, column ${col + 1}, ${state}`}
       className={cn(
-        "relative aspect-square w-full transition-transform duration-150 focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
+        "relative cursor-pointer aspect-square w-full transition-transform duration-150 focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
         "hover:brightness-125 active:scale-[0.95]",
         isConflict && "queens-conflict-shake"
       )}
@@ -81,12 +82,7 @@ export function QueensCell({
             transition={{ duration: 0.15 }}
             className="absolute inset-0 flex items-center justify-center"
           >
-            <span
-              className="text-[42%] font-semibold"
-              style={{ color: isLight ? "rgba(15,23,42,0.45)" : "rgba(245,246,251,0.55)" }}
-            >
-              &times;
-            </span>
+            <X />
           </motion.div>
         )}
       </AnimatePresence>

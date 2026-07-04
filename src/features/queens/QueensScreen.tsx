@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { todaySeedString } from "./lib/rng";
 import { QueensHomeScreen } from "./QueensHomeScreen";
 import type { Difficulty } from "./lib/types";
+import { useRouter } from "next/navigation";
 
 function formatTime(totalSeconds: number) {
   const m = Math.floor(totalSeconds / 60);
@@ -22,11 +23,8 @@ function formatTime(totalSeconds: number) {
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 }
 
-interface QueensScreenProps {
-  onBack: () => void;
-}
-
-export function QueensScreen({ onBack }: QueensScreenProps) {
+export function QueensScreen() {
+  const router = useRouter();
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const { t } = useTranslation();
@@ -65,8 +63,12 @@ export function QueensScreen({ onBack }: QueensScreenProps) {
     setWinOpen(false);
   };
 
+  const handleNavigateHome = () => {
+    router.push("/");
+  };
+
   if (showHome) {
-    return <QueensHomeScreen onStartGame={handleStartGame} />;
+    return <QueensHomeScreen onStartGame={handleStartGame} onBack={handleNavigateHome} />;
   }
 
   return (
@@ -81,7 +83,7 @@ export function QueensScreen({ onBack }: QueensScreenProps) {
       >
         <div className="flex items-center gap-1">
           <TopBarButton
-            onClick={handleBackToHome}
+            onClick={handleNavigateHome}
             icon={<Home size={15} />}
             tooltip={t("queens.back")}
             theme={theme}

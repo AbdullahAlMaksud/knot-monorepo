@@ -1,13 +1,12 @@
 "use client";
 
-import { BarChart2, Settings, Pin, Crown } from "lucide-react";
+import { BarChart2, Settings, Pin, Crown, Home } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useSettingsStore } from "@/shared/stores/settingsStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
-import { useGameStore } from "@/shared/stores/gameStore";
 import { useTranslation } from "react-i18next";
-import { SudokuLogo } from "@/components/ui";
+import { KnotLogo, SudokuLogo } from "@/components/ui";
 import {
   Tooltip,
   TooltipTrigger,
@@ -15,24 +14,27 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { ParentNavigator } from "@/components/commons/parent-navigator";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
-  activePage: "home" | "game" | "queens" | "score" | "settings";
-  onNavigate: (page: "home" | "queens" | "score" | "settings") => void;
+  activePage: "home" | "sudoku" | "queens" | "score" | "settings";
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
-export function Sidebar({ activePage, onNavigate }: SidebarProps) {
+export function Sidebar({ activePage, isFullscreen, onToggleFullscreen }: SidebarProps) {
   const { sidebarPinned, setSidebarPinned } = useSettingsStore();
   const { getTheme } = useThemeStore();
   const theme = getTheme();
-  const gameView = useGameStore((s) => s.view);
+  const router = useRouter();
   const { t } = useTranslation();
 
   const navItems = [
-    { id: "home" as const, icon: SudokuLogo, label: t("navigation.sudoku") },
-    { id: "queens" as const, icon: Crown, label: t("navigation.queens") },
-    { id: "score" as const, icon: BarChart2, label: t("navigation.scores") },
-    { id: "settings" as const, icon: Settings, label: t("navigation.settings") },
+    { id: "home" as const, icon: KnotLogo, label: "Knot", href: "/" },
+    { id: "sudoku" as const, icon: SudokuLogo, label: t("navigation.sudoku"), href: "/sudoku" },
+    { id: "queens" as const, icon: Crown, label: t("navigation.queens"), href: "/queens" },
+    { id: "score" as const, icon: BarChart2, label: t("navigation.scores"), href: "/score" },
+    { id: "settings" as const, icon: Settings, label: t("navigation.settings"), href: "/settings" },
   ];
 
   return (
@@ -64,15 +66,15 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
 
           {/* Nav items */}
           <div className="flex flex-col items-center gap-2">
-            {navItems.map(({ id, icon: Icon, label }) => {
-              const isActive = activePage === id || (id === "home" && gameView === "game");
+            {navItems.map(({ id, icon: Icon, label, href }) => {
+              const isActive = activePage === id;
               return (
                 <SidebarBtn
                   key={id}
                   label={label}
                   active={isActive}
                   accent={theme.accent}
-                  onClick={() => onNavigate(id as "home" | "queens" | "score" | "settings")}
+                  onClick={() => router.push(href)}
                 >
                   <Icon size={16} />
                 </SidebarBtn>

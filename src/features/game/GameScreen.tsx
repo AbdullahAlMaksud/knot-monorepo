@@ -12,6 +12,7 @@ import { useSound } from "@/shared/hooks/useSound";
 import { formatTime } from "@/shared/lib/storage";
 import { useTranslation } from "react-i18next";
 import { translateNumber } from "@/shared/lib/i18n";
+import { useRouter } from "next/navigation";
 
 interface TopBarButtonProps {
   onClick: () => void;
@@ -63,6 +64,12 @@ export function GameScreen() {
   const theme = getTheme();
   const { play } = useSound();
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+
+  const handleHome = () => {
+    resetGame();
+    router.push("/sudoku");
+  };
 
   // Register sound callback into the store (avoids hooks-in-store issue)
   useEffect(() => {
@@ -83,7 +90,7 @@ export function GameScreen() {
         transition={{ duration: 0.3 }}
         className="flex items-center justify-between w-full max-w-[400px]"
       >
-        <TopBarButton onClick={resetGame} icon={<Home size={15} />} tooltip={t("game.home_tooltip")} />
+        <TopBarButton onClick={handleHome} icon={<Home size={15} />} tooltip={t("game.home_tooltip")} />
 
         <span
           className="text-[11px] font-semibold tracking-[0.18em] uppercase"

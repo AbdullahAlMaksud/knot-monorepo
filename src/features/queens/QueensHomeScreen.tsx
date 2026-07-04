@@ -20,11 +20,14 @@ const DIFFICULTIES: {
   { id: "expert", icon: <Gem size={13} />, color: "#ef4444", sizeLabel: "9×9" },
 ];
 
+import { GlassButton } from "@/components/ui/GlassButton";
+
 interface QueensHomeScreenProps {
   onStartGame: (difficulty: Difficulty) => void;
+  onBack?: () => void;
 }
 
-export function QueensHomeScreen({ onStartGame }: QueensHomeScreenProps) {
+export function QueensHomeScreen({ onStartGame, onBack }: QueensHomeScreenProps) {
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const { t } = useTranslation();
@@ -115,6 +118,16 @@ export function QueensHomeScreen({ onStartGame }: QueensHomeScreenProps) {
           transition={{ delay: 0.48 }}
           className="flex flex-col items-center gap-2.5 w-full"
         >
+          {onBack && (
+            <GlassButton
+              variant="ghost"
+              size="sm"
+              className="text-white/25"
+              onClick={onBack}
+            >
+              ← {t("queens.back")}
+            </GlassButton>
+          )}
           <p className="text-[9px] text-white/12 tracking-[0.22em] uppercase">
             {t("queens.footer")}
           </p>

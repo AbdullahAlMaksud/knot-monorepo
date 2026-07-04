@@ -6,6 +6,7 @@ import {
   Trophy, Clock, XCircle, RotateCcw, Home, ChevronRight, 
   Share2, Copy, Download, Check 
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Inline brand SVGs since Lucide-react doesn't export them in this version
 const TwitterIcon = ({ size = 12 }: { size?: number }) => (
@@ -196,6 +197,7 @@ export function WinModal({ onClose }: WinModalProps) {
   const isPersonalBest = !!(currentStats?.bestTime && currentStats.bestTime === elapsed);
   const nextDiff = difficulty ? DIFF_ORDER[DIFF_ORDER.indexOf(difficulty) + 1] : null;
   const { t, i18n } = useTranslation();
+  const router = useRouter();
 
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -417,7 +419,7 @@ export function WinModal({ onClose }: WinModalProps) {
                   )}
 
                   <button
-                    onClick={resetGame}
+                    onClick={() => { resetGame(); router.push("/"); }}
                     className="w-full py-2 rounded-xl text-[11px] font-medium flex items-center justify-center gap-1.5 transition-all active:scale-95"
                     style={{
                       background: "transparent",

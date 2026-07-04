@@ -13,30 +13,30 @@ const notoSerifBengali = Noto_Serif_Bengali({
 });
 
 export const metadata: Metadata = {
-  title: "Sudoku — Minimal Focus",
-  description: "Minimal focus Sudoku puzzle game with a beautiful glassmorphism UI",
+  title: "Knot — Brain Games & Logic Puzzles",
+  description: "Train your mind with Knot - a collection of minimal, focus-oriented logic puzzle games like Sudoku, Queens, and more with a beautiful glassmorphic layout.",
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Sudoku — Minimal Focus",
-    description: "Train your mind with this minimal, focus-oriented Sudoku puzzle game with a beautiful glassmorphic layout.",
+    title: "Knot — Brain Games & Logic Puzzles",
+    description: "Train your mind with Knot - a collection of minimal, focus-oriented logic puzzle games like Sudoku, Queens, and more with a beautiful glassmorphic layout.",
     url: "https://sudoku-focus.vercel.app",
-    siteName: "Sudoku",
+    siteName: "Knot",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 1200,
-        alt: "Sudoku Minimal Focus UI preview",
+        alt: "Knot Minimal Focus UI preview",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sudoku — Minimal Focus",
-    description: "Train your mind with this minimal, focus-oriented Sudoku puzzle game with a beautiful glassmorphic layout.",
+    title: "Knot — Brain Games & Logic Puzzles",
+    description: "Train your mind with Knot - a collection of minimal, focus-oriented logic puzzle games like Sudoku, Queens, and more with a beautiful glassmorphic layout.",
     images: ["/og-image.png"],
   },
 };

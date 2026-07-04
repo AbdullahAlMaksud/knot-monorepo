@@ -2,28 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Grid3X3, Puzzle, Sparkles } from "lucide-react";
+import { Crown, Puzzle, Sparkles } from "lucide-react";
 import { GlassButton } from "@/components/ui/GlassButton";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { useGameStore } from "@/shared/stores/gameStore";
 import { useThemeStore } from "@/shared/stores/themeStore";
 import { loadGame } from "@/shared/lib/storage";
-import { DifficultySelector } from "./DifficultySelector";
-import { SudokuLogo } from "@/components/ui";
+import { SudokuLogo, KnotLogo } from "@/components/ui";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { useGameStore } from "@/shared/stores/gameStore";
 
-type HomeView = "hub" | "sudoku-select";
-
-interface HomeScreenProps {
-  onNavigateQueens?: () => void;
-}
-
-export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
+export function HomeScreen() {
+  const router = useRouter();
   const { restoreGame } = useGameStore();
   const { getTheme } = useThemeStore();
   const theme = getTheme();
   const [hasSaved, setHasSaved] = useState(false);
-  const [view, setView] = useState<HomeView>("hub");
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -31,66 +25,6 @@ export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
     setHasSaved(!!saved && !saved.complete);
   }, []);
 
-  // If showing Sudoku difficulty selector
-  if (view === "sudoku-select") {
-    return (
-      <div className="flex items-center justify-center w-full h-full">
-        <div className="flex flex-col items-center gap-5 w-full max-w-[320px] px-4">
-          <motion.div
-            initial={{ opacity: 0, y: -18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-            className="flex flex-col items-center text-center"
-          >
-            <SudokuLogo size={80} className="text-[var(--accent)] mb-4" />
-            <p className="text-[10px] font-semibold tracking-[0.3em] text-white/20 uppercase mb-2">
-              {t("home.focus")}
-            </p>
-            <h1 className="text-[52px] font-extralight tracking-[0.08em] text-white/88 leading-none">
-              {t("home.sudoku")}
-            </h1>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, duration: 0.4 }}
-            className="w-full"
-          >
-            <DifficultySelector />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.48 }}
-            className="flex flex-col items-center gap-2.5 w-full"
-          >
-            {hasSaved && (
-              <GlassButton
-                variant="outline"
-                size="sm"
-                className="w-full text-white/40"
-                onClick={() => restoreGame()}
-              >
-                {t("home.resume")}
-              </GlassButton>
-            )}
-            <GlassButton
-              variant="ghost"
-              size="sm"
-              className="text-white/25"
-              onClick={() => setView("hub")}
-            >
-              ← {t("queens.back")}
-            </GlassButton>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  // Game Hub view
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col items-center gap-6 w-full max-w-[380px] px-4">
@@ -102,14 +36,15 @@ export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
           transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
           className="flex flex-col items-center text-center"
         >
-          <div className="mb-4 flex items-center gap-3">
-            <Sparkles size={18} className="text-white/20" />
-            <p className="text-[10px] font-semibold tracking-[0.3em] text-white/20 uppercase">
-              {t("home.game_hub_title")}
-            </p>
-            <Sparkles size={18} className="text-white/20" />
-          </div>
-          <p className="text-[11px] text-white/35">
+          {/* Knot brand logo */}
+          <KnotLogo size={72} className="text-white/85 mb-3" />
+          <p className="text-[10px] font-semibold tracking-[0.38em] text-white/20 uppercase mb-1">
+            brain games
+          </p>
+          <h1 className="text-[52px] font-extralight tracking-[0.06em] text-white/88 leading-none">
+            Knot
+          </h1>
+          <p className="text-[11px] text-white/35 mt-2">
             {t("home.game_hub_subtitle")}
           </p>
         </motion.div>
@@ -127,7 +62,7 @@ export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
             title={t("home.sudoku")}
             description={t("home.sudoku_desc")}
             accent={theme.accent}
-            onClick={() => setView("sudoku-select")}
+            onClick={() => router.push("/sudoku")}
             delay={0}
           />
 
@@ -137,7 +72,7 @@ export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
             title={t("queens.title")}
             description={t("home.queens_desc")}
             accent={theme.accent}
-            onClick={onNavigateQueens}
+            onClick={() => router.push("/queens")}
             delay={0.06}
           />
 
@@ -192,7 +127,6 @@ export function HomeScreen({ onNavigateQueens }: HomeScreenProps) {
   );
 }
 
-// ── Game Card component ─────────────────────────────────────────────
 function GameCard({
   icon,
   title,
@@ -214,7 +148,7 @@ function GameCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.18 + delay }}
       onClick={onClick}
-      className="group relative w-full flex items-center gap-4 p-4 rounded-2xl text-left overflow-hidden transition-all duration-200 active:scale-[0.98]"
+      className="group cursor-pointer  relative w-full flex items-center gap-4 p-4 rounded-2xl text-left overflow-hidden transition-all duration-200 active:scale-[0.98]"
       style={{
         background: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(255,255,255,0.08)",
@@ -250,7 +184,7 @@ function GameCard({
       {/* Arrow */}
       <div className="text-white/20 group-hover:text-white/50 transition-colors">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
 
