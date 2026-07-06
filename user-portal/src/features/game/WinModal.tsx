@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Trophy, Clock, XCircle, RotateCcw, Home, ChevronRight, 
@@ -33,6 +33,7 @@ import { formatTime, loadStats } from "@/shared/lib/storage";
 import type { Difficulty } from "@/shared/lib/sudoku";
 import { useTranslation } from "react-i18next";
 import { translateNumber } from "@/shared/lib/i18n";
+import { api } from "@/shared/lib/api";
 
 const DIFF_ORDER: Difficulty[] = ["easy", "medium", "hard", "expert"];
 
@@ -203,6 +204,60 @@ export function WinModal({ onClose }: WinModalProps) {
   const [copied, setCopied] = useState(false);
   const [sharingImage, setSharingImage] = useState(false);
 
+  // Score submission and Auth states
+  const [user, setUser] = useState<any>(null);
+  const [playerName, setPlayerName] = useState("");
+  const [submittingScore, setSubmittingScore] = useState(false);
+  const [submittedScore, setSubmittedScore] = useState(false);
+  const [authMode, setAuthMode] = useState<"none" | "login" | "signup">("none");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Fetch session on load
+  useEffect(() => {
+    api.getSession().then((data) => {
+      if (data && data.user) {
+        setUser(data.user);
+        setPlayerName(data.user.name);
+      }
+    });
+  }, []);
+
+  const handlePostScore = async () => {
+    setSubmittingScore(true);
+    try {
+      const gameKey = `sudoku_${difficulty || "easy"}`;
+      await api.postScore(gameKey, elapsed, playerName.trim() || "Guest");
+      setSubmittedScore(true);
+    } catch (err: any) {
+      alert(err.message || "Failed to submit score");
+    } finally {
+      setSubmittingScore(false);
+    }
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    try {
+      if (authMode === "login") {
+        const res = await api.signIn(email, password);
+        setUser(res.user);
+        setPlayerName(res.user.name);
+        setAuthMode("none");
+      } else {
+        const res = await api.signUp(email, password, name);
+        setUser(res.user);
+        setPlayerName(res.user.name);
+        setAuthMode("none");
+      }
+    } catch (err: any) {
+      setAuthError(err.message || "Authentication failed");
+    }
+  };
+
   const timeStr = translateNumber(formatTime(elapsed), i18n.language);
   const mistakesStr = translateNumber(mistakes, i18n.language);
   const diffStr = difficulty ? t(`difficulty.${difficulty}`) : "";
@@ -368,6 +423,172 @@ export function WinModal({ onClose }: WinModalProps) {
                       </span>
                     </div>
                   ))}
+                </div>
+
+                {/* Online Score Submission */}
+                <div className="w-full flex flex-col gap-2 p-2.5 rounded-xl border border-white/5 bg-white/5">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-white/30 text-left">
+                    {i18n.language === "bn" ? "অনলাইন লিডারবোর্ড" : "Online Leaderboard"}
+                  </p>
+                  
+                  {submittedScore ? (
+                    <div className="text-xs font-medium text-green-400 py-1">
+                      ✓ {i18n.language === "bn" ? "স্কোর জমা দেওয়া হয়েছে!" : "Score submitted!"}
+                    </div>
+                  ) : authMode === "login" ? (
+                    <form onSubmit={handleAuth} className="flex flex-col gap-2 text-left">
+                      <p className="text-xs font-semibold text-white/80">
+                        {i18n.language === "bn" ? "লগইন করুন" : "Sign In"}
+                      </p>
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                      />
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                      />
+                      {authError && (
+                        <p className="text-[10px] text-red-400 font-medium leading-tight">{authError}</p>
+                      )}
+                      <div className="flex gap-1.5">
+                        <button
+                          type="submit"
+                          className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all active:scale-95"
+                          style={{ background: theme.accent, color: theme.accentFg }}
+                        >
+                          {i18n.language === "bn" ? "লগইন" : "Sign In"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setAuthMode("none"); setAuthError(null); }}
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-white/60 hover:text-white"
+                        >
+                          {i18n.language === "bn" ? "বাতিল" : "Cancel"}
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode("signup"); setAuthError(null); }}
+                        className="text-[10px] text-accent/80 hover:text-accent text-center mt-1 outline-none"
+                      >
+                        {i18n.language === "bn" ? "অ্যাকাউন্ট তৈরি করুন" : "Create an account"}
+                      </button>
+                    </form>
+                  ) : authMode === "signup" ? (
+                    <form onSubmit={handleAuth} className="flex flex-col gap-2 text-left">
+                      <p className="text-xs font-semibold text-white/80">
+                        {i18n.language === "bn" ? "অ্যাকাউন্ট তৈরি করুন" : "Create Account"}
+                      </p>
+                      <input
+                        type="text"
+                        placeholder="Name"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                      />
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                      />
+                      {authError && (
+                        <p className="text-[10px] text-red-400 font-medium leading-tight">{authError}</p>
+                      )}
+                      <div className="flex gap-1.5">
+                        <button
+                          type="submit"
+                          className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all active:scale-95"
+                          style={{ background: theme.accent, color: theme.accentFg }}
+                        >
+                          {i18n.language === "bn" ? "তৈরি করুন" : "Sign Up"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setAuthMode("none"); setAuthError(null); }}
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-white/60 hover:text-white"
+                        >
+                          {i18n.language === "bn" ? "বাতিল" : "Cancel"}
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setAuthMode("login"); setAuthError(null); }}
+                        className="text-[10px] text-accent/80 hover:text-accent text-center mt-1 outline-none"
+                      >
+                        {i18n.language === "bn" ? "লগইন করুন" : "Already have an account? Sign In"}
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {user ? (
+                        <div className="flex flex-col gap-1.5 items-stretch">
+                          <p className="text-xs text-white/70 text-left">
+                            {i18n.language === "bn" ? "প্লেয়ার:" : "Player:"}{" "}
+                            <span className="font-semibold text-white">{user.name}</span>
+                          </p>
+                          <button
+                            onClick={handlePostScore}
+                            disabled={submittingScore}
+                            className="w-full py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center transition-all active:scale-95 disabled:opacity-60"
+                            style={{ background: theme.accent, color: theme.accentFg }}
+                          >
+                            {submittingScore
+                              ? (i18n.language === "bn" ? "জমা হচ্ছে..." : "Submitting...")
+                              : (i18n.language === "bn" ? "স্কোর জমা দিন" : "Submit Score")}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2 items-stretch">
+                          <input
+                            type="text"
+                            placeholder={i18n.language === "bn" ? "প্লেয়ারের নাম (Guest)" : "Player name (Guest)"}
+                            value={playerName}
+                            onChange={(e) => setPlayerName(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-accent/50"
+                          />
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={handlePostScore}
+                              disabled={submittingScore}
+                              className="flex-1 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center transition-all active:scale-95 disabled:opacity-60"
+                              style={{ background: theme.accent, color: theme.accentFg }}
+                            >
+                              {submittingScore
+                                ? (i18n.language === "bn" ? "জমা হচ্ছে..." : "Submitting...")
+                                : (i18n.language === "bn" ? "জমা দিন" : "Submit")}
+                            </button>
+                            <button
+                              onClick={() => setAuthMode("login")}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-white/70 hover:text-white transition-all active:scale-95"
+                            >
+                              {i18n.language === "bn" ? "লগইন" : "Login"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Action buttons */}

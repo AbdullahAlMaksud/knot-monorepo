@@ -192,6 +192,7 @@ export function QueensScreen() {
             mistakes={mistakes}
             streak={streak.streak}
             showStreak={mode === "daily"}
+            difficulty={difficulty}
             onNewPuzzle={() => {
               setWinOpen(false);
               startNewGame("practice", difficulty);

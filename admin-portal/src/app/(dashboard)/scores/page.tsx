@@ -12,6 +12,15 @@ export default function ScoresPage() {
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
+  function formatScore(gameKey: string, score: number) {
+    if (gameKey.startsWith("sudoku") || gameKey.startsWith("queens")) {
+      const m = Math.floor(score / 60);
+      const s = score % 60;
+      return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+    return score.toLocaleString();
+  }
+
   const load = useCallback(async (gameValue: string, pageValue: number) => {
     setLoading(true);
     setError(null);
@@ -95,7 +104,7 @@ export default function ScoresPage() {
                       {s.playerName} {!s.userId && <Badge tone="cyan">Guest</Badge>}
                     </td>
                     <td className="px-4 py-3 text-text-muted">{s.game}</td>
-                    <td className="table-figure px-4 py-3 text-accent">{s.score.toLocaleString()}</td>
+                    <td className="table-figure px-4 py-3 text-accent">{formatScore(s.game, s.score)}</td>
                     <td className="px-4 py-3 text-text-muted">{s.country ?? "—"}</td>
                     <td className="table-figure px-4 py-3 text-text-muted">
                       {new Date(s.createdAt).toLocaleString()}

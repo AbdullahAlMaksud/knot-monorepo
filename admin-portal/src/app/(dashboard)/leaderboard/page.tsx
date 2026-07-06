@@ -19,6 +19,15 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function formatScore(gameKey: string, score: number) {
+    if (gameKey.startsWith("sudoku") || gameKey.startsWith("queens")) {
+      const m = Math.floor(score / 60);
+      const s = score % 60;
+      return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+    return score.toLocaleString();
+  }
+
   useEffect(() => {
     api
       .get<OverviewStats>("/api/admin/overview")
@@ -108,7 +117,7 @@ export default function LeaderboardPage() {
                   <td className="px-4 py-3 text-text">
                     {e.playerName} {e.isGuest && <Badge tone="cyan">Guest</Badge>}
                   </td>
-                  <td className="table-figure px-4 py-3 text-accent">{e.bestScore.toLocaleString()}</td>
+                  <td className="table-figure px-4 py-3 text-accent">{formatScore(game, e.bestScore)}</td>
                   <td className="px-4 py-3 text-text-muted">{e.country ?? "—"}</td>
                 </tr>
               ))}

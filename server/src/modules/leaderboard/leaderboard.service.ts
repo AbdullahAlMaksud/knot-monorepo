@@ -38,9 +38,12 @@ export async function getLeaderboard(params: {
   const since = periodStart(params.period);
   if (since) match.createdAt = { $gte: since };
 
+  const isTimeBased = params.game.startsWith("sudoku") || params.game.startsWith("queens");
+  const sortOrder = isTimeBased ? 1 : -1;
+
   const pipeline = [
     { $match: match },
-    { $sort: { score: -1 as const } },
+    { $sort: { score: sortOrder } },
     {
       $group: {
         _id: { $ifNull: ["$userId", "$guestId"] },
@@ -51,7 +54,7 @@ export async function getLeaderboard(params: {
         achievedAt: { $first: "$createdAt" },
       },
     },
-    { $sort: { bestScore: -1 as const } },
+    { $sort: { bestScore: sortOrder } },
     { $limit: params.limit },
   ];
 
