@@ -6,7 +6,7 @@
     "user-portal",
     "admin-portal",
     "server",
-    "app"
+    "mobile-app"
   ],
   "scripts": {
     "dev:user-portal": "bun --filter knot-user-portal dev",

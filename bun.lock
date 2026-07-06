@@ -24,7 +24,7 @@
         "typescript": "^5.7.2",
       },
     },
-    "app": {
+    "mobile-app": {
       "name": "knot-app",
       "version": "1.0.0",
       "dependencies": {
@@ -1589,7 +1589,7 @@
 
     "knot-admin-portal": ["knot-admin-portal@workspace:admin-portal"],
 
-    "knot-app": ["knot-app@workspace:app"],
+    "knot-app": ["knot-app@workspace:mobile-app"],
 
     "knot-server": ["knot-server@workspace:server"],
 
