@@ -1,0 +1,20 @@
+{
+  "name": "knot-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "user-portal",
+    "admin-portal",
+    "server",
+    "app",
+    "landing"
+  ],
+  "scripts": {
+    "dev:user-portal": "bun --filter knot-user-portal dev",
+    "dev:admin-portal": "bun --filter knot-admin-portal dev",
+    "dev:server": "bun --filter knot-server dev",
+    "dev:app": "bun --filter knot-app start",
+    "dev:landing": "bun --filter knot-landing dev",
+    "install:all": "bun install"
+  }
+}
