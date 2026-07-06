@@ -24,7 +24,7 @@ interface SidebarProps {
 
 export function Sidebar({ activePage, isFullscreen, onToggleFullscreen }: SidebarProps) {
   const { sidebarPinned, setSidebarPinned } = useSettingsStore();
-  const { getTheme } = useThemeStore();
+  const { themeId, getTheme } = useThemeStore();
   const theme = getTheme();
   const router = useRouter();
   const { t } = useTranslation();

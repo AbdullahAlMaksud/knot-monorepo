@@ -39,6 +39,6 @@ export const useSettingsStore = create<SettingsStore>()(
         });
       },
     }),
-    { name: "sudoku-settings" }
+    { name: "sudoku-settings", skipHydration: true }
   )
 );

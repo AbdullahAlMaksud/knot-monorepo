@@ -27,7 +27,7 @@ function pathnameToPage(pathname: string): Page {
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const { getTheme } = useThemeStore();
+  const { themeId, getTheme } = useThemeStore();
   const theme = getTheme();
   const { language } = useSettingsStore();
   const { i18n } = useTranslation();

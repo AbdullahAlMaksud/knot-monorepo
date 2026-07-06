@@ -147,6 +147,6 @@ export const useThemeStore = create<ThemeStore>()(
         return THEMES.find((t) => t.id === id) ?? THEMES[0];
       },
     }),
-    { name: "sudoku-theme" }
+    { name: "sudoku-theme", skipHydration: true }
   )
 );
